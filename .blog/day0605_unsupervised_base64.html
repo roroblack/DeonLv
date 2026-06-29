@@ -1,4 +1,5 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
@@ -110,7 +111,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 .flow .turn { color:var(--accent-2); font-weight:700; }
   </style>
 
-<div class="page">
+<style>figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }</style></head><body><div class="page">
 
 <header class="cover">
   <p class="eyebrow">Python · 머신러닝(교과목 2 · 단원 2) Day7 · 부트캠프</p>
@@ -216,15 +217,15 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
     <span class="src">— scikit-learn 공식 문서 · <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means" target="_blank" rel="noopener">Clustering · K-means</a></span>
   </blockquote>
 
-  <pre><code class="language-python"># path : .study/test/unsupervised/unsupervised_runner.py §01 (발췌)
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
+  <pre class="language-python" tabindex="0"><code class="language-python"><span class="token comment"># path : .study/test/unsupervised/unsupervised_runner.py §01 (발췌)</span>
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>cluster <span class="token keyword">import</span> KMeans
 
-X = StandardScaler().fit_transform(load_iris().data)   # 표준화(거리 기반이라 필수)
-km = KMeans(n_clusters=3, random_state=42, n_init=10).fit(X)
-print(km.cluster_centers_.shape)   # 중심 3개 × 4특성
-print(km.n_iter_)                  # 수렴까지 반복 횟수
-print(km.inertia_)                 # 군집 내 거리 제곱합</code></pre>
+X <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>load_iris<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span>   <span class="token comment"># 표준화(거리 기반이라 필수)</span>
+km <span class="token operator">=</span> KMeans<span class="token punctuation">(</span>n_clusters<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">42</span><span class="token punctuation">,</span> n_init<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>km<span class="token punctuation">.</span>cluster_centers_<span class="token punctuation">.</span>shape<span class="token punctuation">)</span>   <span class="token comment"># 중심 3개 × 4특성</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>km<span class="token punctuation">.</span>n_iter_<span class="token punctuation">)</span>                  <span class="token comment"># 수렴까지 반복 횟수</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>km<span class="token punctuation">.</span>inertia_<span class="token punctuation">)</span>                 <span class="token comment"># 군집 내 거리 제곱합</span></code></pre>
 
   <h3 class="step">테스트</h3>
   <div class="terminal">
@@ -378,7 +379,7 @@ inertia(중심까지 거리 제곱합) = 139.820
   <div class="terminal">
     <div class="terminal-header">unsupervised_runner.py §04 · crosstab · ARI · NMI — 군집을 실제 품종과 대조 · Python 3.13.5 · PowerShell</div>
     <pre class="terminal-body">교차표 (실제 품종 × 클러스터):
-클러스터         0   1   2
+클러스터      0   1   2
 실제품종                  
 setosa       0  50   0
 versicolor  39   0  11
@@ -468,12 +469,12 @@ Normalized Mutual Info(NMI) = 0.6595
     <span class="src">— scikit-learn 공식 문서 · <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html" target="_blank" rel="noopener">KMeans · init</a></span>
   </blockquote>
 
-  <pre><code class="language-python"># path : .study/test/unsupervised/unsupervised_runner.py §09 (발췌)
-for s in range(10):
-    # 초기화 효과만 보려고 n_init=1 (sklearn 기본은 10번 시도 후 최선 선택)
-    km_r = KMeans(n_clusters=3, init="random",    n_init=1, random_state=s).fit(X)
-    km_p = KMeans(n_clusters=3, init="k-means++", n_init=1, random_state=s).fit(X)
-    print(km_r.inertia_, km_p.inertia_)   # 시드별 수렴 inertia 비교</code></pre>
+  <pre class="language-python" tabindex="0"><code class="language-python"><span class="token comment"># path : .study/test/unsupervised/unsupervised_runner.py §09 (발췌)</span>
+<span class="token keyword">for</span> s <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># 초기화 효과만 보려고 n_init=1 (sklearn 기본은 10번 시도 후 최선 선택)</span>
+    km_r <span class="token operator">=</span> KMeans<span class="token punctuation">(</span>n_clusters<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> init<span class="token operator">=</span><span class="token string">"random"</span><span class="token punctuation">,</span>    n_init<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span>s<span class="token punctuation">)</span><span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+    km_p <span class="token operator">=</span> KMeans<span class="token punctuation">(</span>n_clusters<span class="token operator">=</span><span class="token number">3</span><span class="token punctuation">,</span> init<span class="token operator">=</span><span class="token string">"k-means++"</span><span class="token punctuation">,</span> n_init<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> random_state<span class="token operator">=</span>s<span class="token punctuation">)</span><span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>km_r<span class="token punctuation">.</span>inertia_<span class="token punctuation">,</span> km_p<span class="token punctuation">.</span>inertia_<span class="token punctuation">)</span>   <span class="token comment"># 시드별 수렴 inertia 비교</span></code></pre>
 
   <h3 class="step">테스트</h3>
   <div class="terminal">
@@ -551,42 +552,42 @@ k-means++ 평균 반복수 5.6 vs random 평균 6.0
     <pre class="terminal-body">거래 수 N = 10,  품목 = ['기저귀', '달걀', '맥주', '버터', '빵', '우유']
 
 빈발 itemset (support&gt;=0.2): 17개
-  ['빵']  support=0.70
-  ['우유']  support=0.60
-  ['기저귀']  support=0.50
-  ['버터']  support=0.50
-  ['버터', '빵']  support=0.50
-  ['맥주']  support=0.40
-  ['기저귀', '맥주']  support=0.40
-  ['빵', '우유']  support=0.40
-  ['기저귀', '우유']  support=0.30
-  ['버터', '우유']  support=0.30
-  ['버터', '빵', '우유']  support=0.30
-  ['달걀']  support=0.20
-  ['기저귀', '버터']  support=0.20
-  ['기저귀', '빵']  support=0.20
-  ['맥주', '우유']  support=0.20
-  ['기저귀', '맥주', '우유']  support=0.20
-  ['기저귀', '버터', '빵']  support=0.20
+  ['빵']  <span style="white-space:pre">			</span>support=0.70
+  ['우유']  <span style="white-space:pre">			</span>support=0.60
+  ['기저귀']  <span style="white-space:pre">			</span>support=0.50
+  ['버터']  <span style="white-space:pre">			</span>support=0.50
+  ['버터', '빵']  <span style="white-space:pre">		</span>support=0.50
+  ['맥주']  <span style="white-space:pre">			</span>support=0.40
+  ['기저귀', '맥주']  <span style="white-space:pre">		</span>support=0.40
+  ['빵', '우유']  <span style="white-space:pre">		</span>support=0.40
+  ['기저귀', '우유']  <span style="white-space:pre">		</span>support=0.30
+  ['버터', '우유']  <span style="white-space:pre">		</span>support=0.30
+  ['버터', '빵', '우유']  <span style="white-space:pre">	</span>support=0.30
+  ['달걀']  <span style="white-space:pre">			</span>support=0.20
+  ['기저귀', '버터']  <span style="white-space:pre">		</span>support=0.20
+  ['기저귀', '빵']  <span style="white-space:pre">		</span>support=0.20
+  ['맥주', '우유']  <span style="white-space:pre">		</span>support=0.20
+  ['기저귀', '맥주', '우유']  <span style="white-space:pre">	</span>support=0.20
+  ['기저귀', '버터', '빵']  <span style="white-space:pre">	</span>support=0.20
 
 연관규칙 (confidence&gt;=0.6), lift 내림차순:
-규칙                      support  confidence    lift
-----------------------------------------------------
-{기저귀}-&gt;{맥주}                0.40        0.80    2.00
-{맥주}-&gt;{기저귀}                0.40        1.00    2.00
+규칙                          support  confidence    lift
+---------------------------------------------------------
+{기저귀}-&gt;{맥주}                <span style="white-space:pre">	</span>0.40        0.80    2.00
+{맥주}-&gt;{기저귀}                <span style="white-space:pre">	</span>0.40        1.00    2.00
 {맥주,우유}-&gt;{기저귀}             0.20        1.00    2.00
-{기저귀,빵}-&gt;{버터}              0.20        1.00    2.00
+{기저귀,빵}-&gt;{버터}              <span style="white-space:pre">	</span>0.20        1.00    2.00
 {기저귀,우유}-&gt;{맥주}             0.20        0.67    1.67
-{버터}-&gt;{빵,우유}               0.30        0.60    1.50
-{빵,우유}-&gt;{버터}               0.30        0.75    1.50
-{버터}-&gt;{빵}                  0.50        1.00    1.43
-{빵}-&gt;{버터}                  0.50        0.71    1.43
-{기저귀,버터}-&gt;{빵}              0.20        1.00    1.43
-{버터,우유}-&gt;{빵}               0.30        1.00    1.43
-{기저귀}-&gt;{우유}                0.30        0.60    1.00
-{버터}-&gt;{우유}                 0.30        0.60    1.00
-{버터,빵}-&gt;{우유}               0.30        0.60    1.00
-{우유}-&gt;{빵}                  0.40        0.67    0.95
+{버터}-&gt;{빵,우유}               <span style="white-space:pre">	</span>0.30        0.60    1.50
+{빵,우유}-&gt;{버터}               <span style="white-space:pre">	</span>0.30        0.75    1.50
+{버터}-&gt;{빵}                  <span style="white-space:pre">	</span>0.50        1.00    1.43
+{빵}-&gt;{버터}                  <span style="white-space:pre">	</span>0.50        0.71    1.43
+{기저귀,버터}-&gt;{빵}              <span style="white-space:pre">	</span>0.20        1.00    1.43
+{버터,우유}-&gt;{빵}               <span style="white-space:pre">	</span>0.30        1.00    1.43
+{기저귀}-&gt;{우유}                <span style="white-space:pre">	</span>0.30        0.60    1.00
+{버터}-&gt;{우유}                 <span style="white-space:pre">	</span>0.30        0.60    1.00
+{버터,빵}-&gt;{우유}             <span style="white-space:pre">	</span>0.30        0.60    1.00
+{우유}-&gt;{빵}                  <span style="white-space:pre">	</span>0.40        0.67    0.95
 
 최고 향상도 규칙: {기저귀} -&gt; {맥주}
   lift=2.00 (&gt;1 → 함께 살 확률이 우연보다 2.00배)
@@ -754,10 +755,10 @@ k-means++ 평균 반복수 5.6 vs random 평균 6.0
     <div class="terminal-header">unsupervised_runner.py §07 · 지도 vs 비지도 요약표 — 입력·목표·평가 비교 · Python 3.13.5 · PowerShell</div>
     <pre class="terminal-body">항목          지도학습                            비지도학습
 ----------------------------------------------------------------------------
-입력          X + 정답 y                        X 만 (정답 없음)
-목표          y 예측(회귀/분류)                     구조 발견(군집/규칙)
-예시          LinearRegression·RandomForest   KMeans·연관규칙
-평가          R2·정확도·정밀도                      inertia·실루엣·(ARI는 정답 있을 때만)
+입력          X + 정답 y                        <span style="white-space:pre">	</span>X 만 (정답 없음)
+목표          y 예측(회귀/분류)                   구조 발견(군집/규칙)
+예시          LinearRegression·RandomForest   <span style="white-space:pre">	</span>KMeans·연관규칙
+평가          R2·정확도·정밀도                    inertia·실루엣·(ARI는 정답 있을 때만)
 정답 비교       항상 가능                           보통 불가 — 오늘은 iris라 예외적으로 가능</pre>
   </div>
   <p>가장 중요한 줄은 "평가"다. 지도학습은 정답이 있으니 R2·정확도로 바로 채점한다.
@@ -854,4 +855,4 @@ k-means++ 평균 반복수 5.6 vs random 평균 6.0
   style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
   document.head.appendChild(style);
 })();
-</script>
+</script><div id="lb-overlay" style="display: none; position: fixed; inset: 0px; z-index: 9999; background: rgba(0, 0, 0, 0.82); cursor: zoom-out; align-items: center; justify-content: center;"><img id="lb-img" style="max-width: 92vw; max-height: 92vh; object-fit: contain; border: 2px solid rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.6) 0px 0px 40px; transition: transform 0.15s;"></div></body></html>
