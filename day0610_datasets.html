@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데이터와 데이터셋 — 다차원배열에서 MNIST·CIFAR-10까지 (Day3)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 딥러닝 Day3. 이미지를 텐서로 만들어 Dataset/DataLoader로 흘려보내고 정규화·배치·분할이 학습을 어떻게 바꾸는지 MNIST·CIFAR-10으로 확인한다.">
+  <meta property="og:title" content="데이터와 데이터셋 — 다차원배열에서 MNIST·CIFAR-10까지 (Day3)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day3. 이미지를 텐서로 만들어 Dataset/DataLoader로 흘려보내고 정규화·배치·분할이 학습을 어떻게 바꾸는지 MNIST·CIFAR-10으로 확인한다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="데이터와 데이터셋 — 다차원배열에서 MNIST·CIFAR-10까지 (Day3)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day3. 이미지를 텐서로 만들어 Dataset/DataLoader로 흘려보내고 정규화·배치·분할이 학습을 어떻게 바꾸는지 MNIST·CIFAR-10으로 확인한다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day3 · 부트캠프</p>
+  <h1>데이터 처리와 데이터셋 — 다차원배열에서 MNIST·CIFAR-10까지</h1>
+  <p class="deck">이미지를 어떻게 텐서로 만들어 Dataset/DataLoader로 흘려보내고, 정규화·배치가 학습을 어떻게 바꾸나.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-10</span>
+    <span><strong>도구</strong>PyTorch · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day3 — 딥러닝_데이터처리와데이터셋.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 텐서 한 장에서 데이터 파이프라인까지</h2>
+    <ol>
+      <li>다차원배열을 텐서로 다루기 — shape가 곧 데이터의 형태</li>
+      <li>이미지를 텐서로: ToTensor와 0~1 스케일링, 채널의 의미</li>
+      <li>Dataset/DataLoader — 배치·셔플로 데이터를 흘려보내기</li>
+      <li>MNIST 학습 — train/val/test 분할이 만드는 차이</li>
+      <li>CIFAR-10 — 흑백 1채널에서 컬러 3채널로</li>
+      <li>정리 — 데이터가 먼저, 모델은 그다음</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">
+    모델 코드를 아무리 잘 짜도, 데이터가 엉뚱한 모양·범위로 들어오면 학습은 시작도 못 한다.
+    오늘은 그 입구를 본다. 행렬·벡터를 텐서로 표현하는 감각에서 출발해, 이미지를 텐서로 바꾸고
+    Dataset/DataLoader로 배치를 흘려보낸 뒤, MNIST와 CIFAR-10에서 실제 숫자로 확인한다.
+  </div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 다차원배열을 텐서로 — shape가 데이터의 형태다 <a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>먼저 텐서의 기본 감각부터 잡았다. 행렬·행벡터·열벡터를 <code>torch.tensor</code>로 만들고
+    shape를 찍어보는 단순한 연습인데, 여기서 익힌 "차원을 읽는 습관"이 뒤의 이미지 데이터에서 그대로 쓰인다.</p>
+
+    <h3 class="step">학습 · 같은 데이터라도 shape에 따라 의미가 달라진다</h3>
+    <p>2×3 행렬, 1×5 행벡터, 4×1 열벡터를 각각 만들어 shape를 비교했다. 숫자의 개수가 같아도
+    배치된 차원이 다르면 연산 규칙이 달라진다는 걸 손으로 확인하는 단계다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">matrix_torch.ipynb — 텐서와 shape</div>
+      <pre class="terminal-body">A (2x3 행렬) =
+tensor([[ 1., -3.,  0.],
+        [ 7.,  5.,  9.]])
+shape: (2, 3)
+
+row_vector (1x5 행벡터) =
+tensor([[ 1.,  3., -9.,  0.,  4.]])
+shape: (1, 5)
+
+column_vector (4x1 열벡터) =
+shape: (4, 1)
+
+S의 대각성분 =
+tensor([1., 5., 8.])
+shape: (3,)</pre>
+    </div>
+
+    <h3 class="step">시행 · 신경망 한 층 = 행렬 곱 + 편향</h3>
+    <p>입력 4×3, 가중치 3×2, 편향 길이 2로 <code>Y = XW + b</code>를 직접 계산했다. 결과는 4×2.
+    "선형 계층 하나가 곧 행렬 곱"이라는 걸 shape 변화로 읽을 수 있다 — 입력 특성 3개가 출력 특성 2개로 바뀐다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">matrix_torch.ipynb — Y = XW + b</div>
+      <pre class="terminal-body">X: 입력 데이터  shape: (4, 3)
+W: 가중치 행렬  shape: (3, 2)
+b: 편향 벡터    shape: (2,)
+
+Y = XW + b =
+tensor([[0.6000, 0.7000],
+        [1.2000, 2.2000],
+        [1.8000, 3.7000],
+        [0.7000, 1.9000]])
+shape: (4, 2)</pre>
+    </div>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      이미지 한 장도 결국 다차원 텐서다. (배치, 채널, 높이, 너비) 순서로 shape를 읽는 습관이
+      뒤의 모든 전처리·디버깅의 기본기가 된다.
+    </div>
+  </section>
+
+  <div class="bridge">행렬을 텐서로 다룰 수 있게 됐으니, 이제 진짜 이미지를 텐서로 바꿔본다.</div>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> 이미지를 텐서로 — ToTensor와 0~1 스케일링 <a href="#ch2" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 · 픽셀 0~255를 그대로 넣으면 안 되나?</h3>
+    <p>MNIST 픽셀 값은 0~255 정수다. 이대로 신경망에 넣으면 입력 크기가 들쭉날쭉해 학습이 한쪽으로 치우친다.
+    그래서 <code>transforms.ToTensor()</code>를 쓴다. 이 한 줄이 PIL 이미지를 텐서로 바꾸면서
+    값을 0~1 범위의 float로 동시에 스케일링한다.</p>
+
+    <div class="qbox">
+      <span class="label">가설</span>
+      "정규화의 핵심은 단위를 맞추는 것이다. 방 개수(1~5)와 연봉(천만 단위)을 그대로 섞으면
+      모델이 큰 숫자에만 끌려가듯, 픽셀도 범위를 0~1로 좁혀야 어느 특성에도 치우치지 않고 균형 있게 학습할 것이다."
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">mnist_torch_detailed.ipynb — 전처리 파이프라인</div>
+      <pre class="terminal-body">transform = transforms.Compose([
+    transforms.ToTensor()   # PIL/ndarray → Tensor, 0~255 → 0~1 float
+])
+
+full_train_dataset = datasets.MNIST(
+    root='./data', train=True, download=True, transform=transform)
+test_dataset = datasets.MNIST(
+    root='./data', train=False, download=True, transform=transform)</pre>
+    </div>
+
+    <h3 class="step">관찰 · 흑백은 채널 1, MNIST 한 장은 (1, 28, 28)</h3>
+    <p>ToTensor를 거친 MNIST 샘플은 채널 차원이 붙어 (1, 28, 28)이 된다. 흑백이라 채널이 1.
+    화면에 띄울 땐 채널 차원이 거추장스러워 <code>squeeze()</code>로 떼어내 28×28로 만들어 출력했다.</p>
+
+    <div class="callout">
+      <span class="label">함정</span>
+      ToTensor는 채널을 맨 앞에 둔다(C, H, W). 반대로 matplotlib의 <code>imshow</code>는
+      (H, W, C)를 기대한다. 컬러 이미지를 그릴 때 <code>permute(1, 2, 0)</code>를 빠뜨리면
+      색이 깨지거나 에러가 난다 — CIFAR-10에서 실제로 마주친다.
+    </div>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      정규화는 "더 정확한 모델"을 위한 장식이 아니라 "학습이 되게 만드는" 전제 조건이다.
+      ToTensor 한 줄이 형변환과 스케일링을 동시에 해준다는 걸 분명히 이해하고 넘어갔다.
+    </div>
+  </section>
+
+  <div class="bridge">텐서가 됐으니, 이제 6만 장을 어떻게 배치로 쪼개 흘려보낼지가 문제다.</div>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> Dataset / DataLoader — 배치와 셔플 <a href="#ch3" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 · train/val/test, 왜 셋으로 쪼개나</h3>
+    <p>학습 데이터로만 점수를 매기면 모델이 데이터를 통째로 외운 건지, 규칙을 이해한 건지 구별할 수 없다.
+    그래서 학습용·검증용·테스트용으로 나눈다. MNIST는 학습 6만 장 중 앞 5만을 train, 뒤 1만을 val로
+    <code>Subset</code>으로 잘라 쓰고, test 1만 장은 끝까지 따로 둔다.</p>
+
+    <div class="qbox">
+      <span class="label">가설</span>
+      "검증 데이터를 따로 두지 않고 학습 데이터로 val을 재면, train과 val 점수가 똑같이 나올 것이다 —
+      같은 데이터를 두 번 채점하는 셈이니까."
+    </div>
+
+    <p>이 가설은 실제로 다른 실습(과일 분류)에서 그대로 재현됐다. val 계산에 실수로
+    학습 데이터를 다시 넣었더니 train과 val 손실이 소수점 4자리까지 완전히 같게 찍혔다.
+    검증의 의미는 "모델이 못 본 데이터로 채점하는 것"임을 역으로 확인한 셈이다.</p>
+
+    <h3 class="step">시행 · DataLoader로 배치·셔플 설정</h3>
+    <p>DataLoader는 데이터셋을 배치 단위로 잘라 모델에 흘려보낸다. 핵심 설정 두 가지:
+    배치 크기 50, 그리고 train만 <code>shuffle=True</code>. 매 에폭마다 순서를 섞어
+    배치 구성이 매번 달라지게 하면, 특정 순서에 모델이 적응하는 걸 막는다. val·test는 채점만 하므로 섞지 않는다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">mnist_torch_detailed.ipynb — 분할과 DataLoader</div>
+      <pre class="terminal-body">train_dataset = Subset(full_train_dataset, range(0, 50000))   # 5만
+val_dataset   = Subset(full_train_dataset, range(50000, 60000)) # 1만
+
+BATCH_SIZE = 50
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False)
+test_loader  = DataLoader(test_dataset,  batch_size=BATCH_SIZE, shuffle=False)</pre>
+    </div>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      DataLoader는 "데이터를 어떻게 먹일까"를 담당한다. 배치 크기는 한 번에 보는 양,
+      셔플은 순서 편향 제거. train에만 셔플을 켜는 이유가 명확해졌다.
+    </div>
+  </section>
+
+  <div class="bridge">파이프라인이 완성됐다. 이제 MNIST에서 실제로 돌려 숫자를 본다.</div>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> MNIST 학습 — 분할이 만드는 차이 <a href="#ch4" class="anchor-link">#</a></h2>
+
+    <h3 class="step">시행 · 784 → 10, 평탄화한 MLP</h3>
+    <p>(1, 28, 28) 이미지를 <code>Flatten</code>으로 784차원 벡터로 펴고, 512→256→128을 거쳐
+    10개 클래스로 보내는 MLP를 썼다. 손실은 CrossEntropyLoss, 옵티마이저는 Adam(lr=0.001), 10 에폭.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">mnist_torch_detailed.ipynb — 모델 구조</div>
+      <pre class="terminal-body">MNISTMLP(
+  (flatten): Flatten(start_dim=1, end_dim=-1)
+  (fc1): Linear(in_features=784, out_features=512)
+  (fc2): Linear(in_features=512, out_features=256)
+  (fc3): Linear(in_features=256, out_features=128)
+  (fc4): Linear(in_features=128, out_features=10)
+  (relu): ReLU()
+)</pre>
+    </div>
+
+    <h3 class="step">관찰 · 검증 정확도 0.96 → 0.98로 수렴</h3>
+    <p>에폭별 로그를 보면 train 손실은 계속 떨어지지만, val 손실은 5~6 에폭 부근부터 0.08대에서 정체된다.
+    여기가 "더 외워봤자 일반화는 안 늘어나는" 지점이다. 검증을 따로 둔 덕에 이 변곡점을 눈으로 볼 수 있다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">mnist_torch_detailed.ipynb — 학습 로그</div>
+      <pre class="terminal-body">Epoch [ 1/10] | Train Loss: 0.2628 | Train Acc: 0.9205 | Val Loss: 0.1290 | Val Acc: 0.9604
+Epoch [ 2/10] | Train Loss: 0.1022 | Train Acc: 0.9685 | Val Loss: 0.0981 | Val Acc: 0.9729
+Epoch [ 5/10] | Train Loss: 0.0401 | Train Acc: 0.9875 | Val Loss: 0.0846 | Val Acc: 0.9772
+Epoch [ 8/10] | Train Loss: 0.0246 | Train Acc: 0.9925 | Val Loss: 0.0933 | Val Acc: 0.9780
+Epoch [10/10] | Train Loss: 0.0185 | Train Acc: 0.9938 | Val Loss: 0.0904 | Val Acc: 0.9798
+
+Test Loss: 0.0810
+Test Accuracy: 98.12%</pre>
+    </div>
+
+    <figure class="shot">
+      <img src="img/day0610_mnist_history.png" alt="MNIST 학습 history — 손실/정확도 곡선">
+      <figcaption>MNIST 학습 history — train/val 손실과 정확도 곡선 (실제 출력)</figcaption>
+    </figure>
+
+    <p>최종 테스트 정확도 98.12%. train 정확도(0.9938)와 비교하면 약간의 격차가 있는데,
+    이 차이가 곧 "외운 부분"이다. 전처리·분할만 제대로 해도 단순 MLP가 손글씨를 거의 다 맞춘다.</p>
+  </section>
+
+  <div class="bridge">흑백 1채널은 잘 됐다. 컬러 3채널 CIFAR-10에서는 무엇이 달라질까.</div>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> CIFAR-10 — 1채널에서 3채널로 <a href="#ch5" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 · 같은 파이프라인, 달라지는 건 채널 수</h3>
+    <p>CIFAR-10도 ToTensor → Dataset → DataLoader 흐름은 똑같다. 다만 컬러라서 채널이 3.
+    한 장의 shape는 (3, 32, 32)이고, 평탄화하면 32×32×3 = 3072차원이 된다. MNIST의 784와 비교하면
+    입력 차원이 약 4배로 늘어난다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">cifar10_torch_detailed.ipynb — 로드와 분할</div>
+      <pre class="terminal-body">transform = transforms.Compose([transforms.ToTensor()])
+
+train_full = datasets.CIFAR10(root='./data', train=True,  download=True, transform=transform)
+test_set   = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+
+# 5만 장을 train 40000 / val 10000 으로 무작위 분할
+train_ds, val_ds = random_split(train_full, [40000, 10000],
+                                generator=torch.Generator().manual_seed(42))
+class_names = train_full.classes   # airplane, automobile, bird, ...</pre>
+    </div>
+
+    <h3 class="step">시행 · 입력 3072 → 10 MLP, 그리고 채널 순서 함정</h3>
+    <p>입력 3072을 받는 MLP(2500→1500→500→10)를 구성했다. 샘플 이미지를 화면에 띄울 땐
+    텐서가 (C, H, W)이라 그대로는 imshow가 못 받는다. <code>permute(1, 2, 0)</code>로
+    (H, W, C)로 돌려준 뒤에야 제대로 그려졌다 — CH 02에서 예고한 함정이 여기서 실제로 걸렸다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">cifar10_torch_detailed.ipynb — 모델과 표시</div>
+      <pre class="terminal-body">CIFAR10MLP(
+  (fc1): Linear(in_features=3072, out_features=2500)
+  (fc2): Linear(in_features=2500, out_features=1500)
+  (fc3): Linear(in_features=1500, out_features=500)
+  (fc4): Linear(in_features=500, out_features=10)
+  (relu): ReLU()
+)
+
+# 표시용: (C,H,W) → (H,W,C)
+img = sample_image.permute(1, 2, 0)
+plt.imshow(img)</pre>
+    </div>
+
+    <figure class="shot">
+      <img src="img/day0610_cifar_sample.png" alt="CIFAR-10 샘플 이미지">
+      <figcaption>CIFAR-10 샘플 — 3채널 컬러 이미지를 permute로 복원해 표시 (실제 출력)</figcaption>
+    </figure>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      데이터 파이프라인의 골격은 데이터셋이 바뀌어도 그대로다. 바뀌는 건 shape — 채널 수와
+      입력 차원이다. 같은 MLP라도 흑백 손글씨(784)와 컬러 사물(3072)은 난이도가 전혀 다르며,
+      여기서부터 합성곱(CNN)이 왜 필요해지는지 감이 온다.
+    </div>
+  </section>
+
+  <div class="bridge">두 데이터셋을 같은 흐름으로 통과시키며, 무엇이 공통이고 무엇이 데이터마다 달랐는지 정리한다.</div>
+
+  <section id="ch6">
+    <h2 class="chap"><span class="num">CH 06</span> 정리 — 데이터가 먼저, 모델은 그다음 <a href="#ch6" class="anchor-link">#</a></h2>
+
+    <p>오늘의 한 줄: <strong>모델보다 데이터 파이프라인이 먼저 정확해야 한다.</strong>
+    이미지를 텐서로 만들 때 형태(shape)와 범위(정규화)를 맞추고, Dataset/DataLoader로
+    배치·셔플을 설정하고, train/val/test를 제대로 나누는 것 — 이 세 가지가 학습의 성패를 가른다.</p>
+
+    <ul>
+      <li><strong>shape 감각</strong> — (배치, 채널, 높이, 너비). MNIST (1,28,28), CIFAR-10 (3,32,32). 평탄화하면 784 vs 3072.</li>
+      <li><strong>정규화</strong> — ToTensor가 0~255 정수를 0~1 float로. 학습을 "되게" 만드는 전제 조건.</li>
+      <li><strong>DataLoader</strong> — 배치 50, train만 shuffle=True. 순서 편향 제거는 학습 데이터에만.</li>
+      <li><strong>분할</strong> — val을 따로 둬야 과적합 변곡점이 보인다. MNIST는 val 0.98에서 수렴, 테스트 98.12%.</li>
+      <li><strong>채널 순서</strong> — 연산은 (C,H,W), 표시는 (H,W,C). permute를 잊지 말 것.</li>
+    </ul>
+
+    <p>다음은 같은 데이터를 받아 모델 구조를 손보는 단계다. 입력 3072을 평탄화해 통째로 받는 MLP의 한계가
+    보였으니, 공간 구조를 살리는 합성곱으로 자연스럽게 넘어간다.</p>
+
+    <div class="ref-chain">
+      <p class="ref-title">📚 근거 출처</p>
+      <ol>
+        <li>실습 코드 — <code>from_colab_deep_learning/0610-s</code> (matrix_torch · mnist_torch_detailed · cifar10_torch_detailed)</li>
+        <li>강의 PDF — 딥러닝_데이터처리와데이터셋</li>
+        <li>공식 문서 — PyTorch Dataset/DataLoader·torchvision</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day3 (2026-06-10)</p>
+  <p>다차원배열의 shape 감각에서 출발해 ToTensor 정규화·DataLoader 배치·train/val/test 분할까지,
+  MNIST(테스트 98.12%)와 CIFAR-10을 같은 파이프라인으로 통과시키며 데이터 처리의 골격을 정리한 기록.</p>
+</footer>
+
+</div>
+</body>
+</html>

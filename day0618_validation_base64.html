@@ -1,0 +1,343 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 모델 검증·평가(교과목 2 · 단원 4) Day1 · 부트캠프</p>
+  <h1>정확도 한 숫자로 충분한가 — 모델을 어떻게 믿을 것인가</h1>
+  <p class="deck">test 정확도 96%라는 한 줄이 나왔다고 모델을 신뢰해도 되는가. 데이터를 train/val/test로 가르는 이유부터, 정확도가 가리는 오류를 혼동행렬·정밀도·재현율·F1·ROC-AUC로 풀어내는 과정, 그리고 같은 평가를 TensorFlow와 PyTorch가 어떻게 다르게 코드로 옮기는지까지 정리한다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-18</span>
+    <span><strong>도구</strong>TensorFlow · PyTorch · scikit-learn · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 2 · 단원 4 · 모델 검증 및 평가 Day1 — AI모델_검증및평가.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 한 숫자에서 한 장의 진단표까지</h2>
+    <ol>
+      <li>왜 데이터를 셋으로 가르나 — train/val/test의 역할 분담</li>
+      <li>Breast Cancer 569개를 397/86/86으로 — 실제 분할과 데이터 누수 차단</li>
+      <li>정확도가 가리는 것 — 혼동행렬과 TP·TN·FP·FN</li>
+      <li>정밀도·재현율·F1·ROC-AUC — 문제가 지표를 고른다</li>
+      <li>같은 평가, 다른 코드 — model.evaluate() vs torch.no_grad()</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">모델 학습은 끝났다고 치자. 그다음 "이 모델 쓸 만한가?"라는 질문에 답하는 게 검증과 평가다. 출발점은 데이터를 어떻게 나누느냐다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 왜 데이터를 셋으로 가르나<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>모델을 학습시킨 데이터로 그 모델을 평가하면 점수는 항상 후하게 나온다. 시험 문제를 미리 보고 친 시험 점수를 실력이라 부를 수 없는 것과 같다. 그래서 데이터를 역할이 다른 세 덩어리로 나눈다.</p>
+
+    <div class="qbox">
+      <p><span class="label">역할 분담</span> Train은 가중치를 학습하는 데, Validation은 학습 중 하이퍼파라미터 튜닝과 조기 종료(Early Stopping) 판단에, Test는 최종 일반화 성능을 <strong>단 한 번</strong> 측정하기 위해 아껴 두는 데이터다.</p>
+    </div>
+
+    <p>핵심은 Test를 학습 과정 어디에도 노출시키지 않는 것이다. Validation을 따로 두는 이유도 여기 있다. 학습을 멈출 시점이나 층 수 같은 결정을 Test로 내리는 순간, Test는 더 이상 "처음 보는 데이터"가 아니게 되고 일반화 성능을 과대평가하게 된다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">핵심</span> Train으로 배우고, Validation으로 멈출 때를 정하고, Test로 단 한 번 판정한다. 데이터가 적으면 K-Fold 교차검증으로 검증셋을 번갈아 써서 변동성을 줄인다.</p>
+    </div>
+
+    <div class="bridge">개념은 이렇다. 그러면 569개짜리 실제 데이터에서 이 분할이 정확히 몇 개씩으로 떨어지는지 보자.</div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> 569개를 397/86/86으로<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p>실습 데이터는 scikit-learn의 Breast Cancer 데이터셋이다. 샘플 569개, 특성 30개, 이진 분류(악성 malignant=0, 양성 benign=1) 문제다. 분할은 두 번에 나눠 한다. 먼저 전체에서 15%를 Test로 떼고, 남은 85%에서 다시 17.65%를 Validation으로 뗀다. 이렇게 하면 대략 70/15/15가 된다.</p>
+
+    <pre class="terminal-body"># 1차: 전체 → (train+val) / test
+X_train_val, X_test, y_train_val, y_test = train_test_split(
+    X, y, test_size=0.15, random_state=42, stratify=y)
+
+# 2차: (train+val) → train / val
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train_val, y_train_val, test_size=0.1765, random_state=42, stratify=y_train_val)
+
+print(X_train.shape, X_val.shape, X_test.shape)
+print(np.bincount(y_test))</pre>
+
+    <p>같은 random_state로 재현하면 분할 크기는 다음처럼 떨어진다.</p>
+
+    <pre class="terminal-body">학습 데이터 크기: (397, 30)
+검증 데이터 크기: (86, 30)
+테스트 데이터 크기: (86, 30)
+테스트 클래스 분포 (malignant=0, benign=1): [32 54]</pre>
+
+    <p>두 가지를 짚어 둘 만하다. 첫째, <code>stratify=y</code>로 원래 클래스 비율(악성 212 : 양성 357)을 각 셋이 그대로 물려받게 했다. 그래서 Test 86개도 악성 32 : 양성 54로 전체와 같은 비율이다. 불균형 데이터에서 이걸 빼먹으면 어떤 셋엔 소수 클래스가 거의 안 들어가는 사고가 난다.</p>
+
+    <div class="callout">
+      <p><span class="label">데이터 누수 차단</span> 표준화(StandardScaler)는 반드시 <code>fit_transform</code>을 Train에만 적용하고, Validation·Test에는 <code>transform</code>만 쓴다. Test 통계까지 포함해 fit하면 Test 정보가 전처리 단계로 새어 들어와(data leakage) 평가가 오염된다.</p>
+    </div>
+
+    <pre class="terminal-body">scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)   # 평균·표준편차는 Train에서만 학습
+X_val_scaled   = scaler.transform(X_val)         # 같은 기준으로 변환만
+X_test_scaled  = scaler.transform(X_test)</pre>
+
+    <div class="bridge">데이터가 깨끗이 갈렸으니, 이제 학습된 모델을 Test로 채점할 차례다. 그런데 채점을 "정확도" 한 숫자로 끝내면 안 되는 이유가 있다.</div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> 정확도가 가리는 것 — 혼동행렬<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>정확도(Accuracy)는 전체 중 맞춘 비율이다. 직관적이지만, 클래스 비율이 한쪽으로 쏠려 있으면 무의미해진다. 암 환자가 1%인 데이터에서 "전부 정상"이라 찍는 모델도 정확도 99%가 나온다. 이 모델은 정작 잡아야 할 환자를 한 명도 못 잡는다. 그래서 "몇 개 맞혔나"가 아니라 "어떻게 틀렸나"를 봐야 한다. 그 도구가 혼동행렬(Confusion Matrix)이다.</p>
+
+    <p>혼동행렬은 예측을 네 칸으로 쪼갠다. 실습 코드는 <code>confusion_matrix</code>로 행렬을 만들고 <code>cm.ravel()</code>로 네 값을 풀어 의미를 출력한다.</p>
+
+    <pre class="terminal-body">cm = confusion_matrix(y_true, test_predictions)
+tn, fp, fn, tp = cm.ravel()
+print("TN: 실제 0을 0으로 맞힌 수")   # True Negative
+print("FP: 실제 0을 1로 잘못 예측한 수")  # False Positive
+print("FN: 실제 1을 0으로 잘못 예측한 수")  # False Negative
+print("TP: 실제 1을 1로 맞힌 수")      # True Positive</pre>
+
+    <table>
+      <thead>
+        <tr><th>구분</th><th>실제 Positive</th><th>실제 Negative</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>예측 Positive</td><td>TP (맞게 잡음)</td><td>FP (헛경보)</td></tr>
+        <tr><td>예측 Negative</td><td>FN (놓침)</td><td>TN (맞게 거름)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="keypoint">
+      <p><span class="label">핵심</span> 정확도는 (TP+TN) / 전체일 뿐이라 FP와 FN을 한데 뭉뚱그린다. 하지만 현실에서 "헛경보(FP)"와 "놓침(FN)"의 비용은 전혀 다르다. 혼동행렬은 그 둘을 분리해서 보여 준다.</p>
+    </div>
+
+    <div class="bridge">FP와 FN을 나눠 봤다면, 이제 어느 쪽 오류를 더 줄여야 하는지를 숫자로 표현하는 지표들이 필요하다.</div>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> 정밀도·재현율·F1·ROC-AUC — 문제가 지표를 고른다<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>혼동행렬의 네 칸을 조합하면 목적에 맞는 지표가 나온다. 실습은 <code>precision_score</code>, <code>recall_score</code>, <code>f1_score</code>, <code>roc_auc_score</code>를 한 번에 뽑고, <code>classification_report</code>로 클래스별 표까지 출력한다.</p>
+
+    <table>
+      <thead>
+        <tr><th>지표</th><th>정의</th><th>언제 중요한가</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>정밀도 Precision</td><td>TP / (TP+FP) — Positive라 예측한 것 중 진짜 비율</td><td>헛경보 비용이 클 때 (스팸 필터: 정상 메일을 스팸으로 버리면 안 됨)</td></tr>
+        <tr><td>재현율 Recall</td><td>TP / (TP+FN) — 실제 Positive 중 잡아낸 비율</td><td>놓치는 비용이 클 때 (암 진단·사기 탐지: 환자를 놓치면 안 됨)</td></tr>
+        <tr><td>F1-score</td><td>정밀도와 재현율의 조화 평균</td><td>둘의 균형이 필요하거나 클래스가 불균형할 때</td></tr>
+        <tr><td>ROC-AUC</td><td>임계값을 전 구간 바꿔 가며 본 분류 능력의 총합 (1에 가까울수록 우수)</td><td>임계값에 독립적인 모델 자체의 분별력을 볼 때</td></tr>
+      </tbody>
+    </table>
+
+    <div class="qbox">
+      <p><span class="label">의문</span> 정밀도와 재현율은 한쪽을 올리면 다른 쪽이 내려가는 트레이드오프 관계다. 그렇다면 "어느 걸 봐야 하나"의 답은 모델이 아니라 <strong>문제</strong>에 있다. 즉 평가지표를 고르는 일은 사실상 문제를 다시 정의하는 일이다.</p>
+    </div>
+
+    <p>이 데이터셋은 암 진단이다. 양성 종양을 악성으로 잘못 분류하는 헛경보(FP)보다, 악성 종양을 양성이라 놓치는 것(FN)이 훨씬 위험하다. 그래서 여기서는 재현율을 우선 봐야 한다. 반대로 스팸 필터라면 멀쩡한 메일을 스팸함에 처박는 FP가 더 치명적이라 정밀도를 중시한다. 같은 혼동행렬을 놓고도 어느 칸의 오류를 더 미워할지가 도메인마다 다르다.</p>
+
+    <div class="callout">
+      <p><span class="label">주의</span> 이 글에는 학습된 모델의 실제 지표 수치(정확도·혼동행렬 값·F1·ROC-AUC)를 싣지 않았다. 실습 노트북에 셀 출력이 저장되어 있지 않아 재현 가능한 수치만 인용한다는 원칙(분할 크기·클래스 분포는 random_state로 고정되어 재현 가능)에 따른 것이다. 지표 칸은 의미와 선택 기준을 정리한 정의표로 읽으면 된다.</p>
+    </div>
+
+    <div class="bridge">평가의 논리는 프레임워크와 무관하다. 하지만 그 논리를 코드로 옮기는 방식은 TensorFlow와 PyTorch가 사뭇 다르다.</div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> 같은 평가, 다른 코드<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>학습이 끝난 모델을 Test로 평가할 때, 두 프레임워크의 추상화 수준 차이가 그대로 드러난다. TensorFlow/Keras는 <code>model.evaluate()</code> 한 줄이 손실과 정확도를 돌려준다.</p>
+
+    <pre class="terminal-body"># TensorFlow / Keras — 한 줄로 평가
+test_loss, test_acc = model.evaluate(X_test_scaled, y_test, verbose=0)
+test_probabilities = model.predict(X_test_scaled).ravel()
+test_predictions = (test_probabilities >= 0.5).astype(int)</pre>
+
+    <p>PyTorch는 같은 일을 손으로 한다. 평가 모드 전환(<code>model.eval()</code>), 그래디언트 계산 차단(<code>torch.no_grad()</code>), 로짓에 시그모이드를 씌워 확률화하고 0.5 임계값으로 라벨링하는 단계를 직접 쓴다.</p>
+
+    <pre class="terminal-body"># PyTorch — 평가 절차를 직접 구성
+model.eval()
+with torch.no_grad():
+    test_logits = model(X_test_tensor.to(device))
+    test_probabilities = torch.sigmoid(test_logits).cpu().numpy().ravel()
+    test_predictions = (test_probabilities >= 0.5).astype(int)</pre>
+
+    <div class="keypoint">
+      <p><span class="label">핵심</span> <code>model.eval()</code>은 Dropout·BatchNorm을 추론 모드로 바꾸고, <code>torch.no_grad()</code>는 평가에 불필요한 그래디언트 그래프를 만들지 않아 메모리·속도를 아낀다. Keras의 <code>evaluate()</code>는 이 둘을 안에서 알아서 처리해 준다. 추상화가 편한 만큼, PyTorch 쪽은 무슨 일이 일어나는지가 코드에 그대로 보인다.</p>
+    </div>
+
+    <p>여기서 한 가지 빠뜨리기 쉬운 점은 손실 함수다. PyTorch 실습은 마지막 층에 시그모이드를 두지 않고 로짓을 그대로 내보낸 뒤 <code>BCEWithLogitsLoss</code>를 쓴다(수치 안정성 때문). 그래서 평가 단계에서 확률이 필요할 때 <code>torch.sigmoid()</code>를 직접 한 번 적용해야 한다. Keras는 출력층 활성화를 sigmoid로 두고 <code>binary_crossentropy</code>를 쓰므로 <code>predict()</code>가 곧바로 확률이다. 두 길은 같은 곳에 도착하지만, 확률을 어디서 만드느냐의 책임 소재가 다르다.</p>
+
+    <div class="callout">
+      <p><span class="label">정리</span> 평가의 본질 — train/val/test 분리, 누수 차단, 문제에 맞는 지표 선택 — 은 프레임워크를 가리지 않는다. 프레임워크가 정하는 건 그 본질을 몇 줄로 쓰느냐, 그리고 그 줄들이 내부를 얼마나 드러내느냐일 뿐이다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0618-s</code> (ai_model_validation_evaluation keras·torch)</li>
+      <li>강의 PDF — AI모델_검증및평가</li>
+      <li>공식 문서 — scikit-learn metrics(confusion_matrix·roc_auc_score)</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 모델 검증·평가 Day1 (2026-06-18)</p>
+  <p>정확도 한 숫자 뒤에는 네 칸의 혼동행렬과, 그 칸들 중 무엇을 더 미워할지 정하는 문제 정의가 숨어 있다. 내일은 이 지표들을 실제 학습 곡선과 함께 읽으며 과적합 시점을 잡는 쪽으로 이어 간다.</p>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

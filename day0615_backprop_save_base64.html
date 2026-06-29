@@ -1,0 +1,315 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day6 · 부트캠프</p>
+  <h1>loss.backward() 한 줄이 가중치를 고치는 과정, 그리고 학습된 모델을 떼어내 재사용하기</h1>
+  <p class="deck">예측과 정답의 차이를 손실로 만들고, 그 손실을 거꾸로 따라가며 각 가중치의 수정 방향을 구한 뒤, 학습이 끝난 모델을 파일로 저장해 새 입력에 다시 쓰는 흐름을 작은 수식부터 XOR 신경망까지 단계적으로 확인했다.</p>
+  <div class="meta-row"><span><strong>날짜</strong>2026-06-15</span><span><strong>도구</strong>PyTorch · TensorFlow · Python 3.13.5</span><span><strong>OS</strong>Windows 11 Pro 25H2</span><span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span><span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day6 — 딥러닝_모델저장및활용.pdf</span></div>
+</header>
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 손실에서 가중치까지, 그리고 저장까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 작은 수식 하나로 본 역전파의 정체</a></li>
+      <li><a href="#ch2">CH 02 · 반복하면 손실이 0으로 가는지 확인</a></li>
+      <li><a href="#ch3">CH 03 · 선형 회귀와 XOR, 자동 미분이 떠맡는 부분</a></li>
+      <li><a href="#ch4">CH 04 · 학습된 모델을 떼어내 다시 쓰기</a></li>
+      <li><a href="#ch5">CH 05 · 재학습과 과소적합, 두 가지 의문 정리</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>출발점</strong> 어제까지는 모델을 정의하고 학습 루프를 돌리는 데 집중했다. 오늘은 그 루프 한가운데 있는 <code>loss.backward()</code>가 정확히 무엇을 계산하는지, 그리고 학습이 끝난 뒤 그 결과물을 어떻게 보존해 재사용하는지를 분리해서 들여다봤다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>작은 수식 하나로 본 역전파의 정체<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>신경망을 통째로 두고 보면 역전파가 마법처럼 보인다. 그래서 계층을 다 걷어내고 가장 작은 식 하나만 남겼다. 입력 <code>x=2</code>, 가중치 <code>w=3</code>, 정답 <code>target=10</code>으로 두고 예측을 <code>x*w</code>, 손실을 <code>(target - 예측)²</code>로 정의했다. 여기서 궁금한 것은 단 하나, <code>loss.backward()</code>가 끝난 뒤 <code>w.grad</code>에 어떤 값이 들어가는가였다.</p>
+
+    <div class="qbox"><span class="label">가설</span> 손실을 w로 미분한 값이 w.grad에 저장되고, 그 부호가 곧 w를 어느 쪽으로 옮겨야 손실이 줄어드는지를 알려줄 것이다.</div>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p>예측은 <code>2*3=6</code>, 손실은 <code>(10-6)²=16</code>이다. 손실 식을 w로 미분하면 기울기는 <code>-2·x·(target - 예측) = -2·2·4 = -16</code>이 된다. 실제로 <code>backward()</code>를 호출하고 <code>w.grad</code>를 찍어보니 같은 값이 나왔다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 단순 수식의 순전파와 기울기</div><pre class="terminal-body">입력값 x: 2.0
+초기 가중치 w: 3.0
+예측값: 6.0
+정답값: 10.0
+손실값: 16.0
+w에 대한 기울기: -16.0</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>기울기가 음수라는 것은 w를 키우는 방향으로 손실이 줄어든다는 뜻이다. 그래서 경사하강법은 기울기의 반대 방향, 즉 <code>w = w - 학습률·기울기</code>로 가중치를 옮긴다. 학습률 <code>0.01</code>을 적용하면 <code>3 - 0.01·(-16) = 3.16</code>이 되고, 출력도 <code>3.1600000858306885</code>로 일치했다.</p>
+
+    <pre class="language-python"><code class="language-python"># 수동 경사하강 한 스텝
+loss.backward()                 # w.grad에 기울기 누적
+with torch.no_grad():
+    w -= learning_rate * w.grad # 기울기 반대 방향으로 한 걸음
+w.grad.zero_()                  # 다음 계산 전 기울기 초기화</code></pre>
+
+    <div class="callout"><span class="label">함정</span> PyTorch는 backward()를 부를 때마다 기울기를 누적한다. zero_()로 비우지 않으면 이전 스텝의 기울기가 그대로 더해져 업데이트가 어긋난다.</div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>반복하면 손실이 0으로 가는지 확인<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>한 스텝으로 w가 3.16이 됐다면, 같은 과정을 반복하면 정답 가중치에 수렴할까. <code>x=2</code>, <code>target=10</code>이므로 손실이 0이 되려면 <code>2·w=10</code>, 곧 <code>w=5</code>가 되어야 한다. 학습률을 <code>0.05</code>로 올리고 30회 반복했다.</p>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 단일 가중치 30회 반복</div><pre class="terminal-body">epoch=01, w=3.8000, prediction=6.0000, loss=16.0000
+epoch=02, w=4.2800, prediction=7.6000, loss=5.7600
+epoch=03, w=4.5680, prediction=8.5600, loss=2.0736
+epoch=05, w=4.8445, prediction=9.4816, loss=0.2687
+epoch=10, w=4.9879, prediction=9.9597, loss=0.0016
+epoch=14, w=4.9984, prediction=9.9948, loss=0.0000
+epoch=30, w=5.0000, prediction=10.0000, loss=0.0000</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>w는 3에서 출발해 5로 수렴했고, 손실은 16에서 사실상 0까지 내려갔다. 정답에 가까워질수록 기울기 자체가 작아져서 한 걸음의 폭도 점점 줄어드는 모습이 그대로 보인다.</p>
+
+    <figure class="shot"><img src="data:image/webp;base64,UklGRuwcAABXRUJQVlA4TOAcAAAvrkJ1AFWL4rZtHGf/tdudkPKNCAVu2yhjOoZHqBNagtk84ClTgCEOJHYVPR3MZQ+0N3Qt6Xmefa+Uujn0W+W/gFjq4heg8ED/v1yuGzMmMTOzw5yY2Q4zM5rtMJOZmZmZw2hmZmZmpnAy857zvufd9/8/V3OOQduo16gKaQzrCjVbhVTFGL6gW4WZq03FFXNWxU6YFKatNLe/hg1XZldh3MrMFf+2Cu0EqztnZmerMG0XRlW3uq5Qc+EoDBpVIVWrMGgMO6GttFVIlVSZNBd2jNWq2DDKClV3iw2qkuF0qsyqQmZXnp1sGM2qwszRzKZDs6uQRlV4i3UVPsXeCjVbmb+FVIUNZ0KqrqpgdW7IvIXZVRhVmV2tCjNKG6ZKE1IV0phUaTSzoypkVmXaMEczZ1SFTapCO6pMOxer4DCKJElR+jezcCiF6cd3Ftg2kqQ4W/6h9RzF0f/3XxYi22LbzAHBE46490GS1jZ6yIh8WNW2bf0uZbOXu7u7u7u7u7u7u7uvme+/vhn8zrMX6CasxjFxbQHurF3A4hdxxus0HJo39+jOaEObN3fZBFYjrUZjAzwxiWm0bwOw5pXk0FybS9K1AbizGn7h/BvHD9fk7qvh+jWcNN58Ek6aOBWH5NAm4vClaSTqbMB7HOzBbMAcswH0IbnbJri7JIfkyd3aJLo3mrtDctgD9w1w0kozjeNwIACAmfT/l8y2nW3bdt3EwLZto5LWr352/WzbRv8hsZGkSHJJA4tHizU3qaXPlaJvTUr/zVUw46ITjAlWaMDwOQneupCRQRNDMQODiLpIjzhzRsrloR1qEFEn6S5nxoTQEsOhhI5qeIyKETMI+gCdBtNFS9R5iVEwaHpCZ5kU2uFU6SsqV8zlYtA1zQwAGDWd4gyxk9nDkXUDmDx0MShuDrAEQLcySc6YU6TL9IMGgitg4PSSztN1+shlA8yI86YHdA6vs2RaaIL+QcsUTJgz4pRw6QvjR2X6nC/dw9RTBsDlgxI0bgZIt+gqwKXTJ7rEKXCmxAgmw3nRMyzd4XyYOYLZcoFYTVH9YhJIlCtl9Fw0GYxnwTaAS6AzzBSV/tIV5iZtZ/Q5QIsXz+ngZqwyTgDAMHRODUs3cd63yKAIHiaSlSPIc+L0GZdimAkVu43lSCNHYE9DYqj0mC6w/MmhYQbgfbpYes7wqUGCZ+k7UaZTZrgIrEREQaLBGGnH1g3ODUeBa7jjWREeeKFcETqLmPDQLx48mS1NAIcIzjsihsK5sCsgj9/FUX+w1BwPGo0PujCAcWDqPQcYGkcyTQRgBnQf4wVxM+usOisEp0LQsNgVRklw1mscAkkR9sCQSTdIRkgxlzPgSgDOFdOFUP/EubcrVa6EU+dIV3ZR2HrNHMHUoGsUtNg1KkJsKqz7+vOfDbYYYN2hd1JniPQGn9KCnHQmrP6D4q5R3cUSXFyycoFX1EAZAZdIpao+F0y1dLR6lTJJJ35kh6gZIz0D+S1JuxoMZU8TldMnp/s19gcaNsDY6CG95SVeYpnqSlB2d3+XpGYFNs+Kdc4O2r7O4qwxTQNghnS0fMApGWpplp5P1gDN0pIQ0iucQ4BKmfsNcJ5EqxUeIqjSMDA7IvICqOWXF6gEAKODxgvg1zoAQKpcCYntAbVpGACL+i7BWCFvCapEXCYAGm4RQLMZKgKN0wWg1qKap4/+QU2VB9HNAFg9bReIXNQe2xO4OAK56O+kZyC3cYXAXd0wQVSMs694oCayeqG5AZcKfY6AigA4bf5ZV9Gw8RwBgP4TPRsQlDRV1CzZlDxLZLlCqCjyU6p1Czl/LAaDW5xEB6kAfBU1vm4hf7NPAMDc1m1Pqwesp8cKVSTLFftoACGhzkAdmjrAZzUTImEsXA7LLLH58AkAADDMgnUnnxZA68F1xbsHROs3PFo0Vh5kaVHwN14GAB50KQiOCQDflU9yBhp2uUUAyE1Qy6xZ98ooTNoEoe0DQKl/VnksweMdUFdhpnWqrJ5iUC6CCr3jAgC4R/ukO7FZ3mYMkCgZa9G8Jfyh4MSkHjeg7uNVJyJ6ZKA1W3T2GluEZLlizwIA6fIBGS2PjDCLv6YmF+bVjuAHy/gQUWYgayLE9kh1NFce5AtBvnQQTBp6JMHnqJwHFskZKKhey9+prLSfGImIpoM0DzosAKQNVA3U+9eBoO6znDMRnebrAeT4oK8wReSXsfvCgQc931rUEilt34LBQS+hVpA38Bgun/NVyzww1QBQ8HXjjLYXlixXBnzWA6I+xUBTk3G0arwEpV3igddyvVYNnDN41tXMUzapGZCWw+J0M5fGWv6O7OULV6fjDNILAwBY2PoToZbjGZuW8WVjBxOFskA9wkCD2nRZQD0Z6ZEBHE8NgOtP3JpkuTIGuCTofWuuHxolUy3E+YYAyGPVMGh9AQfM3p70QI3E4OWkB5Iz0LBNYuBOAQAOoVJI86DqP+s+kNZiD9RyWz6wMwA4BwJRcm4ADBnOHk1GQ/SiAEMvSL0wlceSeohIrFtQpHpFsXQdglemGmg4DACyZ5IuF5D8D9rqBZGBnxV9AI3qHtArBGeLrwFoItiq8SEN9hhUSbJysdXTVQO/vjXJh5SXnAE0KfGQajRtgLBQle9yknrIkZYMvDB9ji7jIb5YlfZiwhNv88S+liaA6k2d+Ot/IfimUNohfbXtfwWNGckXuEZCka2RkyMAb9vGahSvsfwmAUcvY/ks1+HZrPgb7qejC/1Zlnk/cevA8o3z3n5aJ0Gz4a5XVrwpOoBUuRLKHMnd37bPkgAwECihICDZ5BJ3lZpuBngW+ogs/hGeAnwLbe5T3QuIDnRYy+4jpSoXq1TV9PTXGCRxoCIOSy8oOQNIY0o68crKPrFgypjKPNKu3ttJ5ZWDv9jjsOIDfdfqP9qY1KwuQz3TA/md92is2S6AP9t8hEup24zEzlovFe73XbWl3z5guyXxexVKF1i6xdrUYQEE/GuUxbf1FiV+P3g7+9neO2cawHFJEX7XVlDQ4j6cOgp32r5kuRI8Prq6S3IAVN6X/gaA9IHCF1UbQMjKrJb1d+yq0vDzlTJFbe6BRS9PZLvhc8IgUbkYrv/dAk1lSqi/PHGAZizpFgDJGQAOu37Te9d/ehuAS+ZItqQTP4tKreSOJF6eaG39FoemHSFJFvWLtESe3kumDrITt0/ogdL6HletFSoBOJ7P/eh/vPWufP4OWsHLv/i8HcKPp/9htcW1px1yWi1uzg+MuXoUQ3xYrP4sYfEG9uJJv5Z49sIoPlZ+pp3rtI+a5Sg7NqYFnekSjcVTGHuxFAv5ufuIdzez5BV5+5HQgs50icZiKTal/+YqiE4pKHeQIs7Rm+yqU67JUKqnMkVyuxkzBSijxErzzRxuoB+cnUTnhef9VWpyOOwjf45s168IJzfwT3dDDeUkuxk1rZ47ig3szgyqhnK2K49hj0X+Jmrz9USWrPZmsp1FysubcFhvuvsscZW8/ZKRqnDemS7R2M6UZybjlZXebPDrS5/F96pvX14+bsPHR9RRXbXyVkjHBJB7J3rTTYs3/MWCiyCPMruHUuDGWNSbAEh7TIW+bCjl7W1hpUvTlZUOwFf5FL+ra0y4Ff3n873epIorcA/7tDndvmKvpqWoxwTXJrtSm7+mxEYlmDIbqap8EXDWqvpvCvfIa0lVqxiDNgDX6nK27rGbBk9GqzzzO1VOolb50CZKrHSt8us15BnZWhWolJOhHWpV8GZE0nKqVWGGDjGDWqsiLhBhjUGroh1kAgqrVsV+sHgjLq1K8IfQMQFSlSQFbuGPZj9Sq+vm8kGd1LpyWhVYXii3U7QqvNlReIa0Kla2JHvf1aqk1YTU9VirMnR94ucLrcozsYjstFpVYq0SQpm0qvJZwA97aFW9N40H9LWkqmWMQ5sQl6q7e8IfGrwYrfLH7VQ9CVoVSh0pudK0KqrbkndkaVWiYkbGdqBVaZsRSSupVuUcOMTyK/Fl0QK/QO5KKjpHhDN67WXRAl/lVFZRFQ4ygYRVdjPqHBNjrIqqe2fxRl7aY6i5egg0rJZot2XumvwgtEmB8tISsbKvCFHRtBatnZIkBW7gj/g/UnlZtGkyrBAKb+7unbqofuOUN3APTkhIoGirgrtNYGml/E5W3sY7Kyyk7EWyQSVFMDsKzw3pZdECagMlxc5W9FVeFi0LySsJaeqRVJu/JnPHJ0Eh16r8E5MoTqtVpTYaIdRJq6qdBUbSqkZvGo/oY0lVuwiDtiEuVcYT9tDwRWuVP3aj6knUqpDqRMm1plVR3YZ8Y0urEhQLMnYCrUrbCElWSbUqx8AlVlBpVZE5Ipw5aFWFvUxgcdGqOncO7+SlVS1+ELfQ1zEFUmUfi+Y/UqrMoahzY7XqjZTfK1oV3uxx0arYQUWOvqtV/UnTiLQqU8fnBlo1e6K4rVaVWmuEVCatqnYS8MvuWtXwzeARe7WqbYTDs6TKfJNtaNXWmVSrXsmqteoQ5JtYWvUqziG7LNrI/ypkDP2WFSptZvrLLos2rOgY2GCDzf+z0s7A2YWXRQvgfSlAYS78X3vWEhyr5GqJ3avMTiaQtOouixbA3Nq5RY1r0do5sW4cHqhLdlm0ACJzrz8WCm8a/yBjtU2B7gaRaY+0M8UP1GcstiK7jSPTes4UKM48mU+qLos28iNu6RdnhNncotICiSs7V10WrT2pxVtpX8JFqs1fszWWpFX9mbdWHZCExVyr8o5t7qhVAzmOVp2aPWvV5RlCq4aEZ0mV1ZN9SpUZiY1o1ZZ5l1Y9hkdrVfxCQeaOr1Xb52pa1ZdlatVRWZBWvY8g0qJVtW48PqhLq5p/Ieu0S1UfaPGHUmXG5r9aNR8q7iWtCmsMzKBVd2WjWrUZPqhVD+VJWrU0ormNVm2P62rVrlmWVh0eT/ijVe+AdjEuVZYH5KXxm5IqMxLVz4JWfRilN6rmHp9syDq9bI9xPBbekvxTS3OPT3ZXfre/gI/IPDcGro0sHU9yAUkhXs8HhFlGh5LLz4nyUSSrJpKLn9siTQoAfeHxNC3uqUiG298EyJaSC/ecAFQQwDlwjjDYTHTfCG92Ehqww2D3tzGNhDZmN2DgTvFJnaLbyZABYi0eDJwUd/DXKQMk9/hkdxWRbbLEMTnQx0LLP5Tc45MNWWd3sDxGBTCA71L3wUq1+YtPUPEga1VYfaDYQteqNZFz6GjVTUnXDLUqQzskUTHXqjwjm2heo1VOhNZGrapyEvHPbVr1VDzjj1a1ATi0jzGpstyjH03elFQZ3+xB9YugVcGVmTIbRasi2y0FJqZWxcuXZOn6WpWqHpOilmhVtr5HnFypVYVmBhGtTqvKbRWCSotW1bzy+KRPrWr6pXCHfHuVqg4JBi0BlCrjlbip92C0KiC/UukgaVUYY6TYEmlVTL8i19CRlW3EA7mKjQDeJClnpGuFslJliZgRbovqJoOAMxlaAYmLmaxEbBCfmgfzysyZPEOb6F4tK+H2yL0rBNg4U3ylE1ofZWXz9/2Htl/EhEjkTJWjiH9+kxXviOh3Az56SZyp/2TwTDy6OqCGZwkA+5nAmdaAAFdVqVQSWIz7geV9/ywvyeZbJIQNawU0+VCq0m/qoNkMt2Tbvhy32Q06tr/RPX4qG8YXc1LjKqjK0mPw9Ucy1C4lR3JFAAWaZiS4PFFmq6qKSwCubeBgGy6yNtYK+MXq21VytUTJRLRb8k5NVaUllvnUbbi1izQZ5DDcd3BnCF4ZNK1Fq1gC5gpC9TxVZdHeqE90UWBlWeXwuCWPh11i1/lBRpvktZgHyyqL1jxJDECuKSHHLQ0bAIOiNzDana3nEjdfyur+XiA+HvLisH3BylIzUnBm8gdVMTyyW3R0VyhikMM1sWP7rwr8L0bKbhWCyouq+EdtfwELGA5Rh5BjthTbmM133i0y0gtf9KEqodkA4Pa7D+SHkaYfkt6WqFgqqGzQxpsB0AoQqlpwcaAAwEDYPG+MF+Km3oMVlXETXrVixap7/EPuBBA2Kh0lVR3QDDhEgQLzDugv3AmjDxRf6tL6h/FfjOZOdL8h98jWqiSllPTNUKvSt0ISlzKt+hgbl5QlidJ3+LMzli8pOSXCnTF4ilJXJWdM/QeDF/zWqlYhhA4xkCqrN0eWKnNyemlVMHmm7EbRqkhWR8GpqVWPJWvP06qUtZhUtVirsnY94uUKrXony9CqDTOVVv0DX8ypVTtlBZZUuUJrQEiV+Tu/1KoA/Eblo6RV82UOWnVC9q9Vd+PFWrVEptOq3EObGH6tVcWWiN9o1dSMrjaOTTvYCu2bnbczpdhk7Ak5c02TeeVg53MwQGvuuwrjQacM6M36tKZq+V/rFk9cHEqulqgxu6PqlZfOI+hkwGL56PxZbD+oaS1aReNVXglWj0cdQTiPT5YBn0UBuKnewW5TZKX/GfDFHHsR2mBj54dg+2UV3C37Xs3S2cbHrCIovygFyb9Xs2TmfTvDbU6NnzZul5UJcVgT6qw9sedClt5SHKwUmSMbXNTW/OVgI0vy79UsWZJ/r2bJkux7NUumjP2duEO/ZxmhMpZ36mLXUmU2ziu0akl8Xat6cUG7VNkvSC+pMl9nSVr1CjauVbvmUJZUDejJ26XKLI5fa9USiZsrtarCXmYkrXpWbxq/Kakyx+F6WpWqHvMkrXoXo2tVqxCOxUqkykzDHLQqaTmlv1adlWto1f8Ya5VSZRbJc7TqVaSux1r1TkJpo1btkxVMIFUhK+SFUoW75QtatVAimJ1WbZvhBsjMZqkYB0LGZlKVed+kI/EAu2FMkZkdqdfSV7jQlyhuKzL/Wh5BxZRci1Z+qlx4/t5PYWmJ8Cg0N4GmtWjZJEkC3OEPe1JYFu02qi8AnGzuHsHuyD50FDaoR50mIYGCExpmv9ucgzUpbOP2JoeQTOdOYXDgUvigLktl7Qk+vsy47pYGT0aqTFh94NFCbf7CmA+ydq16CH7ZXauGdAd/7FSqzBS4aNXcmEmrBjK9VrUEEH4lVeaNrF+rpiNFNdGqGTiXVq2Pdb5Dqsyy+LxWxc8XpG2EWnUllq9VDV4Mf3aVKmt3jCFVJlZQcUCtWgN/0KpFMEQfqdrra1iIVJnzsxqtOhh31KrD8d29StXNhqDOnZMqE8Hq+ZhWPZSza9XU+KIPS6pcV0DDFy1VZr4UmJhaNTPxC4VWbRj/3KZVbQA+FGuY0C5UTr0BZydhkn2lZ6qyskx77BZxG2RL/pWeiYpziZhf3P3GVs2U/GuREtbMTKFyCi4/Z+cUnCMbfiyRcE9W7ooKa1jck2lGtWFUiYR7MmJI3hr42fQbfqhB883s/XQ1SG+N5+vLhhqUYitkZLVx67f03Zw93+sMDMUZVCWk9bLHA1+MfUKXCfMMLXpOJioDpCu8vtlsniNcMcYY6+Mc3K4ppJYS3DEPmpHVSGtZBf6Y2dPzl1Jl/YHr2pXK7PSCjClV5krstt6DkSrr67yyj1KZI/+dyaXKFJia/Pl2UmU9hin6KJVZ35Rk7vhSZQrOTP78SamyDsG5bqZUptmXfA3nkCrzQFZQ+8ZJlRXNbZjqZkpl9vtdHipVxoXeP5Eq64RcY4IJXSa0q5RZydjMCDg7qZQ5AA5WLydSdt/0YWP1chqk6OnlZEn+B/qk1kGxpS7SjVd56yLu0Td1LWoVQlHuTeYH+sR8YMoHuEqS3A/0yXrONLC5R/fRJ7y26NU0+xlHgvkMtBx+KQLDPq59vwsHv63DZ1BLn4xZ5byHg+Dq5LDBJlDGbHemdWKjwaZQxhSaGrYabD3+8JpqkosNobXhYDu/96A5vBrtqBuH+jMhtssvu5/wgM/5Xw9jQXt00nHcKcdRX4sS5VWuVllmeXw1plwX/DfGrLzK1SqznCaZFfNl2Fgtm8/FFuMX2J6cqe3vYM8MqnxQZ0/HXI22ddJx3CnHUV+LUuUxrVg7+08RTBNPRo9ppEyB/hJx/dpgsDxzhfd+Yd9vTL9ObNT5P9j39gMv9d//dYiB7WRbx51yHPW1KFUe04q1s/8UwTRxZPOtA4aym9UOg/H0PkHGlo8j6ptj47CmW8PszzjD+udyizG2ejEHp5zhWwNiAtcBdqu7Hp+aNJciuxbeKua8/xTBNHGjxYSxAeBfP0LB1RI5Sr83/fhN/Rz54TWNnS8TV9JY2TKi3YZQp++NvU4GpzrkCnbrHn1xWAML//MMOr+O67qdVaZKNcj0vqo46zr2EOvx9m8/pLoL2ftgivdVxUk15KYLGUrThAyumK8qzuDK+byifNOrijP4cgy1beL8lJxafoqT8rhorCFymqZyFW5WS5wB1K5gH5vXsBatlmYET8zhBvoGZYfHHMHBF5IQEHFfdNixbYMvq/cX1H7dxrfd+TJ7n9roXZm9SYsXYfNAXcxuVtXkrkXLkIIbnvNCon9Gv5CclW1vXWpl28oSSu2UlhHWIsSbhURTAJv8YeMfbPQlG37I+h+q4ALZMMHlmM4fHu8BHmBaf3rqp57ml8Y/nhLGM15Tu/P3fu9U7yJkqlf+8/H0p4Rx91flym8qe5AHqSwD14Zx9feUzyLK9iSMs3+mdFZx3l5OLW8vYZzdM6WjinNsObUcm2F5x+atMS2dJrtvGA6Y7ubvn9EyP0tQeZ+GqeO+FsXKY1mxlvafIpgmjh7y24AhcbPaSt5zmTK/dWR95zjya1GsPJYVa2n/KYJp4ulAlh+cIv0jopaWsWNjcp/f1h8834tr7DGmzTcBLcOiMX3Cq2kAAK2mE78TLKX/5hovvesfEgG9659pAr7/CB7EU3wsH7FjY1rQmS7RWFi8AVwnlmIB/hvTgs50jMbmnNuSB8aStaAxbZg6HaGxlJ2F1RmTeVaDiKg3KI/R3S/KdWOuRETOimB4VThzGxBdJ7xALa4bCyIi6j9cGi5lOuqod7wws5ljdsZknnmazeaZoTxWd78oz425ZjWbzRkVwfCqcNI3Mw7S/H8erhsLyms2m/l8Tvat7+14FQ7hE8Nq5pidMZlnTmASVne/KKeNqYsDz5kpVA5hPjcKPClNCI4bQ1AxcJ0D1mc1c8xOksgzY2jmWwxQHqsbXpNrflG9Jv3OuHVXNDlwWGoWwMaujN/GBN2kG3j6l+RVwx6mo7CaOWanoOXYC9dewIEXtbHZojhWtxMozzyyTZZ6VbM3zClD8taAnzYBQPb/4rgxZDnww243cUl8etjwBL97k5i5hnoA0Kxb/YZ8ALBFGjucSm+NVxTjy845LOXg818Gd5XGP/AoYtoy4DyZ/LVkwDsEDh8+tX5L3w0oOWB82TmrpgOD1zzGJ7AaMDtjMudmxwE/VfGHsLr7RXkX30myKYHdVeGE+YwZYIPUgNfGxFZKC+BW33FlNXPMzpjMsacfN/abKBr4WIp//7G6+0U5bmxh79jAfnvtpF6yEhheFU76jY2TNItaFM+N5SiSxj6b7/LBI/9y9g/rH7xMVjPH7IzJHGs11JTYag4ojtHdL8pzY5X6Q5SPNa8yP0sYXhXO3F75gMYlmXlubBvLd7Dscx+xXKpoNUU9xjIlZk7fmpT+mwtAVE+/yJWIiJz1qLKazWZzRj2qONF3w/az2jLfKICHrWlzyLswwT1cg8mrdcHXp3XZZzY9pKV/fYXlJdw0Vh1aoPBhM7sC27etvsL7ugtu6arv6vH2OAv0hxLChdwmKD2A73oIFD/gqoF76xS1UHbeACBYHrBqugz0h4relZC6oFEAoHzfwN99IYAwKnf91LhIbQBuqfSNAxnak1BP4FdC/+ghBP8vOUiatwZ6xgOtGxR4DxU+J/ooKBn6WYUb93UFftD2qcd74GGih0RERPlAw6HfWJJakz7QzeTzCb0pCXrX13jnwh6Q0n9zCQY=" alt="단일 가중치를 30회 반복 학습하며 손실이 16에서 0으로 줄어드는 곡선"><figcaption>단일 가중치 역전파로 손실이 16에서 0까지 감소 (실제 출력)</figcaption></figure>
+
+    <div class="keypoint"><span class="label">배운 점</span> 역전파는 결국 손실을 각 가중치로 미분한 값을 구하는 일이고, 학습은 그 기울기의 반대 방향으로 조금씩 움직이는 반복일 뿐이다.</div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>선형 회귀와 XOR, 자동 미분이 떠맡는 부분<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>가중치가 하나일 때는 손으로 기울기를 따라갈 수 있었다. 그런데 가중치와 편향이 여럿이고 계층이 쌓이면 이 미분을 누가 다 해주는가. PyTorch에서는 <code>optimizer.zero_grad()</code>, <code>loss.backward()</code>, <code>optimizer.step()</code> 세 줄이 그 일을 맡는다. 먼저 <code>y = 2x + 1</code>을 학습하는 선형 회귀로 확인했다.</p>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p><code>nn.Linear(1, 1)</code>에 MSE 손실과 SGD를 붙여 300회 학습했다. weight와 bias가 각각 목표인 2와 1로 다가가는지 봤다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 선형 회귀 학습 결과</div><pre class="terminal-body">학습된 weight: 1.983961582183838
+학습된 bias: 1.05790376663208
+x=10일 때 예측값: 20.897518157958984</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>weight는 1.984, bias는 1.058로 정답 부근에 자리 잡았고, <code>x=10</code> 예측은 20.9였다. 정확히 21이 아닌 이유는 300회로는 아직 완전히 수렴하지 않은 상태이기 때문이다. 세 줄 호출 안에서 weight와 bias 두 파라미터의 기울기가 동시에 계산되어 갱신됐다.</p>
+
+    <h3 class="step">테스트</h3>
+    <p>다음은 직선 하나로 나눌 수 없는 XOR이다. <code>Linear(2,8) → ReLU → Linear(8,1) → Sigmoid</code> 구조에 BCE 손실과 Adam을 붙여 1000회 학습했다. 은닉층과 비선형 활성화가 더해지면 역전파가 여러 계층을 거슬러 올라가야 한다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — XOR 예측 확률과 분류</div><pre class="terminal-body">예측 확률:
+tensor([[6.0647e-05],
+        [9.9992e-01],
+        [9.9993e-01],
+        [8.2106e-05]])
+예측 클래스:
+tensor([[0.], [1.], [1.], [0.]])
+실제 정답:
+tensor([[0.], [1.], [1.], [0.]])</pre></div>
+
+    <figure class="shot"><img src="data:image/webp;base64,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" alt="XOR 다층 신경망의 학습 손실이 빠르게 0 부근으로 떨어지는 곡선"><figcaption>XOR MLP의 BCE 손실 감소 곡선 (실제 출력)</figcaption></figure>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>네 입력 모두 정답 클래스를 맞혔고, 확률은 0과 1 양 끝으로 갈렸다. 가중치가 105개로 늘어도 학습 루프의 세 줄은 그대로다. 자동 미분이 계층을 거슬러 각 파라미터의 기울기를 채워주기 때문에, 손으로 미분하던 일은 더 이상 직접 할 필요가 없었다.</p>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>학습된 모델을 떼어내 다시 쓰기<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>학습이 끝난 가중치는 메모리에만 있다. 프로그램을 닫으면 사라진다. 그래서 결과물을 파일로 남기고, 새 프로세스에서 다시 불러와 예측에 쓰는 방법을 확인했다. PyTorch에서는 가중치만 담은 <code>state_dict</code>를 저장하는 방식을 썼다.</p>
+
+    <div class="qbox"><span class="label">가설</span> 가중치만 저장하면, 같은 모델 구조를 다시 선언한 뒤 그 빈 모델에 가중치를 끼워 넣어야 동일한 예측이 나올 것이다.</div>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p><code>y=2x</code> 데이터로 학습한 모델을 <code>torch.save(model.state_dict(), 'pytorch_model.pth')</code>로 저장했다. 불러올 때는 같은 <code>SimpleModel</code> 클래스를 다시 정의해 빈 객체를 만들고, <code>load_state_dict()</code>로 가중치를 채운 뒤 <code>eval()</code>과 <code>torch.no_grad()</code>로 <code>x=5</code>를 예측했다. 같은 절차를 TensorFlow에서는 모델 전체를 <code>.keras</code>로 저장·복원하는 방식으로 비교했다.</p>
+
+    <div class="terminal"><div class="terminal-header">model_save_usage.ipynb — 재로드 후 x=5 예측</div><pre class="terminal-body">PyTorch  예측 결과 : 10.011872291564941
+TensorFlow 예측 결과 : [[9.977701]]</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>두 프레임워크 모두 정답인 10에 가까운 값을 돌려줬다. 핵심 차이는 PyTorch는 구조 코드를 따로 가지고 있어야 가중치를 끼울 수 있는 반면, TensorFlow의 <code>.keras</code>는 구조와 가중치를 한 파일에 담아 한 줄로 복원된다는 점이다.</p>
+
+    <div class="keypoint"><span class="label">배운 점</span> 가중치만 저장하는 방식은 파일이 작고 안전하지만 동일한 모델 클래스를 반드시 다시 선언해야 하고, 예측 단계에서는 eval()로 추론 모드를 켜고 기울기 계산을 꺼두는 것이 정석이다.</div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>재학습과 과소적합, 두 가지 의문 정리<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <h3 class="step">의문</h3>
+    <p>저장과 불러오기를 정리하다 보니 두 가지가 걸렸다. 하나는 "파인튜닝이라는 게 결국 모델을 불러와 다시 학습시키는 것 아닌가"였고, 다른 하나는 TensorFlow 저장 예제에서 <code>fit(X, y)</code>만 했을 때 <code>x=5</code> 예측이 10이 아니라 6.8 근처로 나온 이유였다.</p>
+
+    <h3 class="step">테스트</h3>
+    <p>첫 의문은 방향은 맞되 그대로 다시 돌리는 것과는 다르다. 보통은 특징을 뽑는 앞부분(백본)의 가중치를 동결해 기존 지식을 보존하고, 목적에 맞게 출력층(헤드)만 교체한 뒤, 평소보다 훨씬 낮은 학습률로 조심스럽게 미세조정한다. 두 번째 의문은 학습 횟수를 직접 바꿔보며 확인했다.</p>
+
+    <div class="terminal"><div class="terminal-header">epochs 비교 — x=5 예측값</div><pre class="terminal-body">Epoch 1 prediction:   [[6.2447696]]
+Epoch 500 prediction: [[9.903336]]</pre></div>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>Keras의 <code>fit</code>은 <code>epochs</code>를 생략하면 기본값이 1이다. 4개 데이터를 한 번만 훑고 끝났으니 규칙을 채 못 익힌 과소적합 상태였고, 그래서 6.8 같은 값이 나온 것이다. <code>epochs=500</code>으로 올리자 9.9까지 정상으로 다가갔다. 낮은 정확도는 모델 결함이 아니라 학습량 부족이었다.</p>
+
+    <div class="callout"><span class="label">함정</span> 저장된 모델이 이상하면 저장 과정을 먼저 의심하기 쉽지만, 애초에 충분히 학습되지 않은 모델을 저장하면 불러와도 같은 과소적합 결과가 그대로 재현된다. 저장은 학습 품질을 보정해 주지 않는다.</div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0615-s</code> (backpropagation · model_save_usage)</li>
+      <li>강의 PDF — 딥러닝_모델저장및활용</li>
+      <li>공식 문서 — PyTorch Autograd·torch.save</li>
+    </ol>
+  </div>
+</main>
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day6 (2026-06-15)</p>
+  <p>손실에서 기울기로, 기울기에서 가중치 갱신으로 이어지는 역전파의 한 바퀴를 작은 수식으로 직접 따라가 본 하루였다. 학습된 결과를 파일로 떼어내 다시 쓰는 절차까지 묶고 나니, 학습 루프와 모델 재사용이 비로소 하나의 흐름으로 이어졌다.</p>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

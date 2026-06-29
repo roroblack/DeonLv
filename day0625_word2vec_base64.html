@@ -1,0 +1,322 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) Day2 · 부트캠프</p>
+  <h1>텍스트 분류 — Word2Vec·FastText·토픽 모델링</h1>
+  <p class="deck">횟수로는 못 담던 '의미'가, 학습한 임베딩에선 숫자(유사도)로 나오나. 그리고 같은 데이터인데 Word2Vec과 FastText의 '대회'–'올림픽' 유사도는 왜 다른가.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-25</span>
+    <span><strong>도구</strong>gensim(Word2Vec·FastText) · KoNLPy · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 Day2 — 자연어처리_텍스트분류.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 횟수에서 의미로, 그리고 정적 임베딩의 한계까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 횟수는 의미를 못 담는다 — 무엇이 부족했나</a></li>
+      <li><a href="#ch2">CH 02 · Word2Vec 학습 — 명사 77개로 '의미의 지도' 그리기</a></li>
+      <li><a href="#ch3">CH 03 · 유사도라는 숫자 — '대회' 옆에 무엇이 모이나</a></li>
+      <li><a href="#ch4">CH 04 · FastText — 같은 데이터, 다른 유사도가 나오는 이유</a></li>
+      <li><a href="#ch5">CH 05 · 토픽 모델링 — 라벨 없이 뉴스에서 주제를 캐다</a></li>
+      <li><a href="#ch6">CH 06 · 정적 임베딩의 끝 — '배'는 왜 항상 같은 벡터인가</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>다음으로</strong> — 지금까지의 텍스트 표현은 단어가 몇 번 나왔는지를 세는 쪽이었다. 빈도는 직관적이지만 '대회'와 '올림픽'이 의미상 가깝다는 사실은 담지 못한다. 오늘은 단어를 100차원 벡터로 학습시켜, 의미의 가까움을 유사도라는 숫자로 꺼내 본다. 실습 데이터는 한국어 뉴스 문장에서 Okt로 뽑은 명사들이고, 같은 데이터를 Word2Vec과 FastText 두 방식으로 학습해 나란히 비교한다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 횟수는 의미를 못 담는다 — 무엇이 부족했나<a href="#ch1" class="anchor-link">#</a></h2>
+    <p>BoW나 TF-IDF는 문서를 "어떤 단어가 몇 번 나왔나"의 표로 바꾼다. 분류기에 넣기엔 충분하지만, 표의 각 열은 서로 완전히 독립된 축이다. '대회'와 '올림픽'은 의미가 맞닿아 있어도, 횟수 표에서는 서로 아무 관계 없는 두 칸일 뿐이다. 같은 문서에 둘 다 자주 나오면 통계적 공기(共起)는 잡히지만, 단어 자체가 "가깝다"는 정보는 표 어디에도 적히지 않는다.</p>
+    <p>예측 기반 임베딩은 이 지점을 다르게 푼다. 단어를 고정 길이 벡터로 바꾸되, <strong>비슷한 문맥에 등장하는 단어가 비슷한 좌표를 갖도록</strong> 학습한다. 학습이 끝나면 단어 사이의 거리가 곧 의미의 유사도가 된다. 횟수로는 못 담던 관계가, 벡터 공간의 좌표로 옮겨 적히는 셈이다.</p>
+    <div class="qbox">
+      <span class="label">의문</span>
+      <p>"의미가 가깝다"는 건 사람의 감각인데, 그게 정말 하나의 숫자로 떨어질까? 그리고 그 숫자는 단어가 같이 등장한 횟수와 뭐가 다른가 — 결국 빈도를 다른 방식으로 센 것뿐 아닐까? 코드로 직접 학습시켜 most_similar 출력을 보면 답이 나온다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 의문을 풀려면 먼저 작은 말뭉치로 임베딩을 직접 학습시켜야 한다. 학습 파라미터부터 본다.</div>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> Word2Vec 학습 — 명사 77개로 '의미의 지도' 그리기<a href="#ch2" class="anchor-link">#</a></h2>
+    <p>실습 데이터는 한국어 뉴스 문장이다. 정제한 텍스트를 KoNLPy의 Okt로 명사만 추출하고, 2글자 이상 토큰만 남겨 학습 입력으로 만들었다. 토큰을 20개씩 끊어 문장 리스트로 묶은 뒤, gensim Word2Vec에 넣었다.</p>
+    <pre class="language-python"><code class="language-python">from gensim.models import Word2Vec
+
+model = Word2Vec(
+    sentences=sentences,
+    sg=1,             # Skip-gram: 중심 단어로 주변 단어를 예측
+    vector_size=100,  # 단어 하나를 100차원 벡터로
+    window=3,         # 중심 단어 좌우 3개까지 문맥으로
+    min_count=1,      # 1번 등장한 단어도 포함
+    workers=2,
+    epochs=100,
+    seed=42,          # 재현용 난수 고정
+)
+print('Word2Vec 단어 사전 크기:', len(model.wv.index_to_key))</code></pre>
+    <p>여기서 <code>sg=1</code>이 핵심 선택이다. Skip-gram은 중심 단어 하나를 입력해 주변 단어들을 맞히는 방향으로 학습한다. 이 작은 말뭉치에서 학습된 단어 사전 크기는 <strong>77개</strong>. 작지만, 의미의 지도가 그려지기엔 충분한 규모다.</p>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>Skip-gram이 빠른 데는 이유가 있다. 입력이 원-핫 벡터(수만 차원 중 단 하나만 1)라서 가중치 행렬과 통째로 곱하면 대부분이 0과의 무의미한 곱셈이 된다. 그래서 실제로는 곱셈 대신 해당 단어 인덱스의 행을 그대로 꺼내는 룩업(look-up)으로 처리한다. 출력층도 단어장 전체에 소프트맥스를 돌리는 대신 정답 1개와 오답 몇 개(네거티브 샘플링)만 계산해, 연산을 O(V)에서 사실상 O(K)로 끌어내린다. 의미를 담는 표현치고는 의외로 가벼운 셈법이다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 학습된 지도 위에서 '대회'라는 좌표 주변에 어떤 단어들이 모였는지 꺼내 본다.</div>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> 유사도라는 숫자 — '대회' 옆에 무엇이 모이나<a href="#ch3" class="anchor-link">#</a></h2>
+    <p><code>model.wv.most_similar('대회')</code>는 '대회' 벡터와 코사인 유사도가 높은 단어를 순서대로 돌려준다. 학습이 의미를 잡았다면 스포츠·대회 맥락의 단어가 위로 올라와야 한다.</p>
+    <div class="terminal">
+      <div class="terminal-header">word2vec_모델_실습하기.ipynb — model.wv.most_similar('대회') (실제 출력)</div>
+      <pre class="terminal-body">[('데이터', 0.8950), ('선수', 0.8785), ('추천', 0.8765),
+ ('모델', 0.8750), ('올림픽', 0.8741), ('러닝', 0.8729),
+ ('분석', 0.8706), ('단어', 0.8704), ('사이', 0.8677),
+ ('결과', 0.8671)]
+
+대회-올림픽 유사도: 0.87414414</pre>
+    </div>
+    <p>의미가 숫자로 떨어졌다. '선수'·'올림픽'처럼 대회와 직결되는 단어가 0.87대로 올라왔고, <code>similarity('대회','올림픽')</code>은 <strong>0.87414414</strong>다. 다만 '데이터'·'모델'·'러닝'이 상위에 섞인 건 말뭉치 탓이다. 명사 77개짜리 작은 데이터에서는 여러 주제 단어가 한 묶음으로 학습돼 좌표가 서로 가까워진다 — 의미 지도가 그려지긴 했으되, 해상도는 데이터 크기에 묶여 있다.</p>
+    <figure class="shot">
+      <img src="data:image/webp;base64,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" alt="Word2Vec '대회' 유사 단어 top10 막대그래프">
+      <figcaption>Word2Vec '대회' 유사 단어 top10 — 코사인 유사도 (실측)</figcaption>
+    </figure>
+    <div class="callout">
+      <span class="label">관찰</span>
+      <p>유사도는 "같이 등장한 횟수"를 직접 센 값이 아니다. '대회'와 '올림픽'이 한 문장에 붙어 나온 횟수가 아니라, 둘이 <strong>비슷한 이웃 단어들에 둘러싸이도록</strong> 100차원 좌표가 조정된 결과다. 그래서 같은 문장에 한 번도 안 붙어도, 문맥이 닮았다면 가까워질 수 있다. 빈도 세기와 결정적으로 갈리는 지점이 여기다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 같은 데이터·같은 파라미터로 FastText를 학습하면 '대회'–'올림픽' 유사도가 달라진다. 왜인지 본다.</div>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> FastText — 같은 데이터, 다른 유사도가 나오는 이유<a href="#ch4" class="anchor-link">#</a></h2>
+    <p>FastText는 Word2Vec과 학습 방식이 거의 같지만 한 가지가 다르다. 단어를 통째로 하나의 벡터로 보지 않고, <strong>단어 안의 글자 n-gram(서브워드)</strong>까지 쪼개 함께 학습한다. 단어 벡터는 그 서브워드 벡터들의 합으로 구성된다. 동일한 명사 77개 데이터로 FastText를 학습한 뒤 같은 두 단어의 유사도를 재 봤다.</p>
+    <div class="terminal">
+      <div class="terminal-header">word2vec_모델_실습하기.ipynb — FastText 동일 데이터 학습 (실제 출력)</div>
+      <pre class="terminal-body">FastText 단어 사전 크기: 77
+FastText 대회 유사 단어:
+[('자연어', 0.9646), ('데이터', 0.9601), ('아이폰', 0.9577),
+ ('컴퓨터', 0.9565), ('분석', 0.9532), ('올림픽', 0.9528),
+ ('형태소', 0.9516), ('갤럭시', 0.9505), ('단어', 0.9483),
+ ('모델', 0.9474)]
+
+FastText 대회-올림픽 유사도: 0.95275533</pre>
+    </div>
+    <p>같은 두 단어인데 유사도가 <code>0.87414414 → 0.95275533</code>으로 올랐다. 사전 크기는 77개로 동일한데 값이 전반적으로 더 높아진 것이다. 원인은 서브워드다. FastText는 글자 n-gram을 공유하는 단어끼리 벡터가 비슷해지는 경향이 있어, 작은 말뭉치에서는 전체 유사도가 위로 쏠린다. 미등록 단어(OOV)에 강하다는 FastText의 장점도 같은 메커니즘에서 나온다 — 처음 보는 단어도 글자 조각으로 벡터를 합성할 수 있기 때문이다.</p>
+    <figure class="shot">
+      <img src="data:image/webp;base64,UklGRholAABXRUJQVlA4TA4lAAAvoQJ0AFXpWbZt2txa2j+js47XbLnnaU3uXvPgNbvbs9tD93bba+y23FqT1+A19Nr2nmz3IE+71+Sh3e012L32mie7pz3vvQa3u/c8z/M81fe8z/fWV1Kp9LT3LqQfYCUFdlZOLBRLP8B/oSKBcoNSIXCqP6B4gRwL9AsciapUoBUb5PgB/QmhVGDEiiUqluFLlQr/ABVUqgVCmVBogVNJ4FSJUoFSxRIoLnCBMoGdGrRDBRVJSFCZQOJzWk4FFQlKojKBFiiWwGFVKCoVSKBYgZwaHAmcGoFTC1RpQTkW5UigtBAIzh4LodSUU+FUoHAx6QcUghUJnCquQODYBU6twJFgjwLDGiqSQXEP+g9rcGiJiiVKSgvk/yDKYe9BqlxCJEmOJDWGe82fiCTw9lyqUlWV5EhyHEnOF4BkgCRr+z+qAO+/LNa2rdQZuyGBqHehgg+OHvG2/fjV9xRoufvP/TM/88r2fvm9fz3z+oxluplEtkpjNplL+IVXK9NM5Tc7Cz/2auXXTbsk+8q0XD6jTaO+cSZPyb7SWG+Yge+6tuJX3vuurX8zk+9NM/9++nuvnOfn7t2l7l51lumyq+jYSt+4/UvvGROZzSnnzGT2ldIyd82J+7fT1/37nZ+8J/jxK93FeAUTjyfkl8yCXZ7+m7b11rSLLA82PN9+4OrQneta/ciVczOavTxsv8D46z9fm6eU9ERKrC+m9Dq91oTsKP213rX71kO+mG7weCRb7clfZmaaXprSrHtl8Bf7Tt6Kvk/vvXsPyhhYv1aaYj2aXFILWW1Dm8n7vVdPlO9e9zDsFswDsffoy0790JWEEFo8njX++m51hvxPo1yIv+4iI7/OmshQZkNk9LqdlEcgo7ek/9O2mNHZi7jvv5u+7j/s/PQr08zFsUvTC/Kw9fYZ3cKKd2//ld4/17t/5ufvAfzsey8N1q79672Sdbq1a1qgVTkN/SzJi6RAvf9AZP1aaYr1aLZc5zdp5vHOHeB1MzMf0PmhK2cxkTrX4a+7mIo1dK26tt+yDYzNSHnPNlhZMGUVaPTDVzUSHoz0njh+B8nXwNQy8JqMTpAvTkmyFUVWntjfpvXrB1Y8BtH5MNS/yui/S5u+pljzrVsJD+384nuA5/16PxIisH6dtsJsGFt6kqwHGpbGZ0quicci+pAdAMrpzWizGeW3jX+j98/05QMOGox/JJJpRlILaxVo/YxYlQc2UK8PAz/6SrKeCNd3rbNL7mdqDxt5oaj/eQDArqbeLcxFpK2UVEcTsnRDwbde6/v25gZ+6p4e7bAN++iAcMEPXem/UGsDT5P1ywMA/qmpn2cJ0Wy9qNbM86o33uM7r4Ak2Xrir/bqb7uWXZfWxdrIEH3YteBrtvUmcC6ii96Wcsbayz4vwBOAEO2RG2ii9Y/eMyHB1GL7V/t0IUGknmEDq3Sa4D9v6fthzT8uqHvoznX56nz7td2cv9ybx3VQJlttyiKwMnKc/ptImuh7roYE5LORLB1uuLJG5TJScUadrhcJKunNaIH0+tox1/PmGa2nYxcWAnP3aYtK7Gbop1J2wGtLWl/ufPZ5o+2CTO1hUo3tpJS/1LsBE3NedEGPHFKYGVF5WHE+uu27trGKVw2iPvIPpK8KO3bc23gKNf4hnVMxRbiqdJTy0gkIEvUquQTxMYYNJTiFtIVKAU9AEoG4GfeoHSqQXl+LWqJ3zKWU0/ofmeLtWlFnjmD/EnHeup1/Zhw4GDajyz8xscHg8bD++mnBW2f0GnPi79k3qL8DwN7u/tis6fLnKwQP6DjJWrkyLc+o9FeaJQOeLvliAknTm/tUDny2tHv4STvmCFeVovLBCm0XBOm+AmvPN4hLkvPIcgYaXLFSVvmwVpesarurecmXWxke12FmZLRwjpi6K3CTy0ht9tCOjkoSzyLnguF7Gc+QCvi8NPj+K2zhHTOjl2UCpR+OJHzttjlReqpsWS4in0dBdcMFlEc0YkVAg4pg4AKPqeXa6lhBRf1oxMSIcUmy7UhgC3llp7BaQcf5PJUa8S+CYMywPpIkCb895TL2C8Z/x1VfvU9gKwCATfDVMx737j3mXwZfavr1fcsOpjiWBCQa1dZ9TWhsmJs8okJfZhaSrseNT22bqTRbOFkfPBDU0M8VXXiyi2wlbhFomvVyEZnNXiByhU6JtcFBXjezUlpvmbGS0eQFGLz/oGXlHaRLEs2e20+mdQ7p518ZztSmeoQJW8B5UmA3cakltTBTgbbQSf8dWhCtv3Hbhdlk4TQRLc2GbmyR07CW3flzGDgrGHaU9Bq7XJKpC2V7efHfl7s9XfLRKxbc3OOFVksfZ2S01dZW36K67JzLX5u58mWBT1+9neRvQuU8JRMPhwNdeIQYnQaU0NVwYc5YOJ1xfhXVXWwhMfKmtLfNrPYERMbZc/Yc7mLOqwc42ugWEcL5ZpvLJNdoD+CvVxwzo3LlOyeZuuCSLt4jzNPqYsNGPtZuLmtZldg7YemBgxNGLw4XWb9pvckM69EKS5PZV6bZ7vzyt3ZC5ly/OZywTu+av0fP7NCl6nJsWo4e+qsM8cRm6MW5E1usWvK0EqS3qqbPd5NrvG5WQeHnS0+Tl7YCkfW1YzczrEerZu2itykrcxBoQp+A6mXEzRgTV8TbVAH95abkhw2wHcNztrm4PPmIjc93EzAb3Jaz44KspTJhvi4Exu1MNjWghIucb4bnbJ0n7bpa9WaX+Y/Xw0My03/qVVyh4jZS7uDBla8efEKv2H9wQHBg5lWDjgcNauWxR3Ib/itvyt04lgR4GoTovi58GTn74aO/7mKbjNVayKubNXZ5e6qOOsGQNYfU5h9KLZ9rPV+640XWC8Ur/nfL7NTTJbeuG/Ww3G5QTe8o2QFIbaTvcGHmHz7K2CKj8y4lG2R1A0w2+dxhLid6UIRtJJht3G8mV0cb8Gy54qHYnay6Bw1KvER8AHZJuSSXW4vkHgdxRtQ8uiRrKwjbPHcojRfoIg6/1u+cxhaSnL3ySnJ2qkBrsx5S98XWBYtr5BtRGnJtSS0CXVF50iUr0OZpbnmi7My5yCXPkFxqVnLdjC5zrrphyyeWI7pU+E9cSVUZ+YNX5hIoPsMbf1LWxGkj+AGdDZE/2zfJXAKVp/RXmB/RMtOPge+9Wqc3zVwChWc9RLd8NCLxzdv9HMCcTWBzCRSeBZEsk9jVFO5EeI9PNZlA4ZVUgSsAiCpkLoEitAk8EoAh79o2l8AgdqxTvWP6VVc/8Z6q87fg4oLHIWeaS2BQSmut/zTzRe+9+r3vfU/BVK5hE+aQHcG0b702l0A+2Gv7A2997+ffUzCVa6hRAsBRMNxkAmkd8t4HPqzqRl4aDLRIutpkAgUoriKEeHz3NXDBceYSqEANAqZCznDUcWltNmVSMZVA7bmjisWVM8KBN848TS5b+RdegakEJqjHcvefu//c/efuP3f/ufEtPNNb3nvj8gl2oOJssYKhtPADVJ64YzMeg5S/yihs/Kx+o5vFg0+0pbLVrhgM+wRjnBJ0VXnOe5HlRVhULdHktq+bganT5hU39NY87zkSMGzPQPGNrH4Q1g4cEKwRnbKzCVBGrxE9Xyr/Q1fAOSUUn38c7mQBBM30Eky6EICoFeEAwaumAwy8TvEJFD5CPc2aCD50pSC/rmJxec1gi1v3C75he7LS07mVvD/bvYyNYAcwO0CXEcKcIS48Q4ZkbU3HgarrrdHYn+1FZwLgvwGzITLi1F3MflcLg8O2EiS7XeFd9lZQdT3eGvuznVsfoSIqN9iMfl/IekiAL7CzKf1sTL5ZDdXdYDupj+Av9PkjK6+agwDmlkNWRSLV3eQTfSzOPx6pm/QHgcHl/aUyvuNK3YktGQLMOBJCpwLpQGiRDG9gRAyidODSUSpvW9YHH9qZc2HL6AgoOq8QbEs17zRhxvxIgOdZNxg/4/LNhXOGye2UXouVo87rPcwfqFvAE+K+xPpQ0T2DTCxeZBU3CHmuNb7aN2yr0FZ/7v5z999/oecovEeYz26U3jGmncPi4MHNN998EjD4kgVHeQOeNwt1kppzcq+l63bKGgxu2/uKIdtSDqCzT48ezSFo3sVnHDtrKqT3cCofPV7JKbc+k4rnoFqGNvA5Q0g9thzwaKQJAJ6RQKmmiLVnoPsrOQ3igb2MgQDYa4YDi5oCbX2RVNgogznLUHLmlwbGXgRAxFp1v/AKKNQP8HDIVJkhOvxavz6j5ESMB2jSAaGijwNuvncv2LNizq7jMJje0rB7ohmpSk5csrDb/9eKKjbbltrJuviEDuB55zktp109GYDryw4GgGUVUHKCV1ksXKfXuCPMfXYLa6UNAQCHT3YK4MpZhldnZs771ms1x5GVCCyPRlZ1CiBW1w5A/2lhxh0C76fqthSsh7QCzt5RknquVcLgvdvdocRFmZI856g6Rc+DiCJlIH4oeC6EyFHp4FkXHI12kGDUANkyVFjV8Tx9U6bHY5AzwP9udQ/oQGL1/+0TNRRIn/g0+SXissZBhK6QbWNNqa3s2gN4lrhY2ELVsT8w+KRXBJMBSNsviLnJYdjI2qM5QNIHVWibqt8MWVB9T6nQw69jAch817ZTpUuSKT3BBTzyp5wtebPyrWm/DnpiJ2DfIGPIkCGtZclUnsVzIjh/fn9R++59oPXEJWXgqqJWk7nFZf/x35WuXE/XKanAPsFWtOjLzDMAiusUOKeE1WTqzlX5ABpm2QWdOwFQNiGCp0vx1pMpO206ApAxWDDzoIFgkK7PNvSrBl2DrSVTdjrXEQxZLa6n11gsH63LULR79y5tguXJ3OC9Neb4/suVLpftrdG3Yv9Oke2d1+Nteq8t6fhFJ/U7Xk8AKF31qZQ8mRu8x9sXfnxxpcsFe7z1zWksK1h9/JohyY9CSgVJbQKLX0JVkfqIf4ZNel/L4Y11JgBx2WqDpMmU1+D2qFtmpwJ4ff1OvmY5Q4ds8oEZAJLTkZW94ETEmhspTaa6Jt/q01C68erorWmJk44GqDLEytfXpnsYNAuTJlNdzjIfY7hfQ+DokyC8NhABeB7vFyQm6N/BIU2m7I5GviHXjX2R1csfFic0gSfKRxa/8tFI8lig6N7G7FcYJVdKkyk8jhqdA3oEA+8/NhEmP9c6d80uZhpAk2rLyraSJ1Nb4iVliOAyrf4UlxhJoYVTUl1ctA7ZAQ2AihQv0iqT5ppw9UknjJvxfsVpFzPfCdXKKk4A/AZ4q68ZWu9SxWkDZmN4M7p3VScxCnQEZSnGcEoqEwDAb4bgCIdt+7XaHNEAKtNIBUorTMLjMtVJx8Ro5QmOWCreqRQncYOBqhQfH682W06Lp6twW057ft9VqtQvvIqNM2jvCwChYU4VrvKkz6jZzK+E0eQ2ycl63FAgdtKfr101qRjAfoFH9+7d37Wt8mSntqcSucxvqChz0NmpfHLMWnWrYQt4j9DL6/nSGoBFCxTaSLwp9dfpjQBeGjQQ9b8CoJU+Dy4EwlMaAvn2Hyi0FivmjrbgfQBpq+wAzCwMwPwlhq8Ic93OauDO12cUnwuOEpeFWMGmzErBQzt6gMCrZENgW6rc4AgFJr1jR38nhsZV8VLj6xhW0oLdwqoWq+9Wp88U7BvMBOg9f/5adS3TQW311pg4Zz3k6ugktKFxlTaS9mdbRhBcpGm91fsE04borgDt7t0bZlwaZm5Pgdrq8XZYA4djS/oTFmBVzzqC6lUAwLfHRUXa1D9Xx4FXqSmtMVbpbLWZimuwrBa0u9ikwFcNBCUTkZXDYxS03xBp0B5ZTYtUXJMLToaQKJNyhs+zAOrOtfI6Kp2P9HU7pUAqaoDiMjoJIlbEmxN2bSbwQnEYpMYBXkDE+wr+0BUxT5cQGLLMbmZXXGZmQtzorWlzOH7ZITutS81JhDbjY6FAiYrtzl116A70Pi7M2Ayg6YR3bd84fwSKS/7VkNQWk+x7BlePuyUOOGkj2Bdiq81pfE4s8ES5u1BJwICyc3vXQnXxOQZua2GgKF990tXj7Mpr911mEB+vJDHy4jWVcBIDLvPqExXXHuAInZTo66Pc/afmhChQU+4IUZ489zJG3aE+J3te8xvd+2SOV5d9Mlsv1TlyIaAkxUt4aVVJg9fQTzqAcIXJMzr/tN6p4KkwXbMVbXec99sQqjCdPhu+ZjsafBWllSs1HpkQtyo+/ihFKSZGM9Mf/EfHxFRVmCMTB0DYILV5EJ9dTLjKByIUpgEFb85plCwEdjPs3nKOuHATeezeCkwMJN2ZQ0oCHNaF31K+5qyDBkZxLUuOv2vd+kwZSR5ZMpXWHqCbVT6Lg5jucZkouMhV6V717t276vBrSR5ZMnXXLnXqLH/gmm0pALjh2RJAJ91CkkeWTN255g6AkPIOANbcBEDf8amSPLJkyk52SuxcpG8xQeezBP10XUkeWTJl17Z/M3o6AHMqAlDqiTJAlXn6TEkeWTKl1VtjjFha0rbfGT3eZn620SenHjW3iO4qySNLpr72tRY0pqpnKwCqT0Co9rf0axuzOkC3l+SRJVNag3ixtLkX8BXoKPALRVYOvzGyPLJkSu0VfFY6FC9nUeihHaSK66WSPNJkyu5oVTKCgT/c1QSHJ+AAUiuUry3JI0umuMQbBZv5Wy1xZ8/LCi3o5wuNVtWG7aSDB99x1Wrm+FqyPLIE6uvz5gFA1yEmpPafNvHp0mTg5tMzIazsAzrVd5DqyvJIE6gyDce44LvxKDPhHuqTPUt9IkFdijfWaGUpRlK3HnHznXWBM63JVJEaf0Luk0NUpPTAxofsOAwmtDl9qpqcXOfce/cOXDCi44nH9xu1T/ALr5TlQWL3DV5kXfBU6vg9g3dtO0BZWmg8msLUNnC58vQLr0Y8Bjl3pZfy3FLQqsGoot7Kc1vWgDlRz7Omqk32Vj5+8/98bYHB6lLkGVF6yAFBREijaw+7VpSmP7Sj71pXVXxrnctnKkp67b6jB4DAP1utayckO1Xk2EjJV/rdu8ix7YDuQg0StesuGLw479JVcdIPR+jK8Zxxc+vb/WoDwO0Tr2h9UGbKb0OYU52qLxCkDtJA/+2pLJ13KV6+azeunPe3AVreJipbEeHTQwt1W0BXcbc0KliUb7M6L5M2bDAIcAVtSRcG6p0r8kgDJnuIRm1DA7C64FSLcMibdJPxHc1uGTjOFTSmGBDS17CvTre2p+F5u5qC5fp6i9B+R4qnl3dpkfF9S58o54t1BY2PACISEMtnRbN5T5cQ/KF46BZNMco7HQFX0Gg7YF8huj5j/8Hq/YJrRwoejSwAmD43MW9VjCtqVTDgXRIAoisB8eszFg1HFwMu8buRvFHfej0AcEXNrQhEXg0AWYlAaBbAlcIvMy4hpbtT6e7d8zKVLCnt6MEV5JMzBBb9oWji+UDkZwGea91mESaUDgvLy9S8ufT9JFxBkfMPu6brmCbQrRsM24AJ4Xuvrm4OEH2p8d583urkFpiuVCu8APAMFcsOqcIPyM22tu4TpMyKqgVM6Q5ePcpnrNrZ9ALoG5u3q7ynySk9SiY8tNNO4vK+WdtSQcCktfssdbc6ffg1DFzilGB57tZixX+hF0BiOoA9xLBcTkUmzHBKeZfyvTQw5/lS1WKON84kG5uHnNr2sGvPOUUlX39n1q1AznCROmtTFb81XfS3X5+xfpAmzRKBqxYbFNgvgPCCQQa7hSvqA384QZUxfZDbhf2zW5jiEFWoI9tpUJIyhC6afc5SfO+5V0387mT9QgDA50QILektOmiwpDZAi0N3ItSeNdMBqF7R8F5SHTo1afpCEdGkbuIpjZ53795SqaCAvuVjF2K9P9vEQD3P+HAtdnRrANIdqct77SiBCuvxltCx15nYlrUR3EowpysAmRcd6Z06dtnBA0HOsLMsXmxWsO0GOf9+daUrL2HQ7trTRp+3KeNR1spBFl8p6OsrPhF2g7CP6mXTTbzX6aB3bdtu8j/7+dOVrryEyZ+9ninDCT5vn0Du4jMABn8WQc8LAehXEWi4Vl2Q1MkTlJjywZxXCwZHyZ0flQ4ccxtgh0Y9AJrMDAJen5G/UjrSz0uJ2ZQ5ZIdh+SAkxdqu/W9JH3Zd+rfzx8EOkkcI9f12NeuGXJf/DwHy9TDIIbULuXDKkSgxkUezcFbzVw2iB1oRfs6YjAKxwM7moCBo0ih/RoUrsHiiXMngG7YDSo4rgRoDEFbuafJeRrjLtPpTaAA4oiZru9KgJlnblYYjao5Qd4D6VLIkKM7JNG8OSnXyETv9wqvIS4XJClOre/cO2gJWnZP77T9QnyNZwepTixvVJ9+nUjmkS1TnQep+dkxv1XmQzsd7Kc+RbLUhKE9jGqpPw3YL1aezelU+IFCbR1Osrf7chX99lH9hIPPCySrT0lMgdv56yJSKClPGBLjziTLFW1hhH7ZO71p1vWR/B+T7tE3OTvmKfzX3tdaflCVTY1LCSVz1Ndv4z7filM3o+p5HFWxt/JTOsy5r360ywIKchtVkSkxAXfYL8sPgmnILM7yBXc2nyQDAyb8N6SmZwE7WvoHVZErMyk2ZEvfuLQF9toDlzt5BAmiSjPUeb1u+bsZqMjV2QgcElfcJgDuqyOWQ+gDgEWKIcTakl4wDnijXsZ5M2T0Pu6YeAEUMd28rjinePjs1B6DzWnUJn11glydTQL01upRoaz3ehrfROln42K4NQ4PrVD8FiLb5vtbu/f/DlS63cY+3LmUjeCQAQ2oIgqObFwu+8DFIO+NfWv21+xKlyZTdoOwVAMzPFPQoBVAsyh8AyP+ubWkyZTd5F/MUgNpTkP8tBetX0WBUV2kyZSdpTDhwwx+KslP9AWpnq21o+Mfx4JEqS6bw2lSVPamJ54GD7g3hRVZUac73uCYk9JCd6jtKwAmtQsf2WyRNpvAkzvFYdWwY8ELRCfWbNlt1/P4DOzByXJeJR0qTqdB2qe7+c/efu//c/efuvyM4cLw0mOvXc6ysw7wiHY72tEgv12FKOSHBCMte1y5XeUpFn1l6nyC5vsHXbGf0b7I4O2XxVGo7Kaz+lnQ1gD3CXc3Q0FC7whMyPwj4MnN7ymDKSwMIrekL/DYQtHZfMLCzuU+g+EZ+2wfgRj8rPd5WxFBFKgItVyo+T5dKAJD8Q1eibsdBuF97o2bFgKaH7ig+H6oHwNzWAHBm24rpz5YaGUOdOkTYr7vk5Ecjvw2owh5vU7NTenTyAIMqUSMBYkNCKuUvBcqux9sKVvqzTe98Wv2Q12fm1BOkNUvDWPVXeaq7QQtxz38z4gS7mDtZAMPHhEPqCQ/tVERWE1eru8nHnAYQsk4vgs6GHm9bY485KRGpB3RqqDvLp/zCK2DBUlGbYQClZ/7QFSW2gO1IDSgYofC2ZVW9oKE9flQITBrUnsjkfQPf1Mt6+UDMSozOKOPVelx/FB7v7aS16sZvBNcARniEwOqLU7rkv90LGs9cu8/YDOCmifMymjvUXpsqhxdC2U19jyRiliQV2urP3X/u/nP3n7v/3P3n5jfh9Fm9Zb/WpUq9Prs0XJZHlkzlueHqRbG3J4cZXDb/0vq3Pl2S5pElU3fS5pcGTskhGWxPnQi+NYNleWTJ1J19ghnCl6fQV97jbfWKsjyyZOrOneLXQVWwNABMmQARfg2leWTJlJ3pFwIw93zD5Ad0BiQ9X9pOkueRJZP31rjb9gd2ee9/mq7t/3260vU/XaXa+NM3V7r+pzPqw//fZXu8XQ4A9m56SfJUeR5ZMnmPt39K+oCaqQ+7jArXC8adL/CfvnR1oY7VR0rzSJJZGXz11IuvXv/eh3PD+q3f/a0P55kqz3kJutRgG1rc+fR797aXfqPCU9tGyPJIk+X+NVaPJQ9RbqxLcNJtAGkdrPV4e74kjzSZsvPJz6YCexuGL5M7cAFAUFaIJI8smbrD9BySN4Xb1oZdzSFxfMN28oGZcMfqxt1keWQJFJ64pkvW7lsWCQysGQLfuL0J/JGZY3IaSZI80mSugdhSsXkGbrFLMMkfocIBcPhL8sgTuLdWoanKTqY3AHgbY5h3WisAvLyElJlG/uFuE16ZQoWa5Z1pKIfbSHfdBCBSDxdPqZczxQWO/8itadBYlzE4Nt5t4pPzUixl+heWN8Ypkq6ZkpLi7TayVB8H0Nx4Sjc70xPlpcGhPr2hj36eJfrhq4KebhTLMF09Dbd6KZmmv5mhULeH63VRgNPG3WpRQbd2prMA/+QQ/JP9kgC4fTFuLSnO9hE3CK+SNVMhOKF5zSQIThglhvE33Ln1xysYwFMyGbj6GrjF8N8JxUUHD6xsgSPcDSLJKEI4zZpNMh1yDk8L30yHkMo78yPFMnFzVHZKD4X4kqXvWnc9xOsdJaDPnHnzOtzgBZQqtWdQ8H8TPKJmQodXDWQ6NIHDr/UTKYAB2WoTWdh0fMKoGy2C3xeV4LdH6MawT9B2ydyKQPptJ3e5doFjTIqumeItU6zAzIS2BwSwg6QvgU/qFlEpOiUl0c3hLN0DWp5Hv50saKnrwDEP7VzoGTH29IEWm9EV/PHagKm20NE6uq9R/GMQ4X5Ilzjgy8xtaNI6vFBs6PU126MO2YHg6lPCHE18wt0GeolHC/cZ7tgvGA0sPibdXqWRr9WRhidfUdo+tvupBI9plkhVj8lukxESx58ObXMatDwe2ian0qRgLEBpj65OBjngqMZCjo8YXJZRxuIo/dvgGHUUz7UGAhQ+DXY2ny65UY6WmuUAw1+nQ6vuyE4B1IuGwnpS64BXDXCj4NiA0vX112xzVEBaFX0BTChg+Cq/LncyApgifory9RBRjSjxB0T4NYahXXwZdX2mU9X2gId2Drt2ixxkZMteq7Q3DJx2ZbgZnz10J9OpJqcA2alstZvRDXCz2CfQR53YJZxi+sa9DX3wAC4+R3TODU6OAWYWFgiT05suG278MJE6DJ+qsCpFrAjKe7tB1J0x4V3bnimZTiefMxyTvDTTuoIpYqVDE60j3S5CArptRUcDo9r0XhIMNVqIFteFUqWAbSnxzSy6O0ndBPZJwuBbrwNui0juAw/oDJA8Af6ubTeI6meCV0ImgL3e+sxo6/J3xVg5pMarqrpdsGxawVOAbm1X9QZiV3W1iPWbbLC8gsXQu9Y52Te4FVltyox6fSYhDk74Q6Ojt6fcIJothDrasDD4r4iAvj90JbWjdIbRpXrRHqHefwAkB7lJNNe6EjBQ698GiLl2woBCBw0m1sAgeOJTqcjBfS4a4qTFwExLpQoOHuhJW8DA5FEjrglZXWJcOKW7txlbu87McDeFpjmk2P6N16pz0vOK77haKKxizj0yziFReorPZSEV+xyfGFR2EqnVaw6Gqy+Pc4vomlIwCJiaUrAYAJVmZjQ7VthBgmHDAEKqdZjVptixs6FqilCzBb/wqnvKAQFA6XLT+q7baRMJBJ3TL2NSJ9wEysw03HPbhi67PvOu7THeMHRS2Tk7m97A7H7i87BjhOM1fJE1re+ck8vQMqUOFC94Elw/IyUR92wqJdO2ZkerLfVP93YlePY6X1UIHtfa1Ri0HuKpKBzzh67IyA7SXoaaEBQV54po0iFVSTgwUxn4hVd7BtU/8tkJkJIpOWxK2k5WVJdx+aDxdCDornUjgfZjHLTfUWqb4Lf4W68t5oV8KOGAgE92zirY7VKZ2dHn98zqfrbU0I3grIKNakULmb5he27AcP+dzbYFq/kLMd613TOrw0sDXjUY43GCcNxls5WEk28Eqt0REvrJot5WbE3f1iSzY8nCLLcsOq/P6G7AyjtoP7FR6/QBp/hZ/sx7ujTSzuxrL2lY++K2Uvl7Lgqt17eTRJ2+fUqH7GqOEpxedCpcekOhuK3o5RZTNmUiEztd+xKxd+26c4Wt3F9mflBJOL0MULYQAFZUEHY6dj2EhWvVtYfnS1vSHwmFHaTi3FINgHwFLD4BjBN6Q1gqtcKy1FxVTWLdzkqAOwR3qxuAWJduS1kkDAf2MpaEwIRAi0u2k5SEWQuBwIsK2607/NoidIUXja+BOV3HlIBNGQcP6CQBEFbSYiEU8wDgQqlpAIU7M1trraOpnSwmE3QHcJx157JV6zMWcwH6Vwfq9RTS9lYSMkKA9NM8Zk1PlzJGcCxJZ3k/2kdzyoYIte+AbLW+AESMtviFV3DZ8dYPMjvaWpBv2H40IsYRnGvRqOf+gzKFo2URZRE6rVESqq8Wr+orx20BQ0ZtIDVBUAwgNhkW3rVudrl9AyrqqTcWh2atBd9xlWGRCoddzxJ/663O0dqYzJimWNkkMGvEyUpCg7MQK3RFBMtqAZ20QHiRY48LgMbZqVN8ochtkxxw5wxBDx+DVI+hFkWdI9VjtpBMInIcsJNl0i5mBSVh+Q4S0KBTUOgBwUVwZL8zEzttiGQJ/ne39sWuurYQsLz8icCwQe8HakflkM5PD5s0cbIBy6Mq+d74bGkz2jm4PapS8NQRMyVCPd44E9pxoknrM4fsKAlTxyRBu/+drXbM0T90BanHtJ25Cfyt1ymCrjEfSSlaHyyjrYDBAcUBas/IWBE1Jw0j3v/ZhFELhjoL3fInTNkz6NRZkuam/DMbvD5jTu2McJREBX6C3KP2C9pgg7qlOWrC1GlxuYeeE2zg8OsioSiKWnlrru6TMyIT68/oZ4P2Up4XvWsbVVepy6d1aeZTGgVa7v5zvx8=" alt="Word2Vec vs FastText '대회'-'올림픽' 유사도 비교 막대그래프">
+      <figcaption>Word2Vec vs FastText — '대회'–'올림픽' 유사도 (실측: 0.8741 vs 0.9528)</figcaption>
+    </figure>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>"FastText가 유사도가 더 높으니 더 좋다"가 아니다. 더 높은 건 서브워드를 공유하는 단어들을 함께 끌어당긴 결과지, 의미를 더 정확히 잡아서가 아닐 수 있다. 작은 데이터에서 값이 위로 쏠리는 것도 이 때문이다. 선택 기준은 데이터다 — 신조어·오타·미등록어가 많은 한국어 텍스트라면 FastText의 서브워드가 강점이 되고, 어휘가 깔끔하게 고정된 도메인이라면 Word2Vec으로 충분하다.</p>
+    </div>
+    <p>학습한 모델은 <code>.model</code>로 저장하고 재로드해도 단어 사전 크기 77이 그대로 유지됐다. 한 번 그린 의미 지도를 파일로 들고 다니며 재사용할 수 있다는 뜻이다.</p>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 단어 단위 임베딩을 떠나, 라벨 없이 문서 묶음에서 주제를 캐내는 토픽 모델링으로 넘어간다.</div>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> 토픽 모델링 — 라벨 없이 뉴스에서 주제를 캐다<a href="#ch5" class="anchor-link">#</a></h2>
+    <p>임베딩이 "단어를 좌표로" 옮겼다면, 토픽 모델링은 "문서를 주제로" 묶는다. 정답 라벨 없이(비지도) 여러 문서를 훑어, 자주 함께 등장하는 단어 묶음을 하나의 주제로 추정한다. 실습은 한국어 뉴스 데이터를 Okt로 명사화한 뒤 LDA로 토픽을 뽑았다.</p>
+    <div class="terminal">
+      <div class="terminal-header">토픽_모델링_실습하기.ipynb — LDA 토픽별 상위 단어 (실제 출력 일부)</div>
+      <pre class="terminal-body">Topic 0: 인공, 지능, 인공 지능, 반도체, 기술 개발, 에너지, ...
+Topic 1: 안전, 사회, 플랫폼, 클라우드, 교통, 보안, 우주, ...
+Topic 5: 경기, 훈련, 축구, 우승, 야구, 관심, 진행, ...
+Topic 6: 선수, 중요하다, 감독, 야구, 리그, 기후, 과학, ...
+Topic 7: 전시, 공연, 축제, 영화, 금리, 음악, 관객, ...</pre>
+    </div>
+    <p>라벨을 준 적이 없는데도 묶음에 결이 보인다. Topic 0은 인공지능·반도체·기술, Topic 5·6은 경기·선수·야구 같은 스포츠, Topic 7은 전시·공연·영화 같은 문화다. 사람이 "이건 IT 주제"라고 적어 주지 않았는데, 단어 공기 패턴만으로 주제 덩어리가 갈라졌다.</p>
+    <div class="callout">
+      <span class="label">관찰</span>
+      <p>토픽이 사람이 보기에 늘 깔끔하진 않다. Topic 6에 '선수·감독·야구'와 함께 '기후·과학·알고리즘'이 섞여 들어왔다. LDA가 뽑는 건 "의미적으로 정의된 주제"가 아니라 "통계적으로 함께 등장한 단어 분포"다. 그래서 토픽의 이름은 결국 사람이 상위 단어를 보고 해석해 붙인다 — 모델은 묶음을 주고, 의미 부여는 분석가의 몫이다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 오늘 본 Word2Vec·FastText에는 공통의 천장이 있다. 그 한계가 다음 단계(동적 임베딩)를 부르는 지점이다.</div>
+
+  <section id="ch6">
+    <h2 class="chap"><span class="num">CH 06</span> 정적 임베딩의 끝 — '배'는 왜 항상 같은 벡터인가<a href="#ch6" class="anchor-link">#</a></h2>
+    <p>Word2Vec과 FastText는 학습이 끝나면 단어 하나당 벡터가 <strong>딱 하나</strong>로 고정된다. 이걸 정적 임베딩이라 부른다. 문제는 문맥에 따라 뜻이 갈리는 단어다. "배가 아파서 병원에 갔다"의 배(복부), "바다 위에 배가 떠 있다"의 배(선박), "맛있는 배를 먹었다"의 배(과일) — 정적 임베딩은 이 셋을 모두 같은 벡터로 변환한다. 주변 문맥이 달라도 좌표는 하나뿐이라, 서로 다른 의미가 한 점으로 평균화돼 버린다.</p>
+    <div class="qbox">
+      <span class="label">의문</span>
+      <p>그럼 단어 하나에 의미가 여럿일 때, 임베딩은 어느 의미를 좌표로 들고 있는 걸까? 답은 "그 단어가 학습 데이터에서 쓰인 모든 의미의 평균 어딘가"다. 어느 한 의미도 정확히 못 가리킨다는 뜻이다. 이 한계를 풀려면 단어가 아니라 <strong>문장 속의 단어</strong>를 임베딩해야 한다.</p>
+    </div>
+    <p>여기서 동적(문맥) 임베딩이 등장한다. BERT·GPT 같은 트랜스포머 기반 모델은 단어 자체가 아니라 문장 전체를 보고 의미를 잡아, 같은 '배'라도 주변 단어에 따라 서로 다른 벡터를 부여한다. 워드 임베딩의 흐름으로 보면 통계 기반(LSA)에서 신경망 정적 임베딩(2013, Word2Vec·GloVe)으로, 다시 문맥 동적 임베딩(2018, BERT·GPT)으로 이어지는 갈래의 한 칸이 오늘 자리다.</p>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>오늘의 결론은 두 줄이다. 첫째, 횟수로는 못 담던 의미가 학습한 임베딩에선 코사인 유사도라는 숫자로 떨어진다 — '대회'–'올림픽' 0.87이 그 증거다. 둘째, 같은 데이터라도 표현 단위(단어 통째 vs 서브워드)가 다르면 그 숫자가 달라진다 — FastText에서 0.95로 올라간 게 그 증거다. 그리고 그 숫자가 단어당 하나로 고정된다는 점이 정적 임베딩의 천장이고, 동적 임베딩은 바로 그 천장을 뚫기 위해 나온 다음 칸이다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_llm/0625-s</code> (word2vec_모델_실습하기 · 토픽_모델링_실습하기)</li>
+      <li>강의 PDF — 자연어처리_텍스트분류</li>
+      <li>공식 문서 — gensim Word2Vec·FastText</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 Day2(단원2) (2026-06-25)</p>
+  <p>의미는 횟수로 못 담지만 학습한 임베딩에선 유사도라는 숫자로 나온다. 같은 데이터에서도 Word2Vec과 FastText의 값이 갈리는 건 단어를 통째로 보느냐 서브워드로 쪼개 보느냐의 차이이며, 그 값이 단어당 하나로 고정된다는 점이 정적 임베딩의 한계이자 동적 임베딩으로 넘어가는 이유다.</p>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

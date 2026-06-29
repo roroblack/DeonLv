@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다층 퍼셉트론과 최적화 — 옵티마이저와 LSTM이 수렴을 가른다 (Day7)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 딥러닝 Day7. SGD·Adam 등 옵티마이저 비교, airline LSTM 시계열 예측, IMDB 시퀀스 pooling을 실측으로 확인한다.">
+  <meta property="og:title" content="다층 퍼셉트론과 최적화 — 옵티마이저와 LSTM이 수렴을 가른다 (Day7)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day7. SGD·Adam 등 옵티마이저 비교, airline LSTM 시계열 예측, IMDB 시퀀스 pooling을 실측으로 확인한다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="다층 퍼셉트론과 최적화 — 옵티마이저와 LSTM이 수렴을 가른다 (Day7)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day7. SGD·Adam 등 옵티마이저 비교, airline LSTM 시계열 예측, IMDB 시퀀스 pooling을 실측으로 확인한다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day7 · 부트캠프</p>
+  <h1>다층 퍼셉트론과 최적화함수 — SGD·Adam이 가르는 수렴, LSTM이 바꾸는 시퀀스</h1>
+  <p class="deck">같은 모델·같은 데이터인데 최적화 알고리즘 하나로 수렴이 갈린다. 그리고 시계열·문장처럼 순서가 있는 데이터에선 LSTM과 시퀀스 요약(pooling)이 무엇을 바꾸는지 끝까지 따라가 본다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-16</span>
+    <span><strong>도구</strong>PyTorch · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day7 — 딥러닝_다층퍼셉트론.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 최적화 알고리즘부터 시퀀스 요약까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 다층 퍼셉트론과 최적화함수의 자리</a></li>
+      <li><a href="#ch2">CH 02 · 같은 MLP, 다섯 옵티마이저 비교</a></li>
+      <li><a href="#ch3">CH 03 · 순서가 있는 데이터 — LSTM이 푸는 문제</a></li>
+      <li><a href="#ch4">CH 04 · airline LSTM, 12개월로 다음 1개월</a></li>
+      <li><a href="#ch5">CH 05 · 시퀀스를 한 벡터로 — pooling이 바꾸는 정확도</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>다음으로</strong> — 어제까지는 기울기를 구하고 한 걸음 내려가는 경사하강법까지 봤다. 오늘은 그 "한 걸음"을 어떻게 디자인하느냐 — 즉 최적화 알고리즘의 선택이 수렴을 얼마나 가르는지 같은 MLP로 직접 비교한다. 그다음, 순서가 의미를 만드는 데이터(시계열·문장)로 넘어가 LSTM과 시퀀스 요약 방식이 결과를 어떻게 바꾸는지 본다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 다층 퍼셉트론과 최적화함수의 자리<a href="#ch1" class="anchor-link">#</a></h2>
+    <p>다층 퍼셉트론(MLP)은 선형 변환과 비선형 활성화(ReLU 등)를 층층이 쌓아, 직선 하나로는 못 가르는 경계까지 휘어 맞추는 모델이다. 오늘 실습의 토대 모델은 <code>nn.Sequential</code>로 <code>Linear(2,16) → ReLU → … → Linear(16,2)</code>처럼 쌓은 단순한 분류기다. 구조가 같아도, 손실 표면 위에서 가중치를 "어떤 방식으로 움직일지"는 최적화 알고리즘이 정한다.</p>
+    <p>경사하강법의 갱신식 <code>w := w − α · ∂L/∂w</code> 자체는 같지만, 옵티마이저마다 이 한 걸음을 다듬는 방법이 다르다. SGD는 기울기 방향으로 고정 학습률만큼 그냥 간다. 여기에 <strong>모멘텀</strong>을 더하면 직전 갱신 방향을 관성처럼 일부 이어받아(여기선 0.9) 진동을 줄이고 골짜기를 더 빨리 내려간다. RMSprop은 파라미터별로 최근 기울기 제곱의 평균으로 학습률을 <strong>적응적</strong>으로 조절하고, Adam은 모멘텀(1차)과 RMSprop의 적응(2차)을 합친다. AdamW는 Adam에 가중치 감쇠를 분리해 붙인 변형이다.</p>
+    <div class="qbox">
+      <span class="label">가설</span>
+      <p>구조·초기값·에폭을 전부 똑같이 고정하면, 최적화 알고리즘만 바꿔도 수렴 속도와 최종 정확도가 의미 있게 갈릴 것이다. 특히 모멘텀이나 적응적 학습률이 있는 쪽이 plain SGD보다 빠르게, 더 낮은 손실로 내려갈 것이다 — 같은 MLP에 다섯 옵티마이저를 붙여 확인한다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 가설을 세웠으니, <code>make_moons</code> 데이터에 동일한 MLP를 두고 SGD부터 AdamW까지 다섯 개를 같은 조건으로 50 에폭 돌려 곡선을 겹쳐 봤다.</div>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> 같은 MLP, 다섯 옵티마이저 비교<a href="#ch2" class="anchor-link">#</a></h2>
+    <p>공정한 비교가 핵심이라, 매 실험마다 <code>torch.manual_seed(42)</code>로 초기 가중치를 똑같이 맞추고 모델을 새로 만든 뒤 옵티마이저만 교체했다. 데이터는 <code>make_moons(n_samples=2000, noise=0.25)</code>를 8:2로 나눠 학습 1600개, 손실은 <code>CrossEntropyLoss</code>, 50 에폭으로 통일했다.</p>
+    <div class="terminal">
+      <div class="terminal-header">optimizer_compare_torch.ipynb — 옵티마이저별 학습 로그 (에폭 10/30/50)</div>
+      <pre class="terminal-body">SGD          | Epoch 10/50 | Loss: 0.3377 | Test Acc: 0.8650
+SGD          | Epoch 50/50 | Loss: 0.2924 | Test Acc: 0.8825
+
+SGD_Momentum | Epoch 10/50 | Loss: 0.2408 | Test Acc: 0.9075
+SGD_Momentum | Epoch 30/50 | Loss: 0.1367 | Test Acc: 0.9300
+SGD_Momentum | Epoch 50/50 | Loss: 0.1464 | Test Acc: 0.9275
+
+RMSprop      | Epoch 10/50 | Loss: 0.2285 | Test Acc: 0.9075
+RMSprop      | Epoch 50/50 | Loss: 0.1350 | Test Acc: 0.9275
+
+Adam         | Epoch 10/50 | Loss: 0.2577 | Test Acc: 0.9000
+Adam         | Epoch 50/50 | Loss: 0.1357 | Test Acc: 0.9275
+
+AdamW        | Epoch 10/50 | Loss: 0.2582 | Test Acc: 0.9000
+AdamW        | Epoch 50/50 | Loss: 0.1359 | Test Acc: 0.9275</pre>
+    </div>
+    <figure class="shot">
+      <img src="img/day0616_optimizer_loss.png" alt="옵티마이저별 에폭에 따른 Loss 변화 곡선">
+      <figcaption>옵티마이저별 Loss 변화 — plain SGD만 위쪽에 남는다 (실제 출력)</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="img/day0616_optimizer_acc.png" alt="옵티마이저별 에폭에 따른 정확도 변화 곡선">
+      <figcaption>옵티마이저별 정확도 변화 — 모멘텀·적응형 4종은 0.93 부근에서 겹친다 (실제 출력)</figcaption>
+    </figure>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>가설대로 갈렸다. plain SGD는 50 에폭을 돌려도 손실 0.2924 / 정확도 0.8825에서 멈췄는데, 나머지 넷은 같은 50 에폭에 손실 0.135 근처, 정확도 0.9275까지 내려갔다. 차이는 단순히 최종값만이 아니라 속도에도 있었다 — SGD_Momentum은 10 에폭 만에 이미 0.9075로, SGD가 50 에폭에 도달한 0.8825를 넘어섰다. "옵티마이저는 그냥 기울기 따라가는 도구"가 아니라, 같은 손실 표면에서 얼마나 빨리·낮게 내려가느냐를 가르는 선택이다.</p>
+    </div>
+    <div class="callout">
+      <span class="label">함정</span>
+      <p>그렇다고 "Adam이 항상 최고"는 아니다. 이 문제에선 모멘텀 붙인 SGD와 RMSprop·Adam·AdamW가 거의 똑같은 곳(0.9275)에 모였다. 차이를 만든 건 "적응형이냐"보다 "관성·적응 중 무엇이든 plain SGD의 고정 학습률을 넘어섰느냐"였다. 데이터·구조가 바뀌면 우열도 바뀔 수 있으니, 옵티마이저는 고르는 게 아니라 같은 조건에서 비교해 정하는 대상이다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 여기까지는 입력 순서가 의미 없는(점 좌표) 데이터였다. 이제 순서 자체가 정보를 만드는 시계열·문장으로 넘어간다. 그러려면 "지나간 정보를 기억하는" 구조 — LSTM이 왜 필요한지부터 짚어야 한다.</div>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> 순서가 있는 데이터 — LSTM이 푸는 문제<a href="#ch3" class="anchor-link">#</a></h2>
+    <p>승객 수, 주가, 문장처럼 "앞이 뒤를 설명하는" 데이터는 MLP에 통째로 넣기 어렵다. 순환 구조(RNN)는 한 스텝씩 읽으며 상태를 다음 스텝으로 넘기는데, 시퀀스가 길어지면 앞쪽 정보가 점점 희미해지는 기울기 소실 문제가 생긴다. LSTM은 여기에 셀 상태(cell state)라는 별도의 정보 통로를 하나 더 두고, 세 개의 게이트로 무엇을 지우고(망각 게이트) 무엇을 새로 담고(입력 게이트) 무엇을 내보낼지(출력 게이트)를 조절한다. 덕분에 한참 전의 정보도 끝까지 살려 보낼 여지가 생긴다.</p>
+    <div class="qbox">
+      <span class="label">가설</span>
+      <p>실습 중 막혔던 지점이 있었다 — "건망증을 해결하려고 나온 게 어텐션 아니었나? LSTM과 뭐가 다른가?" LSTM이 곧 어텐션이라면, 시계열 예측에서도 긴 과거를 완벽히 기억할 것이다. 그렇다면 LSTM 예측은 추세든 피크든 다 맞혀야 한다 — airline 데이터로 어디까지 맞고 어디서 어긋나는지 확인하면 둘의 차이가 드러난다.</p>
+    </div>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>LSTM과 어텐션은 같은 "건망증"을 다른 방식으로 다룬다. LSTM은 차례대로 읽으며 정보를 고정 크기의 요약본 하나에 눌러 담는 순차적 메모리다 — 기억력을 늘리긴 했지만 결국 한 벡터로 압축한다. 어텐션은 요약본만 믿지 않고, 예측 시점마다 앞의 원본 단어들을 전부 다시 펼쳐 보고 필요한 부분에 가중치를 준다(오픈북 방식). 즉 LSTM≠어텐션이며, 어텐션은 LSTM의 "요약본 하나만 넘기기"의 한계에 반기를 든 다음 단계다. 오늘 실습은 그 직전 단계인 LSTM 자체의 한계까지 본다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 개념을 잡았으니, LSTM으로 항공 승객 수 시계열을 실제로 예측해 추세와 피크를 어디까지 잡는지 본다.</div>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> airline LSTM, 12개월로 다음 1개월<a href="#ch4" class="anchor-link">#</a></h2>
+    <p>월별 항공 승객 데이터(144개월)를 MinMaxScaler로 0~1로 정규화한 뒤, 과거 12개월을 입력으로 다음 1개월을 예측하는 시퀀스로 잘랐다. 모델은 <code>LSTM(input 1, hidden 300, batch_first) → Linear(300,1) → Sigmoid</code>, 손실은 회귀용 <code>MSELoss</code>, 옵티마이저는 RMSprop(lr 0.001)로 300 에폭 학습했다. 입력 형태는 <code>(batch, 12, 1)</code>이다.</p>
+    <div class="terminal">
+      <div class="terminal-header">airline_lstm_pytorch.ipynb — 학습·평가 로그와 예측 표본</div>
+      <pre class="terminal-body">Epoch [  1/300] - Train MSE Loss: 0.079773
+Epoch [ 50/300] - Train MSE Loss: 0.006203
+Epoch [150/300] - Train MSE Loss: 0.001229
+Epoch [300/300] - Train MSE Loss: 0.001757
+학습 완료: 30.23초
+
+테스트 MSE Loss: 0.021919
+원래 승객 수 기준 RMSE: 76.691
+
+        truth  prediction      error
+3  360.000000  335.142242  24.857758
+5  406.000000  332.667847  73.332153
+9  548.000000  450.767822  97.232178
+
+다음 1개월 예측 승객 수: 360.25</pre>
+    </div>
+    <figure class="shot">
+      <img src="img/day0616_airline_pred.png" alt="airline LSTM 예측값과 실제값 비교 그래프">
+      <figcaption>airline LSTM 예측 vs 실제 — 추세는 따라가되 피크에서 아래로 벌어진다 (실제 출력)</figcaption>
+    </figure>
+    <div class="callout">
+      <span class="label">함정</span>
+      <p>예측 곡선은 우상향 추세를 잘 따라갔지만, 표본에서 보이듯 실제 548명 구간을 450명으로 예측해 약 97명을 과소예측했다 — 피크가 높을수록 오차가 커졌다(RMSE 76.7명). CH03의 가설에 대한 답이 여기 있다. LSTM은 12개월을 한 요약 상태로 압축하다 보니, 급격히 치솟는 성수기의 정점을 보수적으로 깎아 낸다. "추세는 맞히되 피크는 과소예측"이 정확히 요약본 압축의 한계이고, 이게 어텐션이 필요해진 이유로 이어진다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 시계열에서 본 "한 벡터로 요약"의 문제는 문장 분류에서도 똑같이 나온다. 시퀀스를 어떤 방식으로 한 벡터로 모으느냐(pooling)가 정확도를 얼마나 바꾸는지 IMDB로 확인한다.</div>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> 시퀀스를 한 벡터로 — pooling이 바꾸는 정확도<a href="#ch5" class="anchor-link">#</a></h2>
+    <p>IMDB 영화평 감성 분류(긍정/부정)를 LSTM으로 풀 때, 단어별로 나온 LSTM 출력들을 분류기에 넘기려면 결국 한 벡터로 모아야 한다. 이 "모으는 방식(pooling)"이 변수다. 마지막 스텝 출력만 쓰는 <code>last</code>, 전 스텝 평균인 <code>mean</code>, 최댓값인 <code>max</code>, 평균과 최댓값을 이어 붙인 <code>meanmax</code>를 비교했다. 또 입력 문장 길이(max_len)도 함께 바꿔 봤다.</p>
+    <div class="terminal">
+      <div class="terminal-header">movie_imdb_lstm_pytorch (bayesian/pooling) — 시도별 검증 정확도 발췌</div>
+      <pre class="terminal-body">기본 last (max_len 80)  test_acc: 64.08%
+[trial 1]  pooling=last   max_len=120  val_acc=79.40%
+[trial 4]  pooling=max    max_len=120  val_acc=75.94%
+[trial 8]  pooling=max    max_len=200  val_acc=84.46%
+[trial 14] pooling=meanmax max_len=200 val_acc=86.16%
+[trial 19] pooling=meanmax max_len=200 val_acc=87.14%  (best)
+
+best 하이퍼파라미터: max_len=200, hidden_dim=256,
+  pooling=meanmax, dropout=0.36
+하이퍼파라미터 중요도: dropout 0.381 | max_len 0.368 | pooling 0.051</pre>
+    </div>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>pooling 방식만으로 정확도가 크게 움직였다. 마지막 한 스텝만 보는 <code>last</code>(64.08%)는 문장 전체를 마지막 요약본 하나에 의존하느라 낮았고, 평균(mean)·평균+최댓값(meanmax)으로 갈수록 올라가 best 조합(meanmax)에서 검증 87.14%까지 갔다. CH04에서 본 "요약본 하나로 압축"의 한계를, 여러 스텝을 함께 모으는 pooling이 일부 완화해 준 셈이다. 한 스텝이 아니라 시퀀스 전체에서 정보를 끌어모으는 방향이 어텐션의 발상과 같은 줄기다.</p>
+    </div>
+    <div class="callout">
+      <span class="label">함정</span>
+      <p>흥미롭게도 항상 "길수록·복잡할수록 좋다"는 아니었다. max_len을 80에서 200으로 늘리면 정확도가 오르기도 했지만(trial 8), 같은 200이라도 dropout이 0.49로 과하면 53.96%까지 떨어졌다(trial 3) — 중요도 표에서도 dropout(0.381)·max_len(0.368)이 pooling(0.051)보다 영향이 컸다. 즉 "어떤 옵티마이저·어떤 pooling"만큼이나 정규화와 입력 길이의 균형이 결과를 좌우한다. 한 요인만 보고 결론 내면 안 된다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0616-s</code> (optimizer_compare · airline_lstm · movie_imdb_lstm)</li>
+      <li>강의 PDF — 딥러닝_다층퍼셉트론</li>
+      <li>공식 문서 — PyTorch 옵티마이저(SGD·Adam)·LSTM</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day7 (2026-06-16)</p>
+  <p>같은 MLP라도 최적화 알고리즘이 수렴 속도와 도달점을 가른다(SGD 0.8825 vs 나머지 0.9275). 순서가 있는 데이터에선 LSTM이 정보를 한 요약본에 압축하느라 피크를 과소예측하고, 그 한계를 pooling·어텐션처럼 "시퀀스 전체에서 모으는" 방향이 메운다.</p>
+</footer>
+
+</div>
+</body>
+</html>

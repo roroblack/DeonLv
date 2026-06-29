@@ -1,0 +1,367 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) Day1 · 부트캠프</p>
+  <h1>영문과 한글, 전처리는 어디서 갈리나 — Kkma vs MeCab의 분해 방식</h1>
+  <p class="deck">자연어 딥러닝의 첫 단계는 모델이 아니라 텍스트 정리다. 영문은 NLTK로 문장·단어를 자르고 불용어를 걷어내면 끝나지만, 한글은 띄어쓰기 정규화와 형태소 단위 분해라는 관문이 하나 더 붙는다. 같은 한 문장을 형태소 분석기 두 개(Kkma, MeCab)에 넣어 토큰이 어떻게 달라지는지 끝까지 따라가 본다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-24</span>
+    <span><strong>도구</strong>NLTK · KoNLPy · kss · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 Day1 — 자연어처리_딥러닝모델.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 텍스트가 토큰이 되기까지</h2>
+    <ol>
+      <li>영문 전처리: 정규식 정리 → 문장/단어 토큰화 → 불용어 제거 → 소문자화</li>
+      <li>한글 전처리: 영문과 같아 보이지만 어디서 갈라지는가</li>
+      <li>띄어쓰기가 사라지면 문장 분할도 흔들린다 — kss와 그 한계</li>
+      <li>형태소 분석기 비교: 같은 문장, Kkma는 품사까지 / MeCab은 토큰을 빠르게</li>
+      <li>정리: 전처리는 최소가 아니라 "필요한 만큼"</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">자연어 딥러닝 모델은 문자열을 직접 계산하지 못한다. 그래서 텍스트를 숫자 벡터로 바꾸기 전, "어떤 단위로 자를 것인가"를 먼저 정해야 한다. 영문부터 시작해 한글로 넘어가면 그 단위 결정이 어디서 복잡해지는지가 자연스럽게 드러난다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>영문 전처리 — 정규식, 토큰화, 불용어<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>출발 텍스트는 스티브 잡스 연설의 한 대목이다. 영문 전처리의 골격은 네 단계로 단순하다. 정규식으로 군더더기 문자를 지우고, 문장과 단어로 자르고, 불용어를 걷어낸 뒤, 소문자로 통일한다.</p>
+
+    <p>먼저 <code>string.punctuation</code>으로 어떤 기호들이 후보인지 확인하고, <code>re.sub</code>로 단어·마침표·공백을 제외한 나머지를 제거한다. 따옴표가 사라지면서 문장이 한결 깔끔해진다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">re.sub('[^\w\.\s]', '', text) — 따옴표 제거 후</div>
+      <pre class="terminal-body">Beneath it were the words Stay Hungry. Stay Foolish.
+It was their farewell message as they signed off.
+And I have always wished that for myself.
+And now as you graduate to begin anew I wish that for you.</pre>
+    </div>
+
+    <p>이어서 줄바꿈(<code>\n</code>)까지 지워 한 줄로 만든 다음, NLTK의 <code>punkt</code> 모델을 받아 문장 단위로 자른다. 영문은 마침표·물음표 같은 구두점이 문장 경계 신호로 일관되게 작동하기 때문에, 사전 학습된 <code>punkt</code>만으로 문장 분할이 잘 맞아떨어진다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">nltk.sent_tokenize(cleaned_text)</div>
+      <pre class="terminal-body">['Beneath it were the words Stay Hungry.',
+ 'Stay Foolish.',
+ 'It was their farewell message as they signed off.',
+ 'And I have always wished that for myself.',
+ 'And now as you graduate to begin anew I wish that for you.']</pre>
+    </div>
+
+    <p>단어 토큰화(<code>word_tokenize</code>) 후, <code>stopwords.words('english')</code>로 의미가 옅은 기능어를 제거한다. the·it·was·for 같은 단어가 빠지면서 내용어 위주만 남는다. 마지막으로 소문자화로 같은 단어의 대소문자 변형을 하나로 모은다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">불용어 제거 → 소문자화</div>
+      <pre class="terminal-body">불용어 제거 후 :
+['Beneath','words','Stay','Hungry','.','Stay','Foolish','.','It',
+ 'farewell','message','signed','.','And','I','always','wished','.',
+ 'And','graduate','begin','anew','I','wish','.']
+
+소문자화 후 :
+['beneath','words','stay','hungry','.','stay','foolish','.','it',
+ 'farewell','message','signed','.','and','i','always','wished','.',
+ 'and','graduate','begin','anew','i','wish','.']</pre>
+    </div>
+
+    <div class="keypoint">
+      <span class="label">핵심</span>
+      영문 전처리의 핵심은 "단어가 이미 공백으로 분리되어 있다"는 전제다. 띄어쓰기가 곧 토큰 경계이므로, 정리·자르기·걸러내기만 하면 된다.
+    </div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>한글 전처리 — 같아 보이지만 한 관문이 더 있다<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p>한글 실습도 겉보기엔 영문과 같은 순서로 시작한다. 같은 잡스 연설을 한국어로 옮긴 텍스트에 <code>re.sub('[^\w\s]', '', text)</code>를 적용해 따옴표·마침표를 지운다. 여기까지는 영문과 똑같다.</p>
+
+    <p>문제는 그다음이다. 한국어는 영어와 달리 띄어쓰기가 토큰 경계를 보장하지 못한다. 실습에서는 일부러 <code>re.sub('\s', '', text)</code>로 모든 공백을 제거해 "띄어쓰기가 무너진" 텍스트를 만들어, 그 상태가 이후 단계에 어떤 영향을 주는지 확인한다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">re.sub('\s', '', text) — 공백 전부 제거</div>
+      <pre class="terminal-body">그밑에는"계속배고픔을느끼세요.계속바보로남으세요"라는문구가
+새겨져있었습니다.그들이전한마지막인사말이었습니다.계속배고픔을
+느끼세요.계속바보로남으세요.그리고저는항상제자신이그렇길바랬습
+니다.이제는졸업을하고새로운출발을하는여러분에게바라는바입니다.</pre>
+    </div>
+
+    <p>이렇게 공백이 사라진 텍스트는 영문처럼 <code>split()</code>으로 자르면 통째로 하나의 토큰이 되어 버린다. 그래서 한국어에는 띄어쓰기를 복원하는 단계(PyKoSpacing)와, 형태소 단위로 쪼개는 단계가 추가로 필요하다. 바로 이 지점이 영문과 한글 전처리가 갈리는 분기점이다.</p>
+
+    <div class="qbox">
+      <span class="label">의문</span>
+      한글은 왜 띄어쓰기 교정이 따로 필요한가? 영어는 단어 사이 공백이 거의 강제지만, 한국어는 조사가 명사에 붙고 띄어쓰기 규칙도 느슨해 실제 데이터에는 공백이 빠지거나 잘못 들어간 경우가 흔하다. 공백을 단어 경계로 신뢰할 수 없으니, "공백 정규화 → 형태소 분해"라는 우회로가 필요해진다.
+    </div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>문장 분할 — 띄어쓰기가 무너지면 kss도 흔들린다<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>한국어 문장 분할에는 <code>kss.split_sentences</code>를 쓴다. 공백을 모두 지운 텍스트를 넣어도 마침표를 단서로 문장은 대체로 잘 나뉜다. 다만 각 문장 내부의 띄어쓰기는 복원되지 않은 채 그대로 남는다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">kss.split_sentences(cleaned_text)</div>
+      <pre class="terminal-body">[Kss] 지원되는 C++ 형태소 분석기가 없어 pecab을 백엔드로 사용합니다.
+      mecab / konlpy.tag.Mecab 설치 시 더 빠르게 동작합니다.
+
+['그밑에는"계속배고픔을느끼세요.계속바보로남으세요"라는문구가새겨져있었습니다.',
+ '그들이전한마지막인사말이었습니다.',
+ '계속배고픔을느끼세요.',
+ '계속바보로남으세요.',
+ '그리고저는항상제자신이그렇길바랬습니다.',
+ '이제는졸업을하고새로운출발을하는여러분에게바라는바입니다.']</pre>
+    </div>
+
+    <p>주목할 점은 kss가 던지는 경고다. C++ 기반 형태소 분석기(MeCab)가 없으면 순수 파이썬 백엔드(pecab)로 대체되어 느려진다는 안내다. 문장 분할조차 내부적으로 형태소 정보를 활용한다는 뜻이고, 자연스럽게 다음 주제인 형태소 분석기로 이어진다.</p>
+
+    <div class="callout">
+      <span class="label">메모</span>
+      공백을 지운 상태로 <code>split()</code> 기반 토큰화를 하면 문장 전체가 토큰 하나로 묶인다. 한국어에서 "공백 = 토큰"이라는 영문식 가정이 통하지 않음을 실습이 직접 보여준다.
+    </div>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>형태소 분석기 — 같은 문장, 다른 분해<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>이제 핵심이다. 네이버 영화 리뷰에서 가져온 한 문장으로 분석기들을 비교한다.</p>
+
+    <p><strong>분석 문장:</strong> "살인 용의자와 변호사가 주고받는 대화로 인해 달라지는 상황에 따라 얼굴을 바꾸는 배우들의 다양한 연기를 볼 수 있는 것 또한 장점이다"</p>
+
+    <p>그냥 <code>split()</code>으로 자르면 "용의자와", "변호사가"처럼 조사가 명사에 붙어 있는 어절 단위가 된다. 형태소 분석기는 이 어절을 다시 의미 단위로 쪼갠다.</p>
+
+    <p><strong>MeCab</strong>은 형태소를 빠르게 토큰으로만 끊어 낸다. 품사 정보 없이 <code>morphs()</code>로 토큰 리스트를 돌려준다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">MeCab().morphs(kor_text) — 토큰만, 빠르게</div>
+      <pre class="terminal-body">['살인','용의자','와','변호사','가','주고받','는','대화','로','인해',
+ '달라지','는','상황','에','따라','얼굴','을','바꾸','는','배우','들',
+ '의','다양','한','연기','를','볼','수','있','는','것','또한','장점',
+ '이','다']</pre>
+    </div>
+
+    <p><strong>Kkma</strong>는 같은 문장을 형태소로 쪼개되 각 토큰에 품사 태그까지 붙인다. <code>pos()</code> 결과를 보면 명사(NNG), 조사(JC·JKS·JKM·JKO·JKG), 동사(VV), 어미(ETD·ECS·EFN) 등으로 세밀하게 분류된다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">Kkma().pos(example) — 품사까지 태깅</div>
+      <pre class="terminal-body">[('살인','NNG'),('용의자','NNG'),('와','JC'),('변호사','NNG'),
+ ('가','JKS'),('주고받','VV'),('는','ETD'),('대화','NNG'),('로','JKM'),
+ ('인하','VV'),('어','ECS'),('달라지','VV'),('는','ETD'),('상황','NNG'),
+ ('에','JKM'),('따르','VV'),('아','ECS'),('얼굴','NNG'),('을','JKO'),
+ ('바꾸','VV'),('는','ETD'),('배우','NNG'),('들','XSN'),('의','JKG'),
+ ('다양','NNG'),('하','XSV'),('ㄴ','ETD'),('연기','NNG'),('를','JKO'),
+ ('보','VV'),('ㄹ','ETD'),('수','NNB'),('있','VV'),('는','ETD'),
+ ('것','NNB'),('또한','MAG'),('장점','NNG'),('이','VCP'),('다','EFN')]</pre>
+    </div>
+
+    <p>두 결과를 같은 어절에서 나란히 놓으면 차이가 선명해진다.</p>
+
+    <table>
+      <thead>
+        <tr><th>원어절</th><th>MeCab (morphs)</th><th>Kkma (pos)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>인해</td><td>인해</td><td>인하/VV + 어/ECS</td></tr>
+        <tr><td>따라</td><td>따라</td><td>따르/VV + 아/ECS</td></tr>
+        <tr><td>다양한</td><td>다양 + 한</td><td>다양/NNG + 하/XSV + ㄴ/ETD</td></tr>
+        <tr><td>볼</td><td>볼</td><td>보/VV + ㄹ/ETD</td></tr>
+        <tr><td>장점이다</td><td>장점 + 이 + 다</td><td>장점/NNG + 이/VCP + 다/EFN</td></tr>
+      </tbody>
+    </table>
+
+    <p>Kkma는 "인해"를 기본형 "인하 + 어"로, "따라"를 "따르 + 아"로 되돌리고 "볼"을 "보 + ㄹ"로 분해한다. 어간을 원형으로 복원하고 활용 어미를 분리하는 방향이다. 반면 MeCab은 "인해", "따라", "볼"을 그대로 한 토큰으로 두어, 표면형을 유지하며 더 가볍게 끊는다.</p>
+
+    <div class="keypoint">
+      <span class="label">선택 기준</span>
+      품사·어간 정보가 필요한 분석(예: 명사만 추출, 동사 원형 통계)에는 Kkma처럼 품사를 붙이는 분석기가 유리하다. 대량 텍스트를 빠르게 토큰화해 임베딩에 넣는 게 목적이라면 MeCab의 속도가 강점이다. 같은 문장도 목적에 따라 "어떻게 쪼개는 게 맞는지"가 달라진다.
+    </div>
+
+    <div class="qbox">
+      <span class="label">의문</span>
+      그럼 분석기는 무조건 품사까지 주는 게 좋은가? 아니다. 품사 태깅은 그만큼 연산이 늘고, 어간 복원("인해"→"인하/어")은 표면형을 잃는다. 후속 임베딩이 표면형을 그대로 학습하길 원한다면 MeCab의 토큰이 오히려 자연스럽다. "더 세밀한 분해"가 항상 "더 나은 전처리"는 아니다.
+    </div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>정리 — 전처리는 "최소"가 아니라 "필요한 만큼"<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>오늘 실습을 한 줄로 줄이면 이렇다. 영문은 띄어쓰기가 토큰을 보장하므로 정리·토큰화·불용어 제거의 단순 파이프라인으로 충분하다. 한글은 띄어쓰기를 믿을 수 없어 공백 정규화와 형태소 분해라는 관문이 더 붙고, 그 형태소를 어떻게 쪼갤지는 분석기 선택의 문제로 이어진다.</p>
+
+    <p>분석기 비교에서 본 것처럼, "토큰을 더 잘게 나누는 것"이 목표가 아니다. 후속 모델이 무엇을 학습하길 원하느냐에 따라 품사를 붙일지(Kkma), 표면형 토큰을 빠르게 뽑을지(MeCab)가 결정된다. 전처리는 무조건 줄이거나 무조건 늘리는 작업이 아니라, 다음 단계가 필요로 하는 형태를 맞춰 주는 작업이다.</p>
+
+    <div class="callout">
+      <span class="label">다음</span>
+      오늘 만든 토큰들이 숫자 벡터(임베딩)로 바뀌고, 그 벡터가 RNN·LSTM을 거쳐 트랜스포머로 이어진다. 다음 글에서는 이 토큰이 어떻게 의미를 가진 벡터가 되는지를 다룬다.
+    </div>
+
+    <div class="ref-chain">
+      <p class="ref-title">📚 근거 출처</p>
+      <ol>
+        <li>실습 코드 — <code>from_colab_llm/0624-s</code> (영문·한글 전처리, 형태소 분석 실습)</li>
+        <li>강의 PDF — 자연어처리_딥러닝모델</li>
+        <li>공식 문서 — NLTK · KoNLPy · kss</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 Day1(단원2) (2026-06-24)</p>
+  <p>같은 문장도 분석기에 따라 다르게 쪼개진다 — 전처리의 정답은 "다음 단계가 무엇을 필요로 하는가"에 달려 있다.</p>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

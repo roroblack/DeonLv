@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>활성화함수와 기울기 소실 — 퍼셉트론에서 spiral 다중분류까지 (Day2)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 딥러닝 Day2. 활성화함수별 기울기 소실, 단층 퍼셉트론의 XOR 한계, spiral 3-class 비선형 경계를 실측으로 따라간다.">
+  <meta property="og:title" content="활성화함수와 기울기 소실 — 퍼셉트론에서 spiral 다중분류까지 (Day2)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day2. 활성화함수별 기울기 소실, 단층 퍼셉트론의 XOR 한계, spiral 3-class 비선형 경계를 실측으로 따라간다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="활성화함수와 기울기 소실 — 퍼셉트론에서 spiral 다중분류까지 (Day2)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day2. 활성화함수별 기울기 소실, 단층 퍼셉트론의 XOR 한계, spiral 3-class 비선형 경계를 실측으로 따라간다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day2 · 부트캠프</p>
+  <h1>신경망 계층구조 — 퍼셉트론·활성화함수·기울기 소실 (spiral 다중분류)</h1>
+  <p class="deck">활성화함수에 따라 학습 속도가 왜 갈리며(기울기 소실), 단층 퍼셉트론은 무엇을 못 푸나.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-09</span>
+    <span><strong>도구</strong>PyTorch · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day2 — 딥러닝_신경망알고리즘_계층구조.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 퍼셉트론에서 비선형 경계까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 퍼셉트론 — 가중합과 논리 게이트</a></li>
+      <li><a href="#ch2">CH 02 · XOR — 단층이 못 푸는 벽</a></li>
+      <li><a href="#ch3">CH 03 · 활성화함수 네 가지와 기울기</a></li>
+      <li><a href="#ch4">CH 04 · 기울기 소실 — 학습 속도가 갈리는 이유</a></li>
+      <li><a href="#ch5">CH 05 · spiral 3-class — MLP의 비선형 경계</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>오늘의 출발점</strong> — 노드 내부는 전부 숫자 곱셈과 덧셈뿐인데, 어떻게 "연봉 500 이상인가" 같은 조건을 알아서 만들어내는가. 이 질문을 따라가면 퍼셉트론 한 개에서 시작해 활성화함수, 그리고 층을 쌓아야 하는 이유까지 이어진다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>퍼셉트론 — 가중합과 논리 게이트<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>퍼셉트론 한 개는 입력에 가중치를 곱해 모두 더하고(가중합), 편향을 더한 뒤 기준을 넘으면 1, 못 넘으면 0을 낸다. 코드로 보면 조건문 한 줄 없이 <code>np.sum(x * w) + b</code>가 0보다 큰지 비교하는 것이 전부다. numpy로 AND·NAND·OR 게이트를 직접 가중치를 손으로 정해 구현했다.</p>
+
+    <h3 class="step">학습</h3>
+    <div class="qbox"><span class="label">가설</span> "직업이 개발자인가" 같은 조건은 노드 안에 글자로 들어있지 않다. 입력은 숫자 배열이고, 그 숫자에 곱해지는 가중치가 "기준선"을 만든다. 그렇다면 게이트마다 가중치와 편향만 바꾸면 동작이 달라질 것이다.</div>
+
+    <div class="terminal">
+      <div class="terminal-header">numpy_percept_logical_gate.ipynb — 가중치를 손으로 정한 단층 퍼셉트론</div>
+      <pre class="terminal-body">AND(0,0)=0  AND(1,0)=0  AND(0,1)=0  AND(1,1)=1   # w=[0.5,0.5], b=-0.7
+NAND       1          1          1          0    # w=[-0.2,-0.2], b=0.3
+OR         0          1          1          1    # w=[0.7,0.7], b=-0.4</pre>
+    </div>
+
+    <h3 class="step">관찰</h3>
+    <p>편향을 무작위(정규분포)로 뽑아 4개 입력을 모두 맞히는 <code>w1, w2, b</code>를 탐색해 봐도 AND는 <code>w1≈1.16, w2≈0.95, b≈-1.21</code>처럼 손으로 정한 값과 부호·크기 경향이 같았다. 정답을 가르는 직선 하나만 그으면 되는 문제라 해가 무수히 많다는 뜻이다.</p>
+
+    <div class="keypoint"><span class="label">배운 점</span> 노드 내부에는 "연봉 500 이상"이라는 문장이 없다. 가중치를 키우고 편향을 -500쯤으로 맞추면 <strong>입력이 그 기준을 넘을 때만 신호가 커지는 수학적 필터</strong>가 만들어질 뿐이다. 사람은 입력 칸의 순서를 약속할 뿐, 기준선은 숫자가 만든다.</div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — AND·OR·NAND는 직선 하나로 갈렸다. 그런데 직선 하나로 절대 못 가르는 입력 배치가 하나 있다. XOR이다.</div>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>XOR — 단층이 못 푸는 벽<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <h3 class="step">의문</h3>
+    <div class="qbox"><span class="label">가설</span> 두 입력이 서로 다를 때만 1을 내는 XOR을, 단층 퍼셉트론이 정말 못 푼다면 — 그게 왜 한때 인공지능 연구의 암흑기를 불렀을 만큼 큰 문제였을까. 게이트를 조합하면 풀리지 않을까.</div>
+
+    <h3 class="step">시행</h3>
+    <p>단층은 선형 분리(직선 하나)만 가능하다. XOR의 네 점 (0,0)→0, (1,1)→0, (1,0)→1, (0,1)→1을 평면에 찍으면 어떤 직선을 그어도 0과 1을 한 번에 갈라낼 수 없다. 대신 이미 만든 게이트를 층으로 쌓았다. <code>NAND</code>와 <code>OR</code>의 출력을 다시 <code>AND</code>에 통과시키는 2층 구조다.</p>
+
+    <div class="terminal">
+      <div class="terminal-header">numpy_percept_logical_gate.ipynb — XOR = AND( NAND(x1,x2), OR(x1,x2) )</div>
+      <pre class="terminal-body">[0,0]  NAND→1  OR→0  AND(1,0)→0
+[1,0]  NAND→1  OR→1  AND(1,1)→1</pre>
+    </div>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>한 층을 더 쌓으니 직선 하나로 못 가르던 문제가 풀렸다. 1층(NAND·OR)이 1차 기준을 만들고, 2층(AND)이 그 결과를 다시 조합한 것이다.</p>
+
+    <div class="keypoint"><span class="label">배운 점</span> 단층 퍼셉트론이 XOR을 못 푼다는 건 "비선형 문제를 직선 하나로는 못 가른다"는 한계의 상징이었다. 해결책은 <strong>은닉층을 쌓아 1차 조건을 다시 조합</strong>하는 것 — 이것이 다층 퍼셉트론(MLP), 즉 현대 딥러닝의 출발점이다.</div>
+
+    <div class="callout"><span class="label">함정</span> 위 XOR 코드는 NAND·OR·AND 함수가 먼저 정의돼 있어야만 동작한다. 게이트를 따로 정의하지 않고 XOR만 호출하면 NameError가 난다.</div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 층을 쌓으려면 층 사이에 비선형성을 넣는 활성화함수가 필요하다. 그런데 어떤 활성화함수를 쓰느냐에 따라 학습 속도가 크게 갈린다.</div>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>활성화함수 네 가지와 기울기<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>활성화함수가 없으면 <code>nn.Linear</code>를 아무리 쌓아도 결국 하나의 큰 선형식과 같아진다. 비선형성을 끼워야 곡선 경계를 학습한다. -5부터 5까지 입력에 Sigmoid·Tanh·ReLU·LeakyReLU를 적용하고, PyTorch 자동미분으로 각 함수의 기울기를 직접 구해 비교했다.</p>
+
+    <h3 class="step">테스트</h3>
+    <ul>
+      <li>Sigmoid: 출력을 0~1로 압축.</li>
+      <li>Tanh: -1~1로 압축, 출력 중심이 0에 가까움.</li>
+      <li>ReLU: 음수는 0, 양수는 그대로 통과. 양수 구간 기울기 1.</li>
+      <li>LeakyReLU: 음수 입력에 <code>negative_slope=0.01</code>을 곱해 작게 흘려보냄.</li>
+    </ul>
+
+    <figure class="shot">
+      <img src="img/day0609_grad_compare.png" alt="네 가지 활성화함수의 기울기(gradient) 비교 그래프">
+      <figcaption>활성화함수별 기울기(gradient) 비교 — Sigmoid·Tanh는 양 끝에서 0에 수렴, ReLU는 양수 구간에서 1로 평평 (실제 출력)</figcaption>
+    </figure>
+
+    <div class="callout"><span class="label">함정</span> ReLU는 음수 입력에서 출력도 기울기도 0이라 일부 뉴런이 학습 중 영구히 죽을 수 있다(Dying ReLU). LeakyReLU가 음수쪽 기울기를 0.01만큼 남겨 이 죽음을 막는 이유가 여기 있다.</div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 기울기 그래프에서 본 차이가 실제 학습 속도로 이어지는지, 같은 모델에 활성화함수만 바꿔 끼워 확인한다.</div>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>기울기 소실 — 학습 속도가 갈리는 이유<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <h3 class="step">시행</h3>
+    <p>입력 2 → 은닉 16 → 은닉 16 → 출력 1 구조를 고정하고, 활성화함수만 네 가지로 바꿔 two-moons(반달 모양 이진분류)를 같은 조건(Adam, lr=0.01, 200 epoch)으로 학습했다. 구조가 같으니 차이는 오직 활성화함수에서 온다.</p>
+
+    <h3 class="step">관찰</h3>
+    <div class="terminal">
+      <div class="terminal-header">activation_functions_pytorch.ipynb — 활성화함수별 최종 학습손실 / 검증정확도 (two-moons, 동일 조건)</div>
+      <pre class="terminal-body">Tanh       loss 0.0332   acc 1.000
+ReLU       loss 0.0249   acc 1.000
+LeakyReLU  loss 0.0248   acc 1.000
+Sigmoid    loss 0.2730   acc 0.935</pre>
+    </div>
+
+    <p>Sigmoid만 손실이 한 자릿수 높은 곳에 멈췄고 정확도도 0.935에 그쳤다. Sigmoid의 미분 최대값은 0.25라, 층을 거칠수록 기울기가 0.25씩 곱해지며 작아진다 — 역전파에서 앞쪽 층으로 신호가 거의 안 가는 기울기 소실이다. 반면 ReLU 계열은 양수 구간 기울기가 1이라 신호가 그대로 전달돼 더 빨리, 더 낮은 손실로 수렴했다.</p>
+
+    <div class="qbox"><span class="label">가설</span> 왜 Tanh를 굳이 쓸까. Sigmoid도 0~1로 압축하는데. — Tanh는 출력 중심이 0이라 학습 신호의 치우침이 덜하고, 미분 최대값도 1이라 Sigmoid보다 기울기 소실이 약하다. 실제로 여기서도 Tanh는 손실 0.0332로 ReLU에 근접했다.</div>
+
+    <div class="keypoint"><span class="label">배운 점</span> "학습이 느리다"의 상당 부분은 <strong>활성화함수의 기울기가 작아 역전파 신호가 죽는 문제</strong>다. 깊은 망에서 Sigmoid·Tanh가 기본값에서 밀려나고 ReLU가 표준이 된 건, CH3에서 본 기울기 모양(끝이 0이냐, 양수 구간이 1이냐)의 직접적인 결과였다.</div>
+
+    <div class="callout"><span class="label">함정</span> 이 실험의 lr=0.01은 Adam에는 다소 공격적인 값이다. Adam의 기본 학습률은 0.001이고, 0.01은 SGD 계열에서 흔히 쓰는 값이다. 학습이 튀면 0.001 이하로 낮추는 것이 먼저다.</div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 이진분류를 넘어, 직선으로는 도저히 못 가르는 3클래스 나선형 데이터를 MLP가 실제로 가르는지 결정경계로 확인한다.</div>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>spiral 3-class — MLP의 비선형 경계<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <h3 class="step">시행</h3>
+    <p>극좌표로 클래스마다 다른 각도 범위를 돌려 나선 3개(각 100개, 총 300개)를 만들었다. 클래스가 서로 말려 들어가 직선으로는 못 가른다. 입력 2 → 20 → 10 → 5 → 5 → 출력 3, 사이마다 ReLU를 넣은 MLP를 CrossEntropyLoss·Adam(lr=0.001)으로 10000 epoch 학습했다. 출력층에는 Softmax를 직접 붙이지 않는다 — CrossEntropyLoss가 내부에서 처리한다.</p>
+
+    <h3 class="step">관찰</h3>
+    <div class="terminal">
+      <div class="terminal-header">NN_Spiral_Multiclass_torch.ipynb — spiral 3-class 학습 경과 (CrossEntropyLoss, Adam lr=0.001)</div>
+      <pre class="terminal-body">Epoch [    0/10000]  Loss 1.152041  Acc 0.3333
+Epoch [  500/10000]  Loss 0.375452  Acc 0.9367
+Epoch [ 2000/10000]  Loss 0.052234  Acc 0.9933
+Epoch [10000/10000]  Loss 0.011385  Acc 0.9933</pre>
+    </div>
+
+    <figure class="shot">
+      <img src="img/day0609_spiral_boundary.png" alt="spiral 3-class 결정경계 — 나선 형태를 따라 휘어진 경계">
+      <figcaption>spiral 3-class 결정경계 — 직선이 아닌, 나선을 따라 휘어진 비선형 경계 (실제 출력)</figcaption>
+    </figure>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>시작 정확도 0.3333은 3클래스를 그냥 찍은 수준(1/3)이다. 학습이 진행되며 결정경계가 나선을 따라 휘어졌고 정확도 0.9933에 도달했다. CH2의 XOR에서 본 "층을 쌓아 1차 조건을 조합한다"는 원리가, 그대로 곡선 경계 학습으로 확장된 결과다.</p>
+
+    <div class="keypoint"><span class="label">배운 점</span> 단층이 못 푼 XOR과 직선으로 못 가르는 spiral은 같은 문제의 다른 크기다. <strong>은닉층이 입력을 비틀어 새 좌표(특징)를 만들고, 그 위에서 직선처럼 가르는 것</strong> — 이것이 MLP가 비선형 경계를 학습하는 방식이다.</div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0609-s</code> (activation_functions · NN_Spiral_Multiclass · numpy_percept_logical_gate)</li>
+      <li>강의 PDF — 딥러닝_신경망알고리즘_계층구조</li>
+      <li>공식 문서 — PyTorch 활성화함수</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day2 (2026-06-09)</p>
+  <p>퍼셉트론의 가중합에서 시작해 XOR의 벽, 활성화함수별 기울기 소실, 그리고 spiral 다중분류까지 — 층을 쌓아 비선형 경계를 학습하는 한 줄기를 따라갔다.</p>
+</footer>
+
+</div>
+</body>
+</html>

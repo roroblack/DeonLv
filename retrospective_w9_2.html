@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가입 고객 이탈 예측 — 라벨이 승자를 결정한다 (팀프로젝트2 회고)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 팀프로젝트2(가입 고객 이탈 예측) 주간회고. Bank Churn 베이스라인에서 REES46 2069만 건까지, 라벨 성격에 따라 GBM과 시퀀스 DL의 승자가 갈린 과정을 실측으로 정리한다.">
+  <meta property="og:title" content="가입 고객 이탈 예측 — 라벨이 승자를 결정한다 (팀프로젝트2 회고)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 팀프로젝트2(가입 고객 이탈 예측) 주간회고. Bank Churn 베이스라인에서 REES46 2069만 건까지, 라벨 성격에 따라 GBM과 시퀀스 DL의 승자가 갈린 과정을 실측으로 정리한다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="가입 고객 이탈 예측 — 라벨이 승자를 결정한다 (팀프로젝트2 회고)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 팀프로젝트2(가입 고객 이탈 예측) 주간회고. Bank Churn 베이스라인에서 REES46 2069만 건까지, 라벨 성격에 따라 GBM과 시퀀스 DL의 승자가 갈린 과정을 실측으로 정리한다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 9주차 회고(팀프로젝트2) · 교과목 2 단위 프로젝트 · 부트캠프</p>
+  <h1>가입 고객 이탈 예측 — "라벨이 승자를 결정한다" (팀프로젝트2 회고)</h1>
+  <p class="deck">9주차 중반은 정규 수업 대신 팀 프로젝트2였다. 18일 팀이 배정되고 19일부터 시작해 주말까지 달렸고, 23일에 발표했다.
+  주제는 <strong>가입 고객 이탈 예측(Customer Churn)</strong>. Bank Churn 작은 데이터로 베이스라인을 잡고, REES46 화장품 이커머스 로그 2,069만 건까지 키우며
+  한 질문을 끝까지 따라갔다 — <strong>"어떤 모델이 이탈을 가장 잘 맞히나, 그리고 무엇이 그 답을 정하나."</strong> 모든 수치는 팀이 직접 돌린 결과다.</p>
+  <div class="meta-row">
+    <span><strong>기간</strong>2026-06-18(팀 배정) · 06-19 시작 · 주말 작업 · 06-23 발표</span>
+    <span><strong>주제</strong>가입 고객 이탈 예측 (팀 프로젝트 · 가지마/GAJIMA)</span>
+    <span><strong>데이터</strong>Bank Churn(1만) → REES46 화장품(2019-10~2020-02, 2,069만 이벤트)</span>
+    <span><strong>도구</strong>scikit-learn · XGBoost/LightGBM/CatBoost · PyTorch · optuna (Python 3.13.5)</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+  </div>
+</header>
+<main>
+<nav class="flow">
+  <h2>이 글의 흐름 — 이탈 예측, 답을 정하는 것은 무엇인가</h2>
+  <ol>
+    <li><a href="#ch1">CH 01 · 출발 — 팀 배정과 베이스라인(Bank Churn)</a></li>
+    <li><a href="#ch2">CH 02 · 전처리를 더 짜낼 수 있을까 — 베이지안 최적화의 반전</a></li>
+    <li><a href="#ch3">CH 03 · 데이터를 키우다 — REES46 2,069만 건과 recency의 지배</a></li>
+    <li><a href="#ch4">CH 04 · 반전 — 라벨을 다시 세우자 DL이 GBM을 넘었다</a></li>
+    <li><a href="#ch5">CH 05 · 실시간과 서비스 — 리플레이 예측과 GAJIMA 앱</a></li>
+    <li><a href="#ch6">CH 06 · 종합 회고 — 발표와 배운 점</a></li>
+  </ol>
+</nav>
+
+<div class="bridge">
+  <strong>한 주의 출발</strong> — 첫 팀 프로젝트(1차)가 "데이터를 모아 웹앱으로 보여주기"였다면, 2차는 "모델로 무언가를 <em>예측</em>하기"였다.
+  이탈 예측은 모델 종류 싸움처럼 보였지만, 끝에서 깨달은 건 달랐다 — 승부를 가른 건 모델이 아니라 <strong>라벨(문제를 세우는 방식)</strong>이었다.
+</div>
+
+<section id="ch1">
+  <h2 class="chap"><span class="num">CH 01</span>출발 — 팀 배정과 베이스라인(Bank Churn)<a href="#ch1" class="anchor-link">#</a></h2>
+  <h3 class="step">학습</h3>
+  <p>18일 팀이 배정되고 19일부터 본격 작업을 시작했다. 필수 산출물은 셋 — 데이터 전처리 결과서, 학습 결과서, 학습된 모델이었다.
+  먼저 작은 정형 데이터(Bank Churn, 학습 8,000 / 테스트 2,000, 이탈 20.4%)로 베이스라인을 세웠다. ML 세 종류(로지스틱·랜덤포레스트·그래디언트부스팅)와 DL(MLP)을 같은 데이터로 비교했다.</p>
+  <h3 class="step">의문 → 기준</h3>
+  <div class="qbox"><span class="label">의문</span>
+  이탈이 20.4%로 불균형인데 "정확도"만 보면 다 유지(0)로 찍어도 80%가 나온다. 그러면 무엇을 기준으로 모델을 고를까?</div>
+  <p>비즈니스 목표는 "이탈할 고객을 미리 찾아 잡는다"이므로 <strong>Recall(놓치지 않기)</strong>을 중시하되, 임계값에 흔들리지 않는 <strong>ROC-AUC</strong>를 모델 선정 1차 기준으로 삼았다.</p>
+  <div class="terminal">
+    <div class="terminal-header">train_ml.py · train_dl.py · compare.py — Bank Churn 테스트(2,000건) 성능</div>
+    <pre class="terminal-body">모델                Accuracy  Precision  Recall   F1     ROC-AUC
+GradientBoosting    0.869     0.782      0.494    0.605  0.870  ⭐
+MLP(딥러닝)         0.783     0.480      0.764    0.590  0.862
+RandomForest        0.863     0.788      0.447    0.571  0.855
+LogisticRegression  0.714     0.387      0.700    0.499  0.777</pre>
+  </div>
+  <figure class="shot">
+    <img src="img/w92_bank_auc.png" alt="Bank Churn 모델별 ROC-AUC">
+    <figcaption>Bank Churn 베이스라인 — GBM이 AUC 0.870으로 1위. MLP는 Recall 0.764로 "놓치지 않기"엔 강했다 (실측)</figcaption>
+  </figure>
+  <div class="keypoint"><span class="label">관찰 → 정리</span>
+  종합 분별력(AUC)은 GBM이 가장 높았지만, MLP는 Recall이 0.764로 가장 높아 "이탈 후보를 폭넓게 건진다"는 다른 강점을 보였다.
+  <strong>"최고 모델"은 하나가 아니라 무엇을 중시하느냐(Recall vs 정밀도)에 달렸다</strong>는 걸 첫 표에서 확인했다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 모델을 바꾸기 전에, 전처리를 더 정교하게 하면 점수가 오를까? 이걸 베이지안 최적화로 정면으로 물어봤다.</div>
+</section>
+
+<section id="ch2">
+  <h2 class="chap"><span class="num">CH 02</span>전처리를 더 짜낼 수 있을까 — 베이지안 최적화의 반전<a href="#ch2" class="anchor-link">#</a></h2>
+  <h3 class="step">의문 → 실험</h3>
+  <p>인코딩·스케일링·이상치·불균형 처리(SMOTE 등)와 모델 하이퍼파라미터를 한꺼번에 optuna(TPE) 40회 탐색으로 돌렸다. 5-fold 교차검증 AUC로 평가했다.</p>
+  <div class="qbox"><span class="label">가설</span>
+  전처리 조합을 정교하게 탐색하면 baseline보다 AUC가 의미 있게 오를 것이다.</div>
+  <div class="callout"><span class="label">예상 밖</span>
+  baseline 0.8662 = best 0.8662. 즉 <strong>전처리 탐색으로는 거의 오르지 않았다.</strong> 탐색이 꼽은 중요도는 전처리 기법들이 아니라 <strong>모델 선택이 0.997로 사실상 전부</strong>였고, SMOTE는 오히려 0.8648로 떨어뜨렸다.</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  이 데이터에서 성능을 지배한 건 전처리 레시피가 아니라 모델 종류였다. "전처리를 더 짜내자"는 직관이 항상 통하지는 않는다 —
+  <strong>어디에 병목이 있는지를 먼저 측정</strong>해야 노력을 옳은 곳에 쓴다. SMOTE처럼 흔히 권장되는 기법도 데이터에 따라 역효과가 났다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 작은 정형 데이터에선 GBM이 강했다. 그렇다면 데이터를 수천만 건으로 키우고 "순서"가 있는 행동 로그를 주면, 시퀀스 딥러닝이 GBM을 넘을까? 진짜 데이터로 옮겨갔다.</div>
+</section>
+
+<section id="ch3">
+  <h2 class="chap"><span class="num">CH 03</span>데이터를 키우다 — REES46 2,069만 건과 recency의 지배<a href="#ch3" class="anchor-link">#</a></h2>
+  <h3 class="step">학습 → 시행</h3>
+  <p>최종 데이터를 REES46 화장품 이커머스 로그(2019-10~2020-02, 약 2,069만 이벤트)로 바꿨다. 정형 피처(RFM류)와 주별 행동 시퀀스(view·cart·purchase)를 함께 만들고,
+  "계정 이탈"(관찰 기간 뒤 활동 없음)을 라벨로 ML(GBM 등)과 시퀀스 DL(RNN·LSTM·Transformer)을 같은 표본에서 비교했다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  데이터·시퀀스를 키우면 시퀀스 딥러닝이 정형 모델을 넘는가?</div>
+  <div class="terminal">
+    <div class="terminal-header">retail_rees46 / retail_rees46_multi — 계정 이탈 라벨, 최고 ROC-AUC</div>
+    <pre class="terminal-body">단계                  표본/시퀀스          ML 최고          시퀀스 DL 최고      승자
+온라인리테일          3,317명 · 월9스텝     GBM 0.745        LSTM 0.742         ML
+REES46 1개월          60,000명 · 일21스텝   GBM 0.803        Transformer 0.795  ML(근소)
+REES46 5개월(다개월)  80,000명 · 주18스텝   GBM 0.826 ⭐     Transformer 0.818  ML(근소)</pre>
+  </div>
+  <div class="callout"><span class="label">CLUE</span>
+  데이터를 키울수록 전체 AUC는 0.745 → 0.803 → 0.826으로 올랐지만, <strong>세 단계 모두 시퀀스 DL이 GBM을 넘지 못했다.</strong>
+  원인은 모델이 아니라 라벨이었다 — 이 "계정 이탈"은 <code>recency</code>(마지막 활동 후 경과, 중요도 0.094로 압도적)로 거의 환원돼, 순서·패턴이 정답을 거의 안 가른다.</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  recency로 환원되는 문제에선 그 집계 신호를 가장 잘 쓰는 <strong>GBM이 작은 데이터에서도, 큰 데이터에서도 1위</strong>였다.
+  시퀀스 DL의 강점(순서 학습)은 발휘될 자리가 없었다. "데이터를 키우면 DL이 이긴다"는 기대 자체가 라벨을 잘못 본 것이었다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 그렇다면 순서가 실제로 중요한 라벨을 주면 결과가 뒤집힐까? 라벨을 다시 설계했다.</div>
+</section>
+
+<section id="ch4">
+  <h2 class="chap"><span class="num">CH 04</span>반전 — 라벨을 다시 세우자 DL이 GBM을 넘었다<a href="#ch4" class="anchor-link">#</a></h2>
+  <h3 class="step">의문 → 재정의</h3>
+  <p>라벨을 네 가지로 나눠 같은 조건에서 비교했다 — base(계정 이탈), <strong>A(세션 즉시 이탈: 구매 없이 세션 종료, 입력=구매 직전 이벤트 <em>순서</em>)</strong>, B(단기 이탈), C(다음 활동까지 시간·회귀). A만 순서가 본질인 과제다.</p>
+  <div class="terminal">
+    <div class="terminal-header">retail_rees46_labels — 세션 즉시 이탈(라벨 A) ROC-AUC</div>
+    <pre class="terminal-body">LSTM (시퀀스 DL)     0.930  ⭐   ← 처음으로 GBM을 넘음
+GBM (정형)           0.929
+MLP (정형 DL)        0.928
+Transformer (시퀀스) 0.927
+LogReg (정형)        0.911
+
+참고) recency형 라벨에선 여전히 GBM 우위: base 0.803 · 다개월 0.826</pre>
+  </div>
+  <figure class="shot">
+    <img src="img/w92_label_winner.png" alt="라벨 성격별 최고 모델 — ML vs DL">
+    <figcaption>같은 데이터, 다른 라벨. recency·집계 라벨은 GBM, 순서가 살아 있는 세션 라벨에선 시퀀스 DL(LSTM 0.930)이 GBM(0.929)을 넘었다 (실측)</figcaption>
+  </figure>
+  <div class="keypoint"><span class="label">반전 → 결론</span>
+  모델을 더 키운 게 아니라 <strong>문제(라벨)를 순서가 중요한 형태로 다시 세운 것</strong>이 승부를 갈랐다.
+  recency로 환원되는 문제엔 GBM이, 순서가 살아 있는 실시간 세션 문제엔 시퀀스 DL이 이긴다 — <strong>"라벨의 성격이 어떤 모델이 이길지를 정한다."</strong>
+  이것이 프로젝트 전체를 관통한 한 문장이 됐다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 순서가 중요한 세션 문제라면, 예측은 "세션이 끝난 뒤"가 아니라 "세션 도중 실시간"이어야 가치가 있다. 그래서 실시간 예측과 서비스로 확장했다.</div>
+</section>
+
+<section id="ch5">
+  <h2 class="chap"><span class="num">CH 05</span>실시간과 서비스 — 리플레이 예측과 GAJIMA 앱<a href="#ch5" class="anchor-link">#</a></h2>
+  <h3 class="step">학습 → 시행</h3>
+  <p>운영 사이트가 없어도 실시간을 검증할 수 있었다. 과거 로그를 시간순으로 한 건씩 흘려보내는 <strong>리플레이(replay)</strong>가 곧 실시간 이벤트 스트림과 같기 때문이다.
+  세션 이벤트를 1..t까지만 보여주며(미래 누수 차단) 이탈 확률이 갱신되는 과정을 재생하고, "이벤트 몇 개를 보면 충분히 정확한가(정확도@k)"를 측정했다.</p>
+  <div class="keypoint"><span class="label">배운 점</span>
+  "실시간 예측"은 거창한 인프라가 아니라 <strong>이벤트를 도착 순서대로 처리하는 것</strong>이었다. 라이브 사이트 없이 로그 리플레이만으로 실시간 동작과 조기 경보 성능을 정직하게 시연할 수 있었다.</div>
+  <h3 class="step">시행 — 데모 앱(GAJIMA)</h3>
+  <p>예측을 실제 서비스 형태로 감쌌다. <strong>InsightFace 얼굴 로그인</strong>(등록 얼굴과 비교 인증)에 성공한 사용자만 이탈 예측 대시보드를 쓰는 Streamlit 앱이다.
+  로컬 백엔드(FastAPI)를 cloudflared 터널로 노출하고 Vercel 프런트(gajimasimul)와 연결해, 고객을 조회하면 이탈 확률과 대응 액션(SNS·할인·연관추천)이 뜨도록 만들었다.</p>
+  <div class="callout"><span class="label">정직하게</span>
+  개입 효과(쿠폰을 보내면 전환↑)는 A/B 실험 없이는 인과적으로 증명할 수 없어, <strong>예측 품질과 타겟팅 시뮬레이션</strong>까지만 보이고 "인과 효과는 가정"임을 분명히 했다.</div>
+  <div class="bridge"><strong>그래서</strong> — 베이스라인부터 대규모·실시간·서비스까지 한 바퀴를 돌며, 처음의 "어떤 모델이 최고인가"는 "문제를 어떻게 세울 것인가"로 바뀌어 있었다.</div>
+</section>
+
+<section id="ch6">
+  <h2 class="chap"><span class="num">CH 06</span>종합 회고 — 발표와 배운 점<a href="#ch6" class="anchor-link">#</a></h2>
+  <h3 class="step">잘한 점 / 부족했던 점 / 다음 한 수</h3>
+  <ul>
+    <li><strong>잘한 점</strong> — 작은 데이터(Bank)에서 대규모(REES46 2,069만)까지 스케일을 올리며, 라벨 4종(base/A/B/C)을 같은 조건으로 비교해 "라벨이 승자를 정한다"를 <em>수치로</em> 증명했다(세션 A: LSTM 0.930 &gt; GBM 0.929).</li>
+    <li><strong>부족했던 점</strong> — DL이 이긴 폭이 0.001로 근소했고, 개입 효과는 실험이 없어 가정에 머물렀다. 베이지안 최적화는 이 데이터에선 이득이 거의 없었다(model 중요도 0.997).</li>
+    <li><strong>다음 한 수</strong> — 세션 라벨에 시간 간격 임베딩·하이브리드(통계+시퀀스)·멀티태스크를 더해 0.930의 천장을 올리고, 조기 경보(정확도@k)를 서비스 지표로 다듬는다.</li>
+  </ul>
+  <div class="keypoint"><span class="label">관통 교훈</span>
+  <ol>
+    <li><strong>불균형엔 정확도 한 숫자를 믿지 말 것.</strong> Recall·F1·AUC로 "어떤 오류를 내는 모델인가"를 본다(이탈은 Recall 중시).</li>
+    <li><strong>병목을 먼저 측정.</strong> 이 데이터의 성능은 전처리(0.003 미만 기여)가 아니라 모델 선택(0.997)이 지배했다.</li>
+    <li><strong>라벨의 성격이 승자를 정한다.</strong> recency·집계 → GBM, 순서·세션 → 시퀀스 DL. 모델 교체가 아니라 문제 재정의가 핵심이다.</li>
+    <li><strong>실시간은 순서 처리다.</strong> 로그 리플레이로 라이브 없이 실시간을 검증·시연할 수 있다.</li>
+  </ol>
+  </div>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>팀 프로젝트 코드·리포트 — <code>ml_workspace/team_project_churn/</code> (<code>src/train_ml·train_dl·compare</code>, <code>reports/02 학습결과서·09 다개월 시퀀스DL·11 라벨별 base/A/B/C·12 실시간 구현·16 전처리 베이지안</code>)</li>
+      <li>데모 앱 — <code>ml_workspace/face_churn_app_mysql</code> (InsightFace 얼굴 로그인 + 이탈 예측 Streamlit), GAJIMA(gajimasimul) 배포</li>
+      <li>데이터 — Bank Churn(<code>Churn_Modelling.csv</code>) · REES46 Cosmetics(2019-10~2020-02)</li>
+      <li>공식 문서 — scikit-learn · XGBoost · PyTorch · optuna</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 팀 프로젝트2 회고 (2026-06-18 배정 ~ 06-23 발표)</p>
+  <p>가입 고객 이탈 예측 — Bank Churn 베이스라인에서 REES46 2,069만 건·실시간·서비스까지. 모든 수치·로그는 팀 실행 결과이며, 차트는 그 실측값을 시각화했다.</p>
+</footer>
+
+</div>
+</body>
+</html>

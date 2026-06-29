@@ -1,0 +1,348 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) Day3 · 부트캠프</p>
+  <h1>언어 모델 — LSTM IMDB 감성분류</h1>
+  <p class="deck">텍스트의 순서를 LSTM으로 읽어 감성을 분류한다. 그런데 막상 손에 잡힌 건 모델 설계가 아니라 "이걸 돌아가게 만드는 일", torchtext 호환성과 출력 차원이었다. 절반은 디버깅이었다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-26</span>
+    <span><strong>도구</strong>PyTorch Lightning · torchmetrics · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 Day3 — 자연어처리_언어모델(PDF 미업로드)</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 모델보다 "돌아가게 만드는 일"</h2>
+    <ol>
+      <li>왜 순서를 읽어야 하나 — RNN·LSTM이 등장한 이유</li>
+      <li>LSTM 감성분류기 한 채 짓기 — Embedding → LSTM → Linear</li>
+      <li>첫 번째 벽: torchtext.legacy 임포트가 WinError 127로 죽다</li>
+      <li>두 번째 벽: 출력이 3차원? 긍/부정인데 — output_size와 메트릭</li>
+      <li>Seq2Seq·어텐션으로 가는 길 — 고정 벡터 병목의 예고</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">
+    <p>지난 단원에서 텍스트를 숫자로 바꾸는 데까지 왔다면, 오늘은 그 숫자 시퀀스를 <strong>순서대로</strong> 읽어 하나의 판단(긍정/부정)으로 압축하는 모델을 직접 세운다. 데이터는 IMDB 영화 리뷰, 모델은 LSTM. 그런데 코드를 다 짜고 실행 버튼을 누른 순간, 학습이 시작되기는커녕 임포트 단계에서 프로그램이 멈춰버렸다.</p>
+  </div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>왜 "순서"를 읽어야 하나<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>리뷰 한 줄은 단어가 일렬로 놓인 시퀀스다. "not good"과 "good"은 같은 단어 <code>good</code>을 품지만 순서·문맥이 의미를 뒤집는다. 그래서 단어 가방(BoW)처럼 순서를 버리는 방식 대신, 앞 단어의 정보를 은닉 상태(Hidden State)에 담아 다음 시점으로 흘려보내는 RNN 계열이 자연스러운 출발점이 된다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>강의를 들으며 막혔던 지점. "RNN은 길어지면 앞을 잊는다"는데, 그 '잊음'이 학습할 때 미분값이 사라지는 기울기 소실과 같은 말인가, 다른 말인가?</p>
+    </div>
+
+    <p>정리하면 두 가지를 구분해야 했다. <strong>순방향(Forward)</strong>에서 입력이 <code>tanh</code>·가중치를 거치며 반복 곱해져 앞쪽 단어의 특징 자체가 희석되는 것은 <strong>정보 소실(Information Loss) / 장기 의존성 문제</strong>다 — 데이터가 날아간다. 반면 <strong>역전파(Backprop)</strong>에서 <code>tanh</code> 미분값(최대 1)이 시점만큼 연쇄로 곱해져 0에 수렴하는 것은 <strong>기울기 소실(Vanishing Gradient)</strong>이다 — 학습 신호가 날아간다. 둘은 원인-결과로 얽혀 있지만 일어나는 시점과 대상이 다르다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>LSTM이 RNN보다 초기 정보를 오래 버티는 핵심은 <strong>셀 상태(Cell State)</strong>다. 일반 RNN은 과거 정보에 가중치를 곱하고 <code>tanh</code>를 씌워 넘기지만(곱셈 → 소실), LSTM의 셀 상태 라인은 망각 게이트를 통해 과거 정보를 <strong>더해서(+)</strong> 흘려보낸다. 미분 시 곱셈은 쉽게 사라지지만 덧셈은 기울기를 그대로 보존하기 때문에, 일종의 '메모리 고속도로'처럼 작동한다.</p>
+    </div>
+
+    <p>오늘 짠 모델이 단방향 1층 LSTM인 이유도 여기 있다. 양방향·다층으로 키우기 전에, "순서를 읽어 마지막 은닉 상태 하나로 문장을 요약한다"는 가장 기본 구조부터 손에 익히는 게 목표였다.</p>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>LSTM 감성분류기 한 채 짓기<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p>구조는 단순하다. 단어 인덱스 → 임베딩 벡터 → LSTM으로 순서대로 읽기 → 마지막 은닉 상태 → 선형층으로 2개 클래스 점수. 설정값은 <code>max_len 200</code>, <code>batch 64</code>, <code>embedding/hidden 128</code>, <code>num_layers 1</code>, <code>dropout 0.3</code>, <code>lr 1e-3</code>, <code>max_epochs 3</code>으로 잡았다.</p>
+
+    <pre class="language-python"><code class="language-python">self.embedding = nn.Embedding(
+    num_embeddings=vocab_size,
+    embedding_dim=embedding_dim,
+    padding_idx=pad_index,   # &lt;pad&gt; 토큰(0)은 학습에 거의 영향 안 주게
+)
+self.lstm = nn.LSTM(
+    input_size=embedding_dim,
+    hidden_size=hidden_dim,
+    num_layers=num_layers,
+    batch_first=True,        # 입력 형태 (배치, 문장길이, 임베딩차원)
+    dropout=dropout if num_layers &gt; 1 else 0.0,
+    bidirectional=False,
+)
+self.dropout = nn.Dropout(dropout)
+self.classifier = nn.Linear(hidden_dim, 2)   # 부정/긍정 2개 클래스
+self.loss_fn = nn.CrossEntropyLoss()</code></pre>
+
+    <p><code>forward</code>에서 결정적인 한 줄은 <strong>어떤 출력을 쓸 것인가</strong>였다. LSTM은 모든 시점의 출력과 마지막 은닉 상태를 함께 돌려준다. 분류에서는 문장 전체를 다 읽은 뒤의 마지막 은닉 상태 하나면 충분하다.</p>
+
+    <pre class="language-python"><code class="language-python">embedded = self.embedding(input_ids)        # (배치, 문장길이, 임베딩차원)
+output, (hidden, cell) = self.lstm(embedded)
+sentence_vector = hidden[-1]                 # 마지막 층의 마지막 은닉 상태
+sentence_vector = self.dropout(sentence_vector)
+logits = self.classifier(sentence_vector)   # (배치, 2)  — softmax 없이 logits 그대로
+return logits</code></pre>
+
+    <div class="callout">
+      <p><span class="label">설계 메모</span>PROBLEM_REPORT에 적힌 초기 버전은 LSTM 전 시점 출력에 선형층을 걸고 <code>x.sum(dim=1)</code>으로 모든 위치 점수를 합산하는 비표준 방식이었다. 표준은 <code>hidden[-1]</code> 한 줄. RNN/LSTM 분류에서는 마지막 은닉 상태만 쓴다는 기본기를 코드로 되짚었다.</p>
+    </div>
+
+    <p>전처리도 같이 손봤다. 짧은 리뷰는 패딩, 긴 리뷰는 자르기. 강의에서 본 한 줄짜리 슬라이싱 트릭이 떠올라 직접 비교해봤는데, <code>(encoded + [PAD]*max_len)[:max_len]</code>처럼 줄여도 <code>if/else</code>로 분기한 결과와 출력 벡터가 100% 일치한다. 이 코드에서는 가독성을 위해 분기형을 택했다.</p>
+
+    <pre class="language-python"><code class="language-python">token_ids = token_ids[:max_len]
+if len(token_ids) &lt; max_len:
+    token_ids = token_ids + [word_to_index["&lt;pad&gt;"]] * (max_len - len(token_ids))
+return torch.tensor(token_ids, dtype=torch.long)  # Embedding은 long을 요구</code></pre>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>첫 번째 벽 — WinError 127<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>초기 코드는 데이터 로딩을 <code>torchtext.legacy</code>에 맡기고 있었다. <code>Field</code>, <code>BucketIterator</code>, <code>IMDB</code> 데이터셋까지 한 번에 끌어오는 편한 길이었는데, 실행하자마자 임포트 단계에서 죽었다.</p>
+
+    <div class="callout">
+      <p><span class="label">FAILURE</span>학습은 시작도 못 했다. torchtext를 임포트하는 순간 C++ 확장 로딩이 실패하며 프로세스가 중단됐다.</p>
+    </div>
+
+    <pre class="terminal"><code>from torchtext.legacy.data import Field, BucketIterator
+from torchtext.legacy.datasets import IMDB
+
+OSError: [WinError 127] 지정된 프로시저를 찾을 수 없습니다.
+  (libtorchtext.pyd 로드 실패)</code></pre>
+
+    <div class="qbox">
+      <p><span class="label">CLUE</span>WinError 127 "지정된 프로시저를 찾을 수 없습니다"는 DLL/pyd가 기대한 심볼을 못 찾을 때 나는 전형적 증상. <code>libtorchtext.pyd</code>가 설치된 torch 2.x의 ABI와 맞물리지 못한 것 — 즉 torchtext와 torch의 버전 호환성 불일치였다. <code>torchtext.legacy</code> 자체도 구버전 API라 최신 환경에서 사실상 폐기 수순이다.</p>
+    </div>
+
+    <p>해결은 의외로 라이브러리를 빼는 쪽이었다. torchtext를 통째로 제거하고(<code>pip uninstall -y torchtext</code>), IMDB <code>aclImdb</code> 폴더의 txt 파일을 직접 읽는 파일 기반 로더를 손으로 구현했다. <code>neg=0</code>, <code>pos=1</code>로 라벨을 붙이고 <code>Counter</code>로 vocabulary를 만든다. 의존성을 줄이니 배치 형태(<code>batch_size, seq_len</code>)도 내가 100% 통제하게 됐다.</p>
+
+    <pre class="language-python"><code class="language-python">def read_imdb_split(dataset_path, split):
+    samples = []
+    label_map = {"neg": 0, "pos": 1}
+    for label_name, label_id in label_map.items():
+        review_dir = dataset_path / split / label_name
+        for file_path in sorted(review_dir.glob("*.txt")):
+            text = file_path.read_text(encoding="utf-8", errors="ignore")
+            samples.append((text, label_id))
+    random.shuffle(samples)
+    return samples</code></pre>
+
+    <div class="keypoint">
+      <p><span class="label">해결</span>"편한 고수준 래퍼가 환경에서 안 돌면, 한 단계 내려가 직접 짠다." torchtext가 빠지자 오히려 데이터 흐름이 투명해졌다. 호환성 지옥에서 빠져나오는 가장 빠른 길이 의존성 추가가 아니라 제거일 때가 있다.</p>
+    </div>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>두 번째 벽 — 출력이 3차원?<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>로더를 고치고 다시 돌리니, 이번엔 모델 쪽 차원이 어긋나 있었다. 분류기 출력을 <code>output_size=3</code>으로 잡아둔 것이다. IMDB는 긍정/부정 단 2개 클래스인데.</p>
+
+    <div class="callout">
+      <p><span class="label">FAILURE</span>출력 3차원 + 라벨 2종(0/1). 손실·메트릭 계산에서 차원이 어긋난다. 게다가 정확도 메트릭도 <code>task="multiclass", num_classes=3</code>으로 연쇄로 잘못 걸려 있었다.</p>
+    </div>
+
+    <div class="qbox">
+      <p><span class="label">CLUE</span>일반적인 다중분류를 무심코 가정한 흔적이었다. IMDB 감성분류는 이진 태스크다. 출력 차원, 손실 함수, 메트릭의 task 타입 — 이 셋이 같은 가정 위에 서 있어야 한다.</p>
+    </div>
+
+    <pre class="language-python"><code class="language-python"># 잘못된 가정
+def __init__(self, ..., output_size=3): ...
+self.train_accuracy = Accuracy(task="multiclass", num_classes=3)
+
+# 수정 — 긍/부정 2클래스로 통일
+self.classifier = nn.Linear(hidden_dim, 2)
+self.train_acc = BinaryAccuracy()   # torchmetrics, task="binary"</code></pre>
+
+    <p>여기에 PyTorch Lightning의 자잘한 함정도 하나 걸렸다. <code>devices=None</code>으로 두면 CPU에서 <em>"devices selected with CPUAccelerator should be an int &gt; 0"</em> 에러가 난다. GPU든 CPU든 <code>devices=1</code>로 고정하는 게 안전했다.</p>
+
+    <pre class="language-python"><code class="language-python">trainer = pl.Trainer(
+    max_epochs=config.max_epochs,
+    accelerator="gpu" if torch.cuda.is_available() else "cpu",
+    devices=1,                 # CPU/GPU 모두 1로 고정
+    enable_checkpointing=False,
+)</code></pre>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>모델을 "돌아가게 만드는 일"의 정체는 결국 차원과 가정의 일관성 점검이었다. 출력 차원 ↔ 손실 함수 ↔ 메트릭 task가 같은 클래스 수를 바라보고 있는지, 그리고 Trainer 파라미터가 디바이스 규칙을 지키는지. 이 두 벽(WinError 127, output_size)을 넘는 게 오늘 작업의 절반이었다. (학습 후 최종 test 정확도 수치는 리포트에 별도 기록이 없어 여기서는 다루지 않는다.)</p>
+    </div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>다음 길 — Seq2Seq와 어텐션의 예고<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>오늘은 "시퀀스 → 하나의 판단"이었다. 그런데 번역·요약·챗봇처럼 <strong>시퀀스 → 시퀀스</strong>가 필요해지면 구조가 달라진다. Seq2Seq는 입력을 압축하는 인코더와 출력을 생성하는 디코더, 두 개의 RNN 계열 모델을 잇는다. 인코더에 양방향(BiRNN)을 흔히 쓰고, 디코더는 미래 단어를 미리 보면 안 되므로 단방향을 쓴다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>강의 중 떠오른 질문. "Seq2Seq라는 게 결국 그냥 BiRNN 인코더 + 단방향 디코더 구조 아닌가? LSTM을 써서 정보 휘발을 줄인 것뿐이고?"</p>
+    </div>
+
+    <p>뼈대는 맞다. 다만 거창한 이름이 붙은 건 패러다임이 달랐기 때문이다. 과거 RNN은 입력과 출력을 1:1 실시간으로 매칭해 어순 다른 번역이 불가능했다. Seq2Seq는 "문장을 끝까지 다 듣고(인코더), 생각을 정리한 뒤 처음부터 새로 쓴다(디코더)"는 방식을 제안했다. 정보 휘발은 LSTM의 셀 상태로 일부 막았다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">한계와 다음 주제</span>그래도 한계가 남는다. 아무리 길어도 문장 전체를 <strong>고정 크기 컨텍스트 벡터 하나</strong>에 구겨 넣어야 하니, 30~40단어를 넘기면 정보가 병목에서 터진다. 이걸 깨려고 "디코더가 매 시점 인코더의 모든 은닉 상태를 직접 돌아보게 하자"는 <strong>어텐션(Attention)</strong>이 등장하고, RNN을 아예 걷어낸 게 <strong>트랜스포머</strong>다. 다음 주의 주제 — 오늘은 가볍게 예고만.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_llm/0626-s · llm_workspace/nlp_model_project</code> (lstm_imdb_lightning)</li>
+      <li>실행 리포트 — PROBLEM_REPORT.md (torchtext·output_size)</li>
+      <li>공식 문서 — PyTorch Lightning · torchmetrics</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 Day3(단원2) (2026-06-26)</p>
+  <p>고수준 래퍼가 환경에서 안 돌 때는 한 단계 내려가 직접 짠다. 모델 설계보다 차원과 가정의 일관성을 맞추는 일이 절반이었던 하루.</p>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>
