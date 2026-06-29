@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>영·한 전처리와 형태소 분석 — Kkma vs Mecab (자연어 딥러닝 Day1)</title>
-  <meta name="description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리의 차이, Kkma와 Mecab이 같은 문장을 어떻게 다르게 쪼개는지 실측한다.">
+  <meta name="description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리 차이, Kkma·Mecab 토큰화 비교, 추출 명사를 워드클라우드·Word2Vec 2D 지도로 시각 검증한다.">
   <meta property="og:title" content="영·한 전처리와 형태소 분석 — Kkma vs Mecab (자연어 딥러닝 Day1)">
-  <meta property="og:description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리의 차이, Kkma와 Mecab이 같은 문장을 어떻게 다르게 쪼개는지 실측한다.">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리 차이, Kkma·Mecab 토큰화 비교, 추출 명사를 워드클라우드·Word2Vec 2D 지도로 시각 검증한다.">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="영·한 전처리와 형태소 분석 — Kkma vs Mecab (자연어 딥러닝 Day1)">
-  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리의 차이, Kkma와 Mecab이 같은 문장을 어떻게 다르게 쪼개는지 실측한다.">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 자연어처리. 영문(NLTK)과 한글(kss·형태소) 전처리 차이, Kkma·Mecab 토큰화 비교, 추출 명사를 워드클라우드·Word2Vec 2D 지도로 시각 검증한다.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
@@ -149,6 +149,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
       <li>띄어쓰기가 사라지면 문장 분할도 흔들린다 — kss와 그 한계</li>
       <li>형태소 분석기 비교: 같은 문장, Kkma는 품사까지 / MeCab은 토큰을 빠르게</li>
       <li>정리: 전처리는 최소가 아니라 "필요한 만큼"</li>
+      <li>추출 결과를 눈으로: 워드클라우드와 Word2Vec 2D 의미 지도</li>
     </ol>
   </nav>
 
@@ -322,13 +323,29 @@ And now as you graduate to begin anew I wish that for you.</pre>
       <span class="label">다음</span>
       오늘 만든 토큰들이 숫자 벡터(임베딩)로 바뀌고, 그 벡터가 RNN·LSTM을 거쳐 트랜스포머로 이어진다. 다음 글에서는 이 토큰이 어떻게 의미를 가진 벡터가 되는지를 다룬다.
     </div>
+  </section>
+
+  <section id="ch6">
+    <h2 class="chap"><span class="num">CH 06</span>추출 결과를 눈으로 — 워드클라우드와 임베딩 지도<a href="#ch6" class="anchor-link">#</a></h2>
+    <h3 class="step">의문 → 시행</h3>
+    <p>토큰을 잘 뽑았는지 숫자만 봐서는 감이 오지 않는다. 그래서 같은 형태소 파이프라인(KoNLPy Okt 명사 추출)을 GPT-3 논문 한국어 번역문에 적용하고, 추출 결과를 두 가지로 시각화했다 — 빈도 기반 <strong>워드클라우드</strong>와 의미 기반 <strong>Word2Vec 2D 지도</strong>.</p>
+    <div class="qbox"><span class="label">의문</span>
+    "명사 추출이 제대로 됐나"를 눈으로 확인하려면? 워드클라우드는 무엇이 자주 나오는지를, 임베딩 지도는 무엇이 서로 가까운지를 보여준다.</div>
+    <figure class="shot"><img src="img/day0624_wordcloud.png" alt="GPT-3 논문 한국어 명사 워드클라우드"><figcaption>KoNLPy Okt로 추출한 명사 빈도 워드클라우드 — 학습·작업·모델·언어·파라미터·맥락 등 GPT-3 핵심어가 크게 잡힌다 (실측)</figcaption></figure>
+    <div class="callout"><span class="label">함정</span>
+    워드클라우드 생성 단계에서 <code>numpy ArrayMemoryError</code>가 났다 — 캔버스(600×800 uint32) 메모리 할당 실패. 이미지 크기를 줄이면(800×600 → 400×300) 메모리가 1/4로 떨어져 풀린다. "모델"이 아니라 "시각화 해상도"가 병목일 수 있었다.</div>
+    <h3 class="step">한 발 더 — 빈도 너머의 의미</h3>
+    <p>워드클라우드는 "많이 나온 단어"만 보여줄 뿐 의미 관계는 담지 못한다. 같은 명사들로 Word2Vec(sg=1, 100차원)을 학습해 PCA로 2차원에 펼치면, 비슷한 맥락에서 쓰인 단어가 서로 가까이 모인다.</p>
+    <figure class="shot"><img src="img/day0624_w2v_scatter.png" alt="Word2Vec 임베딩 2D 의미 지도"><figcaption>같은 명사를 Word2Vec으로 학습해 PCA로 2D 투영 — 토큰·텍스트·데이터가 한쪽에, 평가·개선·수준·품질이 다른 쪽에 모인다 (실측)</figcaption></figure>
+    <div class="keypoint"><span class="label">배운 점</span>
+    추출 결과를 검증하는 가장 빠른 방법은 <strong>시각화</strong>였다. 빈도는 워드클라우드로, 의미 구조는 임베딩 2D 지도로 본다. 이 "의미가 좌표가 되는" 확인이 다음 단계(Word2Vec·FastText 유사도)로 이어진다.</div>
 
     <div class="ref-chain">
       <p class="ref-title">📚 근거 출처</p>
       <ol>
-        <li>실습 코드 — <code>from_colab_llm/0624-s</code> (영문·한글 전처리, 형태소 분석 실습)</li>
-        <li>강의 PDF — 자연어처리_딥러닝모델</li>
-        <li>공식 문서 — NLTK · KoNLPy · kss</li>
+        <li>실습 코드 — <code>from_colab_llm/0624-s</code> (영문·한글 전처리·형태소 분석) · <code>llm_workspace/konlpy_practice_project</code> (GPT-3 명사 추출·워드클라우드)</li>
+        <li>강의 PDF — 자연어처리절차와형태소분석 · 자연어처리_딥러닝모델</li>
+        <li>공식 문서 — NLTK · KoNLPy(Okt) · kss · gensim Word2Vec · WordCloud</li>
       </ol>
     </div>
   </section>
