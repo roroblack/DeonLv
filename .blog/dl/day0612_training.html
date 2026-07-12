@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모델 훈련과 평가 — 수치미분·Autograd, 에폭·최적화 (Day5)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 딥러닝 Day5. 수치미분과 Autograd가 같은 기울기를 내는지, 에폭·최적화·랜덤시드가 학습을 어떻게 바꾸는지 확인한다.">
+  <meta property="og:title" content="모델 훈련과 평가 — 수치미분·Autograd, 에폭·최적화 (Day5)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day5. 수치미분과 Autograd가 같은 기울기를 내는지, 에폭·최적화·랜덤시드가 학습을 어떻게 바꾸는지 확인한다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="모델 훈련과 평가 — 수치미분·Autograd, 에폭·최적화 (Day5)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day5. 수치미분과 Autograd가 같은 기울기를 내는지, 에폭·최적화·랜덤시드가 학습을 어떻게 바꾸는지 확인한다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day5 · 부트캠프</p>
+  <h1>모델 훈련과 평가 — 수치미분·기울기, 에폭과 최적화</h1>
+  <p class="deck">기울기는 어떻게 계산되며(수치미분 / Autograd), 에폭·최적화·랜덤시드가 학습 결과를 어떻게 바꾸나.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-06-12</span>
+    <span><strong>도구</strong>PyTorch · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day5 — 딥러닝_모델훈련및평가.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 기울기 계산부터 CIFAR-10 분류까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 학습이라는 루프</a></li>
+      <li><a href="#ch2">CH 02 · 기울기를 손으로 / 자동으로</a></li>
+      <li><a href="#ch3">CH 03 · 선형회귀 100 에폭</a></li>
+      <li><a href="#ch4">CH 04 · 랜덤시드와 재현성</a></li>
+      <li><a href="#ch5">CH 05 · CIFAR-10 CNN, 손실과 혼동행렬</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>다음으로</strong> — 오늘은 "모델이 학습한다"는 말의 속을 열어 본다. 손실을 줄이는 방향은 기울기가 정해 주고, 그 기울기를 구하는 두 가지 길 — 수치미분과 Autograd — 이 정말 같은 값을 내는지 직접 맞춰 본다. 그리고 에폭·최적화·랜덤시드를 한 칸씩 돌려 가며 학습 곡선이 어떻게 달라지는지 본다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 학습이라는 루프 — 순전파·손실·역전파<a href="#ch1" class="anchor-link">#</a></h2>
+    <p>모델이 "학습을 한다"는 건 결국 오차를 가장 작게 만드는 가중치 <code>w</code>와 편향 <code>b</code>를 찾는 일이다. 한 번의 학습 사이클은 늘 같은 순서로 돈다. 데이터를 넣어 예측값을 만드는 <strong>순전파</strong>, 정답과 비교해 얼마나 틀렸는지 숫자로 매기는 <strong>손실 계산</strong>, 그 오차를 거꾸로 흘려 가중치를 고치는 <strong>역전파</strong>. 이 셋을 반복한다.</p>
+    <p>손실 함수 그래프 위 한 점에서 <strong>기울기(gradient)</strong>를 구하는 게 미분의 역할이다. 기울기가 양수면 가중치를 줄여야 손실이 줄고, 음수면 늘려야 줄어든다. 즉 기울기는 "오차를 줄이려면 어느 방향으로 얼마나 움직여야 하나"를 알려 주는 나침반이다. 경사하강법은 그 나침반의 반대 방향으로 학습률 <code>α</code>만큼 한 걸음씩 내려간다: <code>w := w − α · ∂L/∂w</code>.</p>
+    <div class="qbox">
+      <span class="label">가설</span>
+      <p>기울기를 "직접 손으로 구한 미분값"과 "PyTorch가 <code>backward()</code>로 자동 계산한 값"은 정확히 일치할 것이다. 그렇다면 굳이 수치미분을 알 필요가 있나? — 일치 여부를 코드로 확인해 보면 답이 나온다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 가장 단순한 식 하나로 두 방식을 나란히 세워 봤다.</div>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> 기울기를 손으로 / 자동으로 — Autograd 검증<a href="#ch2" class="anchor-link">#</a></h2>
+    <p>텐서를 만들 때 <code>requires_grad=True</code>를 주면, 이 텐서가 들어간 모든 연산이 계산 그래프에 기록된다. 처음엔 <code>x.grad</code>가 <code>None</code>이고, <code>backward()</code>를 부른 뒤에야 채워진다. <code>x → y → z</code>로 이어진 연산은 자식 텐서들도 모두 <code>requires_grad=True</code>가 되고, <code>z.grad_fn</code>에 어떤 연산으로 만들어졌는지(<code>AddBackward0</code>)가 남는다.</p>
+    <p>식은 <code>y = x² + 4x</code>, <code>z = 2y + 3 = 2x² + 8x + 3</code>으로 잡았다. 손으로 미분하면 <code>dz/dx = 4x + 8</code>이다. <code>z.backward(torch.ones_like(z))</code>로 자동 계산한 <code>x.grad</code>와, 직접 적은 <code>4x + 8</code>을 <code>torch.allclose</code>로 맞춰 봤다.</p>
+    <div class="terminal">
+      <div class="terminal-header">Tensor_Autograd.ipynb — 자동 미분과 수동 미분 결과 비교</div>
+      <pre class="terminal-body">x.requires_grad: True
+y.requires_grad: True
+z.requires_grad: True
+z.grad_fn: &lt;AddBackward0 object at 0x7a2c372aec20&gt;
+
+자동 미분으로 구한 x.grad:
+tensor([[ 9.3468,  8.5152,  8.9378,  8.9213],
+        [ 3.5086,  7.2547, 16.8328,  5.4480],
+        [ 9.8466,  9.0694, 10.1396, 11.2374]])
+수식 4x + 8 로 직접 계산한 값:
+tensor([[ 9.3468,  8.5152,  8.9378,  8.9213],
+        [ 3.5086,  7.2547, 16.8328,  5.4480],
+        [ 9.8466,  9.0694, 10.1396, 11.2374]])
+두 값이 같은가?: True</pre>
+    </div>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>두 방식의 결과는 소수점까지 동일했고 <code>allclose</code>도 <code>True</code>다. 수치미분(중앙차분으로 같은 기울기를 근사)은 "Autograd가 맞게 동작하는지"를 검산하는 안전장치이고, 실제 학습에서는 그래프를 거꾸로 타고 연쇄법칙으로 한 번에 미분하는 Autograd가 훨씬 싸다. 둘은 경쟁이 아니라 검증과 실전의 역할 분담이다.</p>
+    </div>
+    <figure class="shot">
+      <img src="../img/day0612_autograd.png" alt="Autograd로 계산한 기울기 시각화">
+      <figcaption>식 위 각 점의 기울기 — 자동 미분 결과 (실제 출력)</figcaption>
+    </figure>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 기울기가 맞다는 걸 확인했으니, 그 기울기를 100번 반복해 실제로 직선을 맞춰 본다.</div>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> 선형회귀 100 에폭 — 손실이 내려가는 모양<a href="#ch3" class="anchor-link">#</a></h2>
+    <p>정답을 <code>y = 2x + 1</code>(약간의 잡음 포함)으로 만들고, <code>nn.Linear(1, 1)</code>에 <code>MSELoss</code> + <code>SGD(lr=0.01)</code>로 100 에폭을 돌렸다. 에폭은 훈련 데이터 전체를 한 번 훑는 단위다. 매 에폭마다 <code>optimizer.zero_grad → loss.backward → optimizer.step</code> 순으로 기울기를 비우고, 구하고, 한 걸음 내려간다.</p>
+    <p>초기 weight·bias는 무작위로 <code>0.1564 / −0.8799</code>에서 출발했다. 학습이 진행되며 weight는 목표값 2.0에, bias는 1.0 쪽으로 다가간다.</p>
+    <div class="terminal">
+      <div class="terminal-header">Autograd_matplotlib.ipynb — 선형회귀 100 에폭 학습 로그</div>
+      <pre class="terminal-body">초기 weight: 0.1563711166381836
+초기 bias: -0.8799213171005249
+
+Epoch [010/100] | Loss: 3.782020 | Weight: 1.7116 | Bias: -0.5306
+Epoch [030/100] | Loss: 1.371338 | Weight: 1.9902 | Bias: -0.0119
+Epoch [050/100] | Loss: 0.744381 | Weight: 1.9969 | Bias:  0.3344
+Epoch [070/100] | Loss: 0.465205 | Weight: 1.9970 | Bias:  0.5656
+Epoch [100/100] | Loss: 0.307520 | Weight: 1.9971 | Bias:  0.7766
+
+최종 weight: 1.9970521926879883
+최종 bias: 0.7766054272651672
+최종 손실값: 0.30487510561943054</pre>
+    </div>
+    <div class="callout">
+      <span class="label">함정</span>
+      <p>weight는 30 에폭 만에 1.99로 사실상 수렴했는데 bias는 100 에폭에도 0.78로 1.0에 못 미쳤다. 기울기(weight)가 손실에 더 민감해 먼저 잡히고, 절편(bias)은 천천히 따라온다. "에폭을 더 돌리면 항상 좋아진다"가 아니라, 파라미터마다 수렴 속도가 다르다는 게 손실 곡선의 평평해지는 꼬리에 그대로 드러난다. 학습률을 키우면 빨라지지만 너무 키우면 최저점을 지나쳐 발산(overshooting)한다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 같은 코드, 같은 에폭인데 시드만 바꾸면 결과가 달라질까. 재현성 문제를 들여다본다.</div>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> 랜덤시드와 재현성 — 출발점이 결과를 바꾼다<a href="#ch4" class="anchor-link">#</a></h2>
+    <p>초기 weight·bias도, 데이터의 잡음도 난수로 정해진다. 그래서 시드를 고정하지 않으면 실행할 때마다 다른 숫자가 나온다. 재현 가능한 실험을 위해 <code>random</code>·<code>numpy</code>·<code>torch</code>의 시드를 모두 같은 값으로 맞추고, GPU 비결정 연산까지 <code>cudnn.deterministic = True</code>로 묶었다.</p>
+    <div class="terminal">
+      <div class="terminal-header">Autograd_matplotlib_랜덤시드실험.ipynb — 시드 고정 후 텐서 재현</div>
+      <pre class="terminal-body">import torch, numpy as np, random
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+torch.cuda.manual_seed_all(42)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+# 시드 42 고정 후 생성한 텐서 — 다시 돌려도 동일
+tensor([[ 0.3367,  0.1288,  0.2345,  0.2303],
+        [-1.1229, -0.1863,  2.2082, -0.6380],
+        [ 0.4617,  0.2674,  0.5349,  0.8094]])</pre>
+    </div>
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>시드를 고정하니 같은 텐서·같은 초기값·같은 손실 곡선이 그대로 재현됐다. 반대로 시드를 바꾸면 초기 weight/bias가 달라지므로 손실이 내려가는 경로와 수렴 속도가 달라진다 — 다만 충분히 학습하면 최종 지표(여기선 weight≈2.0)는 비슷한 곳으로 모인다. 결론이 비슷하다고 과정이 같은 건 아니라서, 실험 비교나 디버깅을 할 땐 시드를 못 박는 게 먼저다.</p>
+    </div>
+  </section>
+
+  <div class="bridge"><strong>다음으로</strong> — 장난감 직선을 넘어, 같은 학습 루프를 실제 이미지 분류에 그대로 적용해 본다.</div>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> CIFAR-10 CNN — 손실 곡선과 혼동행렬<a href="#ch5" class="anchor-link">#</a></h2>
+    <p>CIFAR-10(10개 클래스, 학습 50,000 · 테스트 10,000장)을 ResNet-18 기반 CNN으로 학습했다. 입력이 32×32라 첫 conv를 stride 1·3×3으로 바꾸고 maxpool을 제거했다. <code>CrossEntropyLoss</code> + <code>AdamW(lr=0.001, weight_decay=1e-4)</code>, 배치 64, <code>SEED=111</code>로 5 에폭, GPU(cuda)에서 돌렸다.</p>
+    <div class="terminal">
+      <div class="terminal-header">cifar10_cnn_pytorch_실습.ipynb — 학습 로그와 클래스별 정확도</div>
+      <pre class="terminal-body">사용 장치: cuda
+
+Epoch 1/5  train_loss: 1.3509 | train_acc: 50.76% | test_loss: 1.1509 | test_acc: 60.99%
+Epoch 2/5  train_loss: 0.8727 | train_acc: 69.14% | test_loss: 0.7991 | test_acc: 72.05%
+Epoch 3/5  train_loss: 0.6773 | train_acc: 76.41% | test_loss: 0.6164 | test_acc: 79.42%
+Epoch 4/5  train_loss: 0.5016 | train_acc: 82.62% | test_loss: 0.5072 | test_acc: 83.00%
+
+최종 테스트 손실: 0.4836
+최종 테스트 정확도: 83.62%
+
+클래스별 정확도:
+ship      :  93.40%    frog      :  89.90%    deer      :  88.90%
+airplane  :  88.90%    horse     :  88.40%    truck     :  90.00%
+bird      :  70.40%    cat       :  71.30%    dog       :  71.60%</pre>
+    </div>
+    <figure class="shot">
+      <img src="../img/day0612_cifar_loss.png" alt="CIFAR-10 CNN 에폭별 손실 곡선">
+      <figcaption>에폭별 Train / Test 손실 곡선 — 5 에폭 (실제 출력)</figcaption>
+    </figure>
+    <p>에폭마다 train·test 손실이 함께 내려가고 정확도가 같이 오른다. 두 곡선이 벌어지지 않는 동안은 과적합 신호가 약하다는 뜻이다. 마지막으로 어떤 클래스를 어떤 클래스로 헷갈리는지 혼동행렬로 확인했다.</p>
+    <figure class="shot">
+      <img src="../img/day0612_cifar_cm.png" alt="CIFAR-10 CNN 혼동행렬">
+      <figcaption>테스트셋 혼동행렬 — 최종 정확도 83.62% (실제 출력)</figcaption>
+    </figure>
+    <div class="callout">
+      <span class="label">함정</span>
+      <p>ship·frog·truck 같은 형태가 뚜렷한 클래스는 88~93%로 잘 맞췄지만, cat·dog·bird는 70% 안팎으로 낮았다. 혼동행렬을 보면 cat↔dog(개 149장을 cat으로 오인)처럼 생김새가 비슷한 동물끼리 서로 새는 게 보인다. 전체 정확도 83.6%라는 한 숫자만 보면 이 편차를 놓친다 — 클래스별 정확도와 혼동행렬을 함께 봐야 "무엇을 더 학습시켜야 하나"가 보인다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0612-s</code> (Tensor_Autograd · Autograd_matplotlib · cifar10_cnn_pytorch)</li>
+      <li>강의 PDF — 딥러닝_모델훈련및평가</li>
+      <li>공식 문서 — PyTorch Autograd</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day5 (2026-06-12)</p>
+  <p>기울기는 수치미분과 Autograd가 같은 값을 내며 학습의 방향을 잡고, 에폭·최적화·랜덤시드는 그 길의 속도와 출발점을 바꾼다. 한 줄 정확도 뒤에 숨은 손실 곡선과 혼동행렬까지 봐야 학습이 보인다.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+</body>
+</html>

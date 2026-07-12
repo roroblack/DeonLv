@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오차역전파와 모델 저장 — grad는 어디서 오고 학습은 어떻게 떼어내나 (Day6)</title>
+  <meta name="description" content="SK 네트웍스 AI Family 32기 딥러닝 Day6. loss.backward()의 grad 계산, 경사하강 수동 구현, XOR MLP, 모델 저장·재로드를 실측으로 따라간다.">
+  <meta property="og:title" content="오차역전파와 모델 저장 — grad는 어디서 오고 학습은 어떻게 떼어내나 (Day6)">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day6. loss.backward()의 grad 계산, 경사하강 수동 구현, XOR MLP, 모델 저장·재로드를 실측으로 따라간다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="오차역전파와 모델 저장 — grad는 어디서 오고 학습은 어떻게 떼어내나 (Day6)">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 딥러닝 Day6. loss.backward()의 grad 계산, 경사하강 수동 구현, XOR MLP, 모델 저장·재로드를 실측으로 따라간다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 딥러닝(교과목 2 · 단원 3) Day6 · 부트캠프</p>
+  <h1>loss.backward() 한 줄이 가중치를 고치는 과정, 그리고 학습된 모델을 떼어내 재사용하기</h1>
+  <p class="deck">예측과 정답의 차이를 손실로 만들고, 그 손실을 거꾸로 따라가며 각 가중치의 수정 방향을 구한 뒤, 학습이 끝난 모델을 파일로 저장해 새 입력에 다시 쓰는 흐름을 작은 수식부터 XOR 신경망까지 단계적으로 확인했다.</p>
+  <div class="meta-row"><span><strong>날짜</strong>2026-06-15</span><span><strong>도구</strong>PyTorch · TensorFlow · Python 3.13.5</span><span><strong>OS</strong>Windows 11 Pro 25H2</span><span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span><span><strong>커리큘럼</strong>교과목 2 · 단원 3 · 딥러닝 Day6 — 딥러닝_모델저장및활용.pdf</span></div>
+</header>
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 손실에서 가중치까지, 그리고 저장까지</h2>
+    <ol>
+      <li><a href="#ch1">CH 01 · 작은 수식 하나로 본 역전파의 정체</a></li>
+      <li><a href="#ch2">CH 02 · 반복하면 손실이 0으로 가는지 확인</a></li>
+      <li><a href="#ch3">CH 03 · 선형 회귀와 XOR, 자동 미분이 떠맡는 부분</a></li>
+      <li><a href="#ch4">CH 04 · 학습된 모델을 떼어내 다시 쓰기</a></li>
+      <li><a href="#ch5">CH 05 · 재학습과 과소적합, 두 가지 의문 정리</a></li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>출발점</strong> 어제까지는 모델을 정의하고 학습 루프를 돌리는 데 집중했다. 오늘은 그 루프 한가운데 있는 <code>loss.backward()</code>가 정확히 무엇을 계산하는지, 그리고 학습이 끝난 뒤 그 결과물을 어떻게 보존해 재사용하는지를 분리해서 들여다봤다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>작은 수식 하나로 본 역전파의 정체<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>신경망을 통째로 두고 보면 역전파가 마법처럼 보인다. 그래서 계층을 다 걷어내고 가장 작은 식 하나만 남겼다. 입력 <code>x=2</code>, 가중치 <code>w=3</code>, 정답 <code>target=10</code>으로 두고 예측을 <code>x*w</code>, 손실을 <code>(target - 예측)²</code>로 정의했다. 여기서 궁금한 것은 단 하나, <code>loss.backward()</code>가 끝난 뒤 <code>w.grad</code>에 어떤 값이 들어가는가였다.</p>
+
+    <div class="qbox"><span class="label">가설</span> 손실을 w로 미분한 값이 w.grad에 저장되고, 그 부호가 곧 w를 어느 쪽으로 옮겨야 손실이 줄어드는지를 알려줄 것이다.</div>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p>예측은 <code>2*3=6</code>, 손실은 <code>(10-6)²=16</code>이다. 손실 식을 w로 미분하면 기울기는 <code>-2·x·(target - 예측) = -2·2·4 = -16</code>이 된다. 실제로 <code>backward()</code>를 호출하고 <code>w.grad</code>를 찍어보니 같은 값이 나왔다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 단순 수식의 순전파와 기울기</div><pre class="terminal-body">입력값 x: 2.0
+초기 가중치 w: 3.0
+예측값: 6.0
+정답값: 10.0
+손실값: 16.0
+w에 대한 기울기: -16.0</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>기울기가 음수라는 것은 w를 키우는 방향으로 손실이 줄어든다는 뜻이다. 그래서 경사하강법은 기울기의 반대 방향, 즉 <code>w = w - 학습률·기울기</code>로 가중치를 옮긴다. 학습률 <code>0.01</code>을 적용하면 <code>3 - 0.01·(-16) = 3.16</code>이 되고, 출력도 <code>3.1600000858306885</code>로 일치했다.</p>
+
+    <pre class="language-python"><code class="language-python"># 수동 경사하강 한 스텝
+loss.backward()                 # w.grad에 기울기 누적
+with torch.no_grad():
+    w -= learning_rate * w.grad # 기울기 반대 방향으로 한 걸음
+w.grad.zero_()                  # 다음 계산 전 기울기 초기화</code></pre>
+
+    <div class="callout"><span class="label">함정</span> PyTorch는 backward()를 부를 때마다 기울기를 누적한다. zero_()로 비우지 않으면 이전 스텝의 기울기가 그대로 더해져 업데이트가 어긋난다.</div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>반복하면 손실이 0으로 가는지 확인<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>한 스텝으로 w가 3.16이 됐다면, 같은 과정을 반복하면 정답 가중치에 수렴할까. <code>x=2</code>, <code>target=10</code>이므로 손실이 0이 되려면 <code>2·w=10</code>, 곧 <code>w=5</code>가 되어야 한다. 학습률을 <code>0.05</code>로 올리고 30회 반복했다.</p>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 단일 가중치 30회 반복</div><pre class="terminal-body">epoch=01, w=3.8000, prediction=6.0000, loss=16.0000
+epoch=02, w=4.2800, prediction=7.6000, loss=5.7600
+epoch=03, w=4.5680, prediction=8.5600, loss=2.0736
+epoch=05, w=4.8445, prediction=9.4816, loss=0.2687
+epoch=10, w=4.9879, prediction=9.9597, loss=0.0016
+epoch=14, w=4.9984, prediction=9.9948, loss=0.0000
+epoch=30, w=5.0000, prediction=10.0000, loss=0.0000</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>w는 3에서 출발해 5로 수렴했고, 손실은 16에서 사실상 0까지 내려갔다. 정답에 가까워질수록 기울기 자체가 작아져서 한 걸음의 폭도 점점 줄어드는 모습이 그대로 보인다.</p>
+
+    <figure class="shot"><img src="../img/day0615_backprop_loss.png" alt="단일 가중치를 30회 반복 학습하며 손실이 16에서 0으로 줄어드는 곡선"><figcaption>단일 가중치 역전파로 손실이 16에서 0까지 감소 (실제 출력)</figcaption></figure>
+
+    <div class="keypoint"><span class="label">배운 점</span> 역전파는 결국 손실을 각 가중치로 미분한 값을 구하는 일이고, 학습은 그 기울기의 반대 방향으로 조금씩 움직이는 반복일 뿐이다.</div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>선형 회귀와 XOR, 자동 미분이 떠맡는 부분<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>가중치가 하나일 때는 손으로 기울기를 따라갈 수 있었다. 그런데 가중치와 편향이 여럿이고 계층이 쌓이면 이 미분을 누가 다 해주는가. PyTorch에서는 <code>optimizer.zero_grad()</code>, <code>loss.backward()</code>, <code>optimizer.step()</code> 세 줄이 그 일을 맡는다. 먼저 <code>y = 2x + 1</code>을 학습하는 선형 회귀로 확인했다.</p>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p><code>nn.Linear(1, 1)</code>에 MSE 손실과 SGD를 붙여 300회 학습했다. weight와 bias가 각각 목표인 2와 1로 다가가는지 봤다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — 선형 회귀 학습 결과</div><pre class="terminal-body">학습된 weight: 1.983961582183838
+학습된 bias: 1.05790376663208
+x=10일 때 예측값: 20.897518157958984</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>weight는 1.984, bias는 1.058로 정답 부근에 자리 잡았고, <code>x=10</code> 예측은 20.9였다. 정확히 21이 아닌 이유는 300회로는 아직 완전히 수렴하지 않은 상태이기 때문이다. 세 줄 호출 안에서 weight와 bias 두 파라미터의 기울기가 동시에 계산되어 갱신됐다.</p>
+
+    <h3 class="step">테스트</h3>
+    <p>다음은 직선 하나로 나눌 수 없는 XOR이다. <code>Linear(2,8) → ReLU → Linear(8,1) → Sigmoid</code> 구조에 BCE 손실과 Adam을 붙여 1000회 학습했다. 은닉층과 비선형 활성화가 더해지면 역전파가 여러 계층을 거슬러 올라가야 한다.</p>
+
+    <div class="terminal"><div class="terminal-header">backpropagation_pytorch.ipynb — XOR 예측 확률과 분류</div><pre class="terminal-body">예측 확률:
+tensor([[6.0647e-05],
+        [9.9992e-01],
+        [9.9993e-01],
+        [8.2106e-05]])
+예측 클래스:
+tensor([[0.], [1.], [1.], [0.]])
+실제 정답:
+tensor([[0.], [1.], [1.], [0.]])</pre></div>
+
+    <figure class="shot"><img src="../img/day0615_xor_loss.png" alt="XOR 다층 신경망의 학습 손실이 빠르게 0 부근으로 떨어지는 곡선"><figcaption>XOR MLP의 BCE 손실 감소 곡선 (실제 출력)</figcaption></figure>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>네 입력 모두 정답 클래스를 맞혔고, 확률은 0과 1 양 끝으로 갈렸다. 가중치가 105개로 늘어도 학습 루프의 세 줄은 그대로다. 자동 미분이 계층을 거슬러 각 파라미터의 기울기를 채워주기 때문에, 손으로 미분하던 일은 더 이상 직접 할 필요가 없었다.</p>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>학습된 모델을 떼어내 다시 쓰기<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <h3 class="step">학습 / 의문</h3>
+    <p>학습이 끝난 가중치는 메모리에만 있다. 프로그램을 닫으면 사라진다. 그래서 결과물을 파일로 남기고, 새 프로세스에서 다시 불러와 예측에 쓰는 방법을 확인했다. PyTorch에서는 가중치만 담은 <code>state_dict</code>를 저장하는 방식을 썼다.</p>
+
+    <div class="qbox"><span class="label">가설</span> 가중치만 저장하면, 같은 모델 구조를 다시 선언한 뒤 그 빈 모델에 가중치를 끼워 넣어야 동일한 예측이 나올 것이다.</div>
+
+    <h3 class="step">시행 / 테스트</h3>
+    <p><code>y=2x</code> 데이터로 학습한 모델을 <code>torch.save(model.state_dict(), 'pytorch_model.pth')</code>로 저장했다. 불러올 때는 같은 <code>SimpleModel</code> 클래스를 다시 정의해 빈 객체를 만들고, <code>load_state_dict()</code>로 가중치를 채운 뒤 <code>eval()</code>과 <code>torch.no_grad()</code>로 <code>x=5</code>를 예측했다. 같은 절차를 TensorFlow에서는 모델 전체를 <code>.keras</code>로 저장·복원하는 방식으로 비교했다.</p>
+
+    <div class="terminal"><div class="terminal-header">model_save_usage.ipynb — 재로드 후 x=5 예측</div><pre class="terminal-body">PyTorch  예측 결과 : 10.011872291564941
+TensorFlow 예측 결과 : [[9.977701]]</pre></div>
+
+    <h3 class="step">관찰</h3>
+    <p>두 프레임워크 모두 정답인 10에 가까운 값을 돌려줬다. 핵심 차이는 PyTorch는 구조 코드를 따로 가지고 있어야 가중치를 끼울 수 있는 반면, TensorFlow의 <code>.keras</code>는 구조와 가중치를 한 파일에 담아 한 줄로 복원된다는 점이다.</p>
+
+    <div class="keypoint"><span class="label">배운 점</span> 가중치만 저장하는 방식은 파일이 작고 안전하지만 동일한 모델 클래스를 반드시 다시 선언해야 하고, 예측 단계에서는 eval()로 추론 모드를 켜고 기울기 계산을 꺼두는 것이 정석이다.</div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>재학습과 과소적합, 두 가지 의문 정리<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <h3 class="step">의문</h3>
+    <p>저장과 불러오기를 정리하다 보니 두 가지가 걸렸다. 하나는 "파인튜닝이라는 게 결국 모델을 불러와 다시 학습시키는 것 아닌가"였고, 다른 하나는 TensorFlow 저장 예제에서 <code>fit(X, y)</code>만 했을 때 <code>x=5</code> 예측이 10이 아니라 6.8 근처로 나온 이유였다.</p>
+
+    <h3 class="step">테스트</h3>
+    <p>첫 의문은 방향은 맞되 그대로 다시 돌리는 것과는 다르다. 보통은 특징을 뽑는 앞부분(백본)의 가중치를 동결해 기존 지식을 보존하고, 목적에 맞게 출력층(헤드)만 교체한 뒤, 평소보다 훨씬 낮은 학습률로 조심스럽게 미세조정한다. 두 번째 의문은 학습 횟수를 직접 바꿔보며 확인했다.</p>
+
+    <div class="terminal"><div class="terminal-header">epochs 비교 — x=5 예측값</div><pre class="terminal-body">Epoch 1 prediction:   [[6.2447696]]
+Epoch 500 prediction: [[9.903336]]</pre></div>
+
+    <h3 class="step">결론(중간)</h3>
+    <p>Keras의 <code>fit</code>은 <code>epochs</code>를 생략하면 기본값이 1이다. 4개 데이터를 한 번만 훑고 끝났으니 규칙을 채 못 익힌 과소적합 상태였고, 그래서 6.8 같은 값이 나온 것이다. <code>epochs=500</code>으로 올리자 9.9까지 정상으로 다가갔다. 낮은 정확도는 모델 결함이 아니라 학습량 부족이었다.</p>
+
+    <div class="callout"><span class="label">함정</span> 저장된 모델이 이상하면 저장 과정을 먼저 의심하기 쉽지만, 애초에 충분히 학습되지 않은 모델을 저장하면 불러와도 같은 과소적합 결과가 그대로 재현된다. 저장은 학습 품질을 보정해 주지 않는다.</div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>from_colab_deep_learning/0615-s</code> (backpropagation · model_save_usage)</li>
+      <li>강의 PDF — 딥러닝_모델저장및활용</li>
+      <li>공식 문서 — PyTorch Autograd·torch.save</li>
+    </ol>
+  </div>
+</main>
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 딥러닝 Day6 (2026-06-15)</p>
+  <p>손실에서 기울기로, 기울기에서 가중치 갱신으로 이어지는 역전파의 한 바퀴를 작은 수식으로 직접 따라가 본 하루였다. 학습된 결과를 파일로 떼어내 다시 쓰는 절차까지 묶고 나니, 학습 루프와 모델 재사용이 비로소 하나의 흐름으로 이어졌다.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+</body>
+</html>
