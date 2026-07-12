@@ -1,0 +1,336 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p>
+  <h1>트랜스포머 — RNN을 버리다 (Attention Is All You Need)</h1>
+  <p class="deck">"순환도 합성곱도 완전히 버리고, 오직 어텐션만." 지난주까지 시퀀스의 뼈대였던 RNN을 아예 걷어낸다는 선언이 처음엔 과격하게 들렸다. 그게 어떻게 가능하고, 무엇이 좋아지며, 순서 정보는 왜 하필 sin·cos로 다시 넣는지 — 오늘은 그 세 물음을 따라갔다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-07-02</span>
+    <span><strong>주제</strong>Transformer · self-attention · 위치 인코딩</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 — 자연어처리_트랜스포머.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — "RNN을 버린다"는 문장 한 줄을 풀어보기</h2>
+    <ol>
+      <li>"dispensing with recurrence" — biRNN이 하던 일과, 그걸 왜 버렸나</li>
+      <li>self-attention 한 방 — Q·K·V로 모든 단어를 한 번에 잇기</li>
+      <li>연산이 어떻게 달라지나 — 순차 O(N)에서 행렬 곱 1스텝으로</li>
+      <li>멀티헤드와 FFN — 관계를 다각도로 보고, 다시 혼자 깊게 생각하기</li>
+      <li>순서를 잃었다 — 왜 sin/cos 위치 인코딩인가</li>
+      <li>공짜는 아니다 — O(N²) 메모리라는 대가와 인코더·디코더 스택</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">
+    <p>지난 주제의 끝에서, Seq2Seq가 문장 전체를 고정 크기 벡터 하나에 구겨 넣는 병목을 봤고, 그 병목을 뚫으려 디코더가 인코더의 모든 은닉 상태를 돌아보는 <strong>어텐션</strong>이 붙었다는 데까지 왔다. 오늘 읽은 논문은 거기서 한 발 더 나간다. "어텐션이 그렇게 좋으면, 굳이 밑에 깔린 RNN을 유지할 이유가 있나?" 논문의 첫 문단이 그 선언이다 — <em>"a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."</em></p>
+  </div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>"RNN을 버린다"는 문장의 무게<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>강의 PDF 초록의 그 한 문장 — <strong>"dispensing with recurrence and convolutions entirely"</strong> — 을 직역하면 "순환과 합성곱을 완전히 없앤다"다. 여기서 '순환(recurrence)'에는 당시 NLP의 필수 코스였던 <strong>biRNN(양방향 RNN)·BiLSTM</strong>이 전부 포함된다. 그래서 처음 읽을 때 이 질문이 걸렸다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>강의 초록을 읽다 막힌 지점. 이게 정말 그동안 biRNN으로 하던 걸 그냥 생략하고 안 하겠다는 이야기가 맞나? 그럼 biRNN이 원래 <em>무슨 일</em>을 하고 있었는데?</p>
+    </div>
+
+    <p>정리하면 이렇다. biRNN이 목숨 걸고 하던 일은 결국 <strong>"이 단어 주변에 어떤 단어들이 같이 쓰였지?"를 알아내 문맥을 만드는 일</strong>이었다. 예를 들어 <code>He deposited money in the bank.</code>에서 <code>bank</code>가 '은행'인지 '강둑'인지는, 앞의 <code>money</code>와 뒤의 <code>deposited</code>를 함께 봐야 정해진다. biRNN은 정방향으로 한 번(<code>money</code>를 기억), 역방향으로 한 번(<code>deposited</code>를 기억) 훑어 이 양방향 문맥을 합쳤다. 대명사 추적도 같은 원리다 — <code>The animal didn't cross the street because it was too tired.</code>에서 <code>it</code>이 <code>animal</code>인지 <code>street</code>인지를 앞뒤 정보를 합쳐 판단했다.</p>
+
+    <p>진화 과정으로 보면 어텐션과 biRNN의 관계가 분명해진다. <strong>1단계</strong> 초기 Seq2Seq는 어텐션 없이 RNN이 문장을 고정 벡터 하나로 압축했고, 문장이 길어지면 번역 품질이 처참했다. <strong>2단계</strong>는 "RNN이 앞을 자꾸 까먹으니 원문을 다시 기웃거리게 하자"며 <strong>biRNN 뼈대 위에 어텐션을 보조 장치로</strong> 얹은 과도기다. 품질은 올랐지만 "한 단어씩 순서대로 계산"하는 하드웨어 병목은 그대로였다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span><strong>3단계가 트랜스포머다.</strong> 보조 장치였던 어텐션의 성능이 압도적이다 보니, 주객을 뒤집었다 — "쓸모가 다한 환자(biRNN)는 퇴원시키고, 치료제(어텐션)만으로 병원을 차리자." biRNN이 하던 양방향 문맥 파악을, 문장 안 모든 단어가 서로를 <strong>동시에</strong> 쳐다보는 <strong>셀프 어텐션</strong>이 통째로 대체한다. 여기서 한 가지 오해도 교정됐다 — 이건 전처리(토큰화·임베딩)를 바꾼 게 아니라, 그 뒤 <strong>모델 본체(두뇌)의 핵심 연산</strong>에서 RNN을 퇴출한 것이다.</p>
+    </div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>self-attention — Q·K·V로 한 번에 잇기<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p>트랜스포머의 심장은 셀프 어텐션이다. 문장 안 모든 단어가 서로 어떤 연관성을 갖는지 <strong>스스로 점수를 매긴다</strong>. 이때 각 단어는 세 가지 역할로 복제되어 계산에 들어간다.</p>
+
+    <table>
+      <thead>
+        <tr><th>역할</th><th>기호</th><th>의미 (한 문장으로)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Query</td><td>Q</td><td>"지금 내가 초점을 맞춘 단어는 무엇인가?"</td></tr>
+        <tr><td>Key</td><td>K</td><td>"비교 대상이 될 다른 단어들은 무엇인가?"</td></tr>
+        <tr><td>Value</td><td>V</td><td>"연관성이 확인됐을 때, 그 단어가 실어 나를 실제 의미(값)는?"</td></tr>
+      </tbody>
+    </table>
+
+    <p>스케일드 닷-프로덕트 어텐션의 수식은 <code>Attention(Q,K,V) = softmax(QKᵀ / √d_k) · V</code> 한 줄이다. 네 단계로 읽으면 이렇게 된다. <strong>①</strong> <code>QKᵀ</code>로 Q와 모든 K의 내적을 구해 서로의 유사도(연관성)를 계산하고, <strong>②</strong> <code>√d_k</code>로 나눠 스케일링하며, <strong>③</strong> softmax로 "어느 단어에 몇 %나 집중할지"를 확률로 바꾼 뒤, <strong>④</strong> 그 집중도를 실제 의미값 V에 곱해 최종 벡터를 만든다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>②번의 <code>√d_k</code> 나눗셈이 왜 필요한지 처음엔 사족처럼 보였다. 그냥 내적만 하면 안 되나?</p>
+    </div>
+
+    <p>차원 <code>d_k</code>가 커지면 내적값의 크기 자체가 커진다. 값이 너무 큰 상태로 softmax에 들어가면 분포가 한쪽으로 뾰족하게 쏠려 기울기가 죽고 학습이 잘 안 된다. <code>√d_k</code>로 나눠 크기를 눌러주는 것 — 이 스케일링이 논문 제목에 '스케일드'가 붙은 이유다. 작지만 학습 안정성을 좌우하는 장치였다.</p>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>연산이 어떻게 달라지나 — 순차에서 병렬로<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>같은 문장 <code>"I love deep learning"</code>(4토큰)이 들어왔을 때, biRNN과 트랜스포머의 연산이 실제로 어떻게 갈리는지가 오늘의 핵심 축이었다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>"병렬화가 된다"는 말은 자주 들었는데, 구체적으로 <em>연산 단계가 어떻게</em> 달라지길래 GPU를 다 쓰게 되는 건가?</p>
+    </div>
+
+    <p><strong>biRNN(순차)</strong>은 이전 시점 <code>t−1</code>의 계산이 끝나야 다음 시점 <code>t</code>가 가능하다. <code>I → love → deep → learning</code>을 한 칸씩 밟아야 하니, 단어가 N개면 최소 N번의 단계를 <strong>기다려야</strong> 한다. 코어가 수천 개인 GPU를 붙여도 한 코어만 일하고 나머지는 논다.</p>
+
+    <p><strong>트랜스포머(병렬)</strong>는 4개 단어를 하나의 행렬로 묶어 통째로 던지고, 4×4 어텐션 맵의 16칸을 GPU 코어들이 <strong>동시에</strong> 계산한다. <code>I</code>–<code>learning</code>의 관계나 <code>love</code>–<code>deep</code>의 관계나 같은 1스텝에 나온다.</p>
+
+    <table>
+      <thead>
+        <tr><th>비교 항목</th><th>biRNN (순차)</th><th>Transformer (병렬)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>연산 제어 흐름</td><td>단어를 한 개씩 밟는 시간의 흐름</td><td>큰 행렬을 GPU에 올려 일괄 연산</td></tr>
+        <tr><td>단계 수(길이 N)</td><td>길이에 비례해 증가 (~O(N))</td><td>길이와 무관하게 1스텝</td></tr>
+        <tr><td>장거리 문맥</td><td>뒤로 갈수록 앞 단어를 소실</td><td><code>I</code>–<code>learning</code>을 다이렉트로 계산</td></tr>
+        <tr><td>하드웨어 효율</td><td>멀티코어를 못 살림</td><td>대규모 병렬 연산에 최적</td></tr>
+      </tbody>
+    </table>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>"병렬화"와 "장거리"는 사실 같은 구조에서 나온 두 얼굴이다. 모든 단어를 한 평면에 펼쳐 관계 점수를 <strong>거리와 무관하게 직접</strong> 매기기 때문에, 첫 단어와 만 번째 단어의 연산도 딱 한 번의 행렬 곱으로 끝난다. 거리에 따른 연산 페널티가 0이 되고, 동시에 그 행렬 곱이 GPU 병렬 연산 그 자체다. RNN을 버려서 얻은 게 바로 이 둘이었다.</p>
+    </div>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>멀티헤드와 FFN — 다각도로 보고, 다시 혼자 생각하기<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>어텐션을 한 번만 쓰지 않는다. 여러 개(헤드)로 쪼개 동시에 계산하는 게 <strong>멀티헤드 어텐션</strong>이다. Figure 2에서 왼쪽 스케일드 닷-프로덕트 어텐션이 오른쪽 멀티헤드보다 단순해 보여, 이런 의문이 들었다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>구조상 멀티헤드(후자)가 더 좋아 보이는데, 그럼 왼쪽의 단일 스케일드 닷-프로덕트 어텐션(전자)은 왜 따로 그려져 있는 거지?</p>
+    </div>
+
+    <p>오해였다. 둘은 대립하는 선택지가 아니다 — <strong>전자는 후자를 이루는 가장 작은 부품(엔진)</strong>이고, 후자는 그 엔진 여럿을 병렬로 묶은 완제품이다. '엔진 단면도'와 '그 엔진 8개를 얹은 슈퍼카'의 관계라, 부품의 연산이 정의돼야 완제품을 만들 수 있어 둘을 나란히 그린 것이었다. 여러 헤드를 쓰면, 한 헤드는 <code>it → animal</code> 지칭을 보고 다른 헤드는 <code>tired</code>–<code>animal</code>의 상태 관계를 보는 식으로 <strong>여러 표현 공간의 정보에 공동으로 집중(jointly attend)</strong>한다. 단일 헤드는 전체 차원을 평균 내버려 정보가 희석된다고 논문은 지적한다.</p>
+
+    <p>어텐션 블록 바로 위엔 <strong>FFN(Position-Wise Feed-Forward Network)</strong>이 붙는다. 처음엔 "이건 또 뭐지?" 싶었던 블록이다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>어텐션이 <strong>단어 사이의 관계(외적 문맥)</strong>를 다룬다면, FFN은 그렇게 모은 정보를 바탕으로 <strong>각 단어 벡터 하나하나를 독립적으로 깊게 재해석</strong>한다. 구조는 두 층짜리 선형망 <code>FFN(x) = max(0, xW₁+b₁)W₂+b₂</code>로, 512차원을 2,048차원으로 넓혔다가(방을 키워 표현력 확보) 다시 512로 압축한다. 가운데 ReLU 같은 <strong>비선형 활성화</strong>가 핵심 — 어텐션의 <code>QKᵀ</code>는 본질적으로 선형이라, 이것만 쌓으면 아무리 깊어도 복잡한 패턴을 못 배운다. FFN이 데이터를 비틀어 비선형성을 넣어준다. 'Position-Wise'라 부르는 건, 이 단계에선 각 단어가 서로를 신경 쓰지 않고 똑같은 계산기를 독립적으로 통과하기 때문이다. 한 블록은 결국 <strong>[어텐션: 정보 교류] → [FFN: 혼자 깊게 정제]</strong>의 2인 3각으로 굴러간다.</p>
+    </div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>순서를 잃었다 — 왜 sin/cos 위치 인코딩인가<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>RNN을 버리고 문장을 통째로 넣으면서 부작용이 생겼다. 단어를 순서대로 넣지 않으니 <strong>'순서' 정보 자체가 사라진다.</strong> PDF 3.5절이 이 문제를 이렇게 연다 — "우리 모델은 순환도 합성곱도 포함하지 않으므로, 시퀀스의 순서를 활용하려면 토큰의 상대적·절대적 위치 정보를 어떤 식으로든 주입해야 한다." 그 주입 장치가 <strong>위치 인코딩(Positional Encoding)</strong>이고, 임베딩과 같은 <code>d_model</code> 차원이라 임베딩에 그냥 더할 수 있다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>위치를 알려줄 거면 그냥 1, 2, 3, 4 같은 정수를 더하거나 학습 가능한 변수를 쓰면 될 텐데, <em>왜 하필</em> 복잡한 주기함수 sin·cos를 조합해서 쓰는 걸까?</p>
+    </div>
+
+    <p>단순 정수를 더하는 방식부터 막힌다. 문장이 10,000단어면 뒤쪽 단어엔 10,000이라는 거대한 값이 얹혀, 임베딩의 의미값을 압도하고 학습을 불안정하게 만든다. 그렇다고 0~1로 정규화하면 4단어 문장의 두 번째 단어(0.33)와 100단어 문장의 두 번째 단어(0.01)가 달라져, 같은 '2번째'라는 거리가 왜곡된다. sin·cos는 이 문제들을 세 가지 성질로 동시에 푼다.</p>
+
+    <table>
+      <thead>
+        <tr><th>성질</th><th>내용</th><th>얻는 것</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>유계성 (−1~1)</td><td>몇 번째 단어든 출력이 −1~1로 유지</td><td>값 폭발 없이 임베딩 의미를 안 해침</td></tr>
+        <tr><td>선형 상대거리</td><td>삼각함수 덧셈정리로, <code>pos+k</code>의 값이 <code>pos</code> 값에 회전행렬을 곱한 선형 결합으로 표현됨</td><td>모델이 "상대 거리 k"의 규칙을 거리와 무관하게 쉽게 학습</td></tr>
+        <tr><td>외삽 (Extrapolation)</td><td>주기함수는 무한히 이어짐</td><td>학습 때 안 본 501·1,000번째 위치도 즉석에서 에러 없이 계산</td></tr>
+      </tbody>
+    </table>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>가장 직관적인 그림은 <strong>이진법 시계</strong>였다. 각 차원마다 주파수가 다른 sin·cos를 번갈아 넣는데, <strong>앞쪽 차원(고주파, 초침)</strong>은 단어가 1칸만 바뀌어도 값이 요동쳐 <em>바로 옆 단어와의 세밀한 순서</em>를 구별하고, <strong>뒤쪽 차원(저주파, 시침)</strong>은 수백 칸이 바뀌어야 천천히 변해 <em>문장에서 앞부분인지 뒷부분인지 거시적 위치</em>를 잡는다. 결국 sin/cos는 "값 폭발을 막으면서(−1~1), 상대 거리를 선형으로 쉽게 연산하고, 길이에 구애받지 않는" 세 조건을 한 번에 만족시키는 우아한 해였다.</p>
+    </div>
+  </section>
+
+  <section id="ch6">
+    <h2 class="chap"><span class="num">CH 06</span>공짜는 아니다 — O(N²) 메모리와 인코더·디코더 스택<a href="#ch6" class="anchor-link">#</a></h2>
+
+    <p>거리에 무관한 다이렉트 연산에는 대가가 있다. 모든 단어가 서로를 보는 어텐션 맵은 N×N 크기다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>모든 단어를 한 판에 펼쳐 관계를 다 계산한다면, 문장이 길어질수록 용량 부하가 감당 못 하게 커지는 것 아닌가?</p>
+    </div>
+
+    <p>정확한 지적이다. 이게 어텐션의 <strong>O(N²) 메모리 복잡도</strong>다. 4단어면 4×4=16칸이지만, 1,000단어면 100만 칸, 10,000단어면 1억 칸이 필요하다. RNN/CNN이 문장 길이와 무관하게 거의 일정한 메모리를 쓰는 것과 정반대다. 토큰 수가 10배면 판넬은 100배로 급증해 OOM(메모리 부족)이 난다. 트랜스포머는 <strong>"연산 단계(시간)를 줄이는 대신 거대한 행렬을 유지할 공간(메모리)을 대거 희생한 모델"</strong>인 셈이다. (실무에선 HBM 같은 고대역폭 메모리, FlashAttention처럼 행렬을 블록으로 쪼개 계산하는 기법, Sparse/Linear Attention 등으로 이 부하를 눌러왔다.)</p>
+
+    <p>마지막으로 전체 골격을 정리해 두면, 트랜스포머는 <strong>인코더 스택</strong>과 <strong>디코더 스택</strong>으로 나뉜다. 인코더 블록은 <code>[Multi-Head Attention] → [FFN]</code>으로 문장 전체 관계를 한 번에 계산한다. 디코더 블록은 미래 단어를 미리 못 보게 가리는 <strong>Masked Multi-Head Attention</strong>과, 인코더의 정보를 받아오는 인코더-디코더 어텐션으로 이원화된다. 순환 구조가 사라진 자리에서 층을 깊게 쌓을 수 있게 해주는 게 각 블록을 우회하는 <strong>잔차 연결(Residual)</strong>과 <strong>Add &amp; Norm</strong>이다 — 이 덕에 논문 기본 모델은 인코더·디코더 각 N=6층을 안정적으로 적층했다.</p>
+
+    <div class="callout">
+      <p><span class="label">정리</span>오늘 하루를 한 줄로 요약하면 — RNN을 버릴 수 있었던 건 self-attention이 biRNN의 양방향 문맥 파악을 <strong>거리와 무관한 한 번의 행렬 곱</strong>으로 대체했기 때문이고, 그 대가로 얻은 병렬화·장거리 강점이 O(N²) 메모리라는 비용을 치르고도 남았기 때문이다. 잃어버린 순서 정보는 sin/cos로 되메웠다. 이 구조 위에서 GPT·BERT를 비롯한 오늘날의 모든 대형 언어 모델이 출발했다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>강의 PDF — 자연어처리_트랜스포머</li>
+      <li>공식 문서 — Vaswani et al. "Attention Is All You Need"</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-07-02)</p>
+  <p>"순환을 완전히 버린다"는 한 문장을 풀어보니, 병렬화·장거리라는 이득과 O(N²) 메모리라는 대가, 그리고 sin/cos로 순서를 되메우는 설계가 한 묶음으로 딸려 나왔다. 과격해 보이던 선언이 왜 표준이 됐는지 납득한 하루.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

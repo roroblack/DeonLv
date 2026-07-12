@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAVER 뉴스 카테고리 분류 — LSTM 텍스트 분류 실전</title>
+  <meta name="description" content="IMDB 감성분류에서 확장한 한국어 NAVER 뉴스 6분류 LSTM 실험 — 데이터와 형태소 분석이 성능을 가른다.">
+  <meta property="og:title" content="NAVER 뉴스 카테고리 분류 — LSTM 텍스트 분류 실전">
+  <meta property="og:description" content="IMDB 감성분류에서 확장한 한국어 NAVER 뉴스 6분류 LSTM 실험 — 데이터와 형태소 분석이 성능을 가른다.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="NAVER 뉴스 카테고리 분류 — LSTM 텍스트 분류 실전">
+  <meta name="twitter:description" content="IMDB 감성분류에서 확장한 한국어 NAVER 뉴스 6분류 LSTM 실험 — 데이터와 형태소 분석이 성능을 가른다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover"><p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p><h1>NAVER 뉴스 카테고리 분류기 (LSTM) 실험</h1><p class="deck">한국어 뉴스를 카테고리로 분류하는 LSTM 모델을 어떻게 만들고, 무엇이 성능을 가르나. 임베딩 → LSTM → 분류로 이어지는 뼈대는 짧지만, 정확도를 실제로 움직인 것은 모델 구조가 아니라 한국어 전처리였다.</p>
+<div class="meta-row"><span><strong>날짜</strong>2026-06-30</span><span><strong>도구</strong>PyTorch · KoNLPy · Python 3.13.5</span><span><strong>OS</strong>Windows 11 Pro 25H2</span><span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span><span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 — 자연어처리_텍스트분류.pdf</span></div></header>
+<main><nav class="flow"><h2>이 글의 흐름 — 텍스트 분류의 뼈대에서 한국어의 함정까지</h2><ol><li><a href="#ch1">CH 01 · 텍스트 분류라는 문제 정의</a></li><li><a href="#ch2">CH 02 · 임베딩 → LSTM → 분류 뼈대</a></li><li><a href="#ch3">CH 03 · 감성 2진에서 뉴스 6분류로</a></li><li><a href="#ch4">CH 04 · 무엇이 성능을 가르나 — 형태소와 데이터</a></li><li><a href="#ch5">CH 05 · 평가와 다음 단계(BERT 계열)</a></li></ol></nav><div class="bridge"><strong>출발점</strong> — 감성 분석(긍정/부정) LSTM 코드를 기반으로, 입력을 네이버 뉴스로 바꾸고 출력을 다중 카테고리로 확장하면서 어디서 정확도가 새는지 관찰한 기록이다.</div>
+
+<section id="ch1"><h2 class="chap"><span class="num">CH 01</span>텍스트 분류라는 문제 정의<a href="#ch1" class="anchor-link">#</a></h2>
+<h3 class="step">학습 → 입력은 문장, 출력은 미리 정의된 라벨</h3>
+<p>강의 자료는 텍스트 분류를 "문장·문서의 내용을 분석해 미리 정해진 범주(Class) 중 하나 또는 여러 개로 자동 분류하는 작업"으로 정의한다. 입력은 텍스트, 출력은 사전에 정의된 라벨이다. 스팸/정상, 영화 리뷰 긍정/부정이 대표적인 이진 분류이고, IT·교육·건강처럼 세 개 이상 중 하나를 고르면 다중 분류가 된다. 뉴스 카테고리 분류는 후자에 속한다.</p>
+<p>분류 과정은 <strong>텍스트 수집 → 전처리(정제·토큰화·형태소 분석·불용어 제거) → 벡터화 → 모델 학습 → 예측·평가</strong>의 순서로 정리된다. 이 파이프라인에서 딥러닝 모델은 "벡터화된 입력을 받아 예측하는" 한 단계일 뿐이고, 그 앞의 전처리가 한국어에서는 유독 무겁다는 점이 이번 실험의 핵심 주제가 된다.</p>
+<div class="qbox"><span class="label">의문</span>감성 분석(2진)과 뉴스 분류(다중)는 코드 관점에서 얼마나 다른가? 출력 차원만 늘리면 되는가, 아니면 전처리·손실·평가까지 함께 바뀌는가?</div>
+<div class="bridge"><strong>다음으로</strong> — 그 답을 확인하려면 먼저 기존 감성 분석 모델의 뼈대를 그대로 읽어봐야 한다.</div></section>
+
+<section id="ch2"><h2 class="chap"><span class="num">CH 02</span>임베딩 → LSTM → 분류 뼈대<a href="#ch2" class="anchor-link">#</a></h2>
+<h3 class="step">시행 → NSMC 감성 분류 LSTM의 설정값 읽기</h3>
+<p>출발 코드는 네이버 영화 리뷰(NSMC) 데이터로 긍정/부정을 가르는 LSTM 분류기다. 설정값은 하나의 <code>Config</code> 데이터클래스에 모아 두어, 뉴스 분류로 넘어갈 때 어떤 값을 건드려야 하는지 한눈에 보인다.</p>
+<div class="terminal"><div class="terminal-header">assignment/LSTM_movie_review.py — 학습 설정(Config)</div><pre class="terminal-body">max_len          = 200        # 문장 최대 길이(패딩 기준)
+max_vocab_size   = 20000      # 사전 최대 단어 수
+min_freq         = 2          # 2회 미만 등장 단어는 &lt;unk&gt; 처리
+batch_size       = 64
+embedding_dim    = 128
+hidden_dim       = 128
+num_layers       = 1
+dropout          = 0.3
+learning_rate    = 0.001
+max_epochs       = 3
+val_ratio        = 0.2        # 학습 데이터의 20%를 검증으로 분리</pre></div>
+<p>모델 본체는 세 층이다. <code>nn.Embedding</code>이 정수 토큰을 128차원 벡터로 바꾸고, 단방향 <code>nn.LSTM</code>이 시퀀스를 훑고, 마지막 <code>nn.Linear</code>가 클래스 점수를 낸다. 여기서 중요한 세부는 "문장 벡터"를 어떻게 뽑느냐다.</p>
+<pre class="language-python"><code class="language-python">def forward(self, input_ids):
+    embedded = self.embedding(input_ids)          # (B, L, E)
+    output, (hidden, cell) = self.lstm(embedded)  # hidden: (num_layers, B, H)
+    sentence_vector = hidden[-1]                  # 마지막 층의 최종 은닉상태
+    sentence_vector = self.dropout(sentence_vector)
+    logits = self.classifier(sentence_vector)     # (B, num_classes)
+    return logits</code></pre>
+<div class="keypoint"><span class="label">배운 점</span>LSTM의 모든 시점 출력을 쓰는 게 아니라 <code>hidden[-1]</code>, 즉 마지막 층의 최종 은닉상태 하나를 문장 대표 벡터로 쓴다. 시퀀스 전체를 한 벡터로 요약하는 이 지점이 "가변 길이 텍스트 → 고정 차원 분류"의 다리다.</div>
+<div class="callout"><span class="label">함정</span>기존 코드 정비 과정에서, LSTM의 모든 시점 출력에 선형층을 걸고 점수를 <code>sum(dim=1)</code>으로 합산하던 비표준 구조와 출력 차원을 3으로 두고 라벨은 2개(0/1)이던 불일치가 문제로 기록됐다. 표준은 <em>마지막 은닉상태 → 선형층</em>, 그리고 <em>출력 차원 = 실제 클래스 수</em>다. 이 원칙은 다음 장에서 뉴스로 확장할 때 그대로 밟게 된다.</div>
+<div class="bridge"><strong>다음으로</strong> — 이 뼈대에서 무엇을 바꾸면 2진 감성이 6분류 뉴스가 되는지 짚는다.</div></section>
+
+<section id="ch3"><h2 class="chap"><span class="num">CH 03</span>감성 2진에서 뉴스 6분류로<a href="#ch3" class="anchor-link">#</a></h2>
+<h3 class="step">시행 → 입력 데이터와 출력 차원을 함께 바꾸기</h3>
+<p>실험 보고서 기준, 뉴스 분류는 <strong>IT·스포츠·사회·경제·연예·정치</strong> 6개 카테고리를 다룬다. 2진 분류 코드에서 다중 분류로 넘어갈 때 실제로 손대는 지점은 생각보다 좁고 분명하다.</p>
+<table><thead><tr><th>구성 요소</th><th>감성(2진)</th><th>뉴스(6분류)</th></tr></thead><tbody>
+<tr><td>라벨</td><td>0/1 (부정/긍정)</td><td>0~5 (IT·스포츠·사회·경제·연예·정치)</td></tr>
+<tr><td>분류층 출력</td><td><code>Linear(H, 2)</code></td><td><code>Linear(H, 6)</code></td></tr>
+<tr><td>손실 함수</td><td colspan="2"><code>CrossEntropyLoss</code> — 그대로 (다중 클래스 지원)</td></tr>
+<tr><td>정확도 지표</td><td>task="binary"</td><td>task="multiclass", num_classes=6</td></tr>
+<tr><td>전처리</td><td colspan="2">토큰화 → 정수 인코딩 → 패딩 (동일 파이프라인)</td></tr>
+</tbody></table>
+<p>즉 <code>CrossEntropyLoss</code>와 임베딩·LSTM 뼈대는 손대지 않는다. 바뀌는 건 (1) 입력 데이터셋, (2) 마지막 <code>Linear</code>의 출력 차원 2→6, (3) 정확도 메트릭의 task 타입이다. 강의 자료가 다중 분류를 "세 개 이상의 클래스 중 하나를 선택"으로 정의하듯, 소프트맥스 출력이 카테고리 수만큼 늘어날 뿐 문제의 형태는 같다.</p>
+<div class="qbox"><span class="label">의문</span>구조 변경이 이렇게 얕은데 초기 성능은 왜 낮게 나오는가? 다중 클래스라 어려워진 것인가, 아니면 다른 데서 새는 것인가?</div>
+<div class="bridge"><strong>다음으로</strong> — 실험의 버전별 정확도 추이를 보면, 성능을 실제로 끌어올린 건 모델이 아니라 데이터·전처리 쪽이었다.</div></section>
+
+<section id="ch4"><h2 class="chap"><span class="num">CH 04</span>무엇이 성능을 가르나 — 형태소와 데이터<a href="#ch4" class="anchor-link">#</a></h2>
+<h3 class="step">관찰 → 버전을 거치며 무엇을 바꿨을 때 올랐나</h3>
+<p>실험 보고서에는 여러 버전에 걸친 검증·테스트 정확도가 기록돼 있다. 초기 버전들은 검증 정확도가 40~50%대에 머물렀고, <strong>데이터를 늘리고 형태소 분석을 붙인 버전에서 눈에 띄게 올라갔다</strong>는 흐름이 핵심이다. 구조를 바꿔서가 아니라 입력 품질을 손봐서 개선됐다는 점이 중요하다.</p>
+<table><thead><tr><th>변경 내용</th><th>관찰된 방향</th></tr></thead><tbody>
+<tr><td>초기 다중 분류(공백 토큰화)</td><td>40~50%대 — 기준선</td></tr>
+<tr><td>데이터 약 3배 확대 + 형태소 분석 적용</td><td>테스트 정확도 뚜렷한 상승</td></tr>
+<tr><td>전처리·하이퍼파라미터 정비 누적</td><td>추가 개선</td></tr>
+</tbody></table>
+<p>이유는 강의 자료의 한 문장으로 요약된다. "한국어에서는 조사와 어미가 많기 때문에 형태소 분석이 매우 중요하다." 공백 단위로 자르면 "뉴스가/뉴스를/뉴스는"이 전부 다른 토큰이 되어 사전이 낭비되고 <code>&lt;unk&gt;</code>가 늘어난다. 형태소 분석기(KoNLPy의 Okt·Mecab 등)로 어간과 조사를 분리하면 같은 의미 단어가 하나로 모여 임베딩이 촘촘해진다.</p>
+<div class="keypoint"><span class="label">배운 점</span>기존 감성 코드의 토큰화는 정규식으로 특수문자를 제거한 뒤 <code>split()</code>으로 공백 분할하는 방식이었다. 이 단계를 형태소 분석으로 교체하는 것이 한국어 뉴스 분류에서 가장 큰 성능 레버였다. 모델 층을 늘리는 것보다 앞 단이 먼저다.</div>
+<div class="callout"><span class="label">함정</span><code>min_freq=2</code>로 희귀어를 <code>&lt;unk&gt;</code> 처리하는 설정은, 공백 토큰화 상태에서는 조사 변형까지 희귀어로 몰아 정보를 더 깎을 수 있다. 형태소 분석으로 토큰이 정규화된 뒤에야 이 임계값이 의도대로 "진짜 드문 단어만" 걸러낸다. 전처리와 사전 설정은 함께 조율해야 한다.</div>
+<div class="bridge"><strong>다음으로</strong> — 그러면 이 모델의 성능을 어떻게 읽고, 어디서 한계에 부딪히는지 정리한다.</div></section>
+
+<section id="ch5"><h2 class="chap"><span class="num">CH 05</span>평가와 다음 단계(BERT 계열)<a href="#ch5" class="anchor-link">#</a></h2>
+<h3 class="step">결론 → 지표로 읽고, 문맥의 벽에서 다음 모델로</h3>
+<p>다중 분류 평가는 정확도 하나로 끝내지 않는다. 강의 자료가 정리한 지표는 Accuracy, Precision, Recall, F1-Score, 그리고 <strong>Confusion Matrix</strong>다. 6개 카테고리에서는 경제와 사회, IT와 연예처럼 어휘가 겹치는 쌍이 서로 혼동되기 쉬운데, 이 오분류 구조는 혼동 행렬로만 드러난다. 클래스별 데이터 수가 다르면 특정 카테고리로 편향될 수 있다는 점(데이터 불균형)도 자료가 명시한 한계다.</p>
+<div class="terminal"><div class="terminal-header">평가 관점 — 다중 분류에서 봐야 할 것</div><pre class="terminal-body">Accuracy       : 전체 정답 비율(불균형이면 과대평가 위험)
+Precision/Recall: 카테고리별로 따로 확인
+F1-Score       : 두 지표의 조화평균
+Confusion Matrix: 어떤 카테고리끼리 헷갈리는지 파악</pre></div>
+<p>LSTM은 단어 순서와 문맥을 어느 정도 학습하지만, 같은 단어가 문장마다 다른 의미로 쓰이는 상황(자료의 예: 금융 "은행" vs 나무 "은행")까지는 하나의 임베딩으로 뭉개 버린다. 자료가 최신 기술로 제시하는 <strong>BERT 계열</strong>(KoBERT·KoELECTRA)은 앞뒤 문맥을 동시에 보는 양방향 학습으로 이 문맥 의존 의미를 구분하고, 적은 데이터로도 파인튜닝만으로 높은 분류 성능을 낸다. 이번 실험의 LSTM은 그 다리를 놓기 위한 기준선인 셈이다.</p>
+<div class="keypoint"><span class="label">배운 점</span>한 줄 목표의 답 — 뉴스 LSTM 분류기는 임베딩→LSTM(마지막 은닉상태)→선형층으로 짧게 만들 수 있지만, 성능을 가른 것은 모델 깊이가 아니라 <em>한국어 형태소 전처리와 데이터 양</em>이었다. 그리고 문맥 의존 의미의 벽에서 다음 모델(BERT 계열)로 넘어가는 이유가 생긴다.</div></section>
+
+<div class="ref-chain"><p class="ref-title">📚 근거 출처</p><ol><li>실습 코드 — <code>llm_workspace/nlp_model_project</code></li><li>강의 PDF — 자연어처리_텍스트분류</li><li>공식 문서 — PyTorch LSTM · KoNLPy</li></ol></div></main>
+<footer><p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-06-30)</p><p>다음 글에서는 같은 뉴스 데이터를 KoBERT로 파인튜닝하며, 문맥 임베딩이 LSTM 기준선을 얼마나 밀어 올리는지 이어서 확인한다.</p></footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+</body>
+</html>

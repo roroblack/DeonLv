@@ -1,0 +1,275 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 10주차 회고 · 교과목 3 단원 2·3 자연어처리·LLM · 부트캠프</p>
+  <h1>번역에서 트랜스포머, 그리고 LLM으로 — 10주차 회고</h1>
+  <p class="deck">9주차가 "말을 숫자로(형태소·임베딩·LSTM)"였다면, 10주차(0629~0703)는 <strong>그 숫자로 문장을 옮기고(번역), 순환을 버리고(트랜스포머), 거대해지는(LLM)</strong> 길이었다.
+  한국어 뉴스 분류 실전으로 시작해, 고정 벡터 병목을 어텐션으로 풀고, RNN을 아예 없앤 트랜스포머까지 간 뒤, 그 트랜스포머가 커지면 LLM이 된다는 데서 한 주가 끝났다.
+  한 줄 목표는 — <strong>"순서를 어떻게 다루는가 — 차례로 읽기(RNN)에서 전부 동시에 보기(self-attention)로."</strong>
+  이번 주는 강의 자료·논문 노트 기반의 개념 정리가 중심이라, 실측 로그보다 <em>왜 그렇게 설계됐는가</em>의 사슬을 따라간다.</p>
+  <div class="meta-row">
+    <span><strong>기간</strong>2026-06-29 ~ 07-03</span>
+    <span><strong>범위</strong>텍스트 분류(NAVER) · 번역 모델 · 트랜스포머 · LLM 개념</span>
+    <span><strong>자료</strong>강의 PDF · 논문 노트 · 발행글(devroro /label/llm)</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+  </div>
+</header>
+<main>
+<nav class="flow">
+  <h2>이 글의 흐름 — 순서를 다루는 방식의 진화</h2>
+  <ol>
+    <li><a href="#ch1">CH 01 · 출발 — LSTM으로는 어디까지</a></li>
+    <li><a href="#ch2">CH 02 · NAVER 뉴스 분류 — 텍스트 분류 실전</a></li>
+    <li><a href="#ch3">CH 03 · 번역 모델 — 고정 벡터 병목과 어텐션</a></li>
+    <li><a href="#ch4">CH 04 · 트랜스포머 — 순환을 버리다</a></li>
+    <li><a href="#ch5">CH 05 · LLM의 시작 — 트랜스포머가 거대해지면</a></li>
+    <li><a href="#ch6">CH 06 · 종합 회고</a></li>
+  </ol>
+</nav>
+
+<div class="bridge">
+  <strong>한 주의 출발</strong> — 9주차 끝에서 LSTM은 문장을 <em>차례로</em> 읽어 하나의 벡터로 압축했다.
+  그 압축이 만든 병목이 이번 주의 출발점이다 — 어텐션이 그 병목을 풀고, 트랜스포머가 순환 자체를 없애며, 그 끝에 LLM이 있었다.
+</div>
+
+<section id="ch1">
+  <h2 class="chap"><span class="num">CH 01</span>출발 — LSTM으로는 어디까지<a href="#ch1" class="anchor-link">#</a></h2>
+  <p>텍스트를 다루는 모델은 9주차까지 RNN·LSTM이었다. 순서대로 읽어 은닉 상태에 기억을 쌓는 구조는 직관적이지만, 두 가지 벽이 있었다 — <strong>장기 의존성</strong>(뒤로 갈수록 앞이 희석)과 <strong>병렬화 불가</strong>(앞을 계산해야 뒤를 계산). 이번 주는 이 벽을 하나씩 넘는 이야기다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  차례로 읽는 것 말고 다른 방법이 있을까? 문장의 모든 단어를 한 번에 서로 견주면 안 되나?</div>
+  <div class="bridge"><strong>다음으로</strong> — 그 전에, 배운 LSTM을 실전 분류에 부딪혀 봤다.</div>
+</section>
+
+<section id="ch2">
+  <h2 class="chap"><span class="num">CH 02</span>NAVER 뉴스 분류 — 텍스트 분류 실전<a href="#ch2" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0630엔 한국어 뉴스를 카테고리(IT·스포츠·사회·경제·연예·정치)로 나누는 LSTM 분류기를 다뤘다. IMDB 감성 2분류(긍/부정)에서 출발한 코드를, 출력 차원을 늘리고 지표 타입을 맞춰 다중 분류로 확장했다.</p>
+  <div class="keypoint"><span class="label">배운 점</span>
+  성능을 가른 건 모델 크기가 아니라 <strong>데이터 양과 형태소 분석</strong>이었다 — 한국어는 조사·어미가 많아 형태소 단위로 자를 때 분류가 뚜렷이 좋아졌다. 8주차·9주차의 "전처리·토큰 단위가 결과를 가른다"가 실전에서 재확인됐다.
+  <span style="color:#667085;">(자세히: <a href="../nlp/day0630_naver_classifier.html">NAVER 뉴스 분류기</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 분류를 넘어 "문장을 다른 문장으로 옮기는" 번역으로 갔다. 여기서 LSTM의 병목이 정면으로 드러난다.</div>
+</section>
+
+<section id="ch3">
+  <h2 class="chap"><span class="num">CH 03</span>번역 모델 — 고정 벡터 병목과 어텐션<a href="#ch3" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0701엔 기계번역의 진화를 훑었다 — 규칙·통계 기반(PBMT)에서 신경망(Seq2Seq)으로, 다시 어텐션으로. Seq2Seq는 인코더가 원문을 <strong>하나의 고정 길이 벡터</strong>로 압축해 디코더에 넘기는데, 문장이 길수록 이 벡터가 병목이 됐다.</p>
+  <div class="qbox"><span class="label">의문 → 해결</span>
+  왜 원문 전체를 한 벡터에 욱여넣나? 디코더가 단어를 낼 때마다 <strong>원문의 필요한 부분을 다시 골라 보면</strong> 되지 않나 — 이것이 어텐션(soft, 미분 가능한 '가중 보기')이었다.</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  어텐션은 "정렬(어디를 볼지)과 번역(무엇을 낼지)을 함께 학습"하는 장치였다. 8주차 IMDB에서 "마지막 시점 대신 전 구간 요약(mean+max)"을 골랐던 직관이, 번역에선 "매 시점 원문 전체를 가중 참조"로 확장된 것이다.
+  <span style="color:#667085;">(자세히: <a href="../nlp/day0701_translation_model.html">번역 모델 구조</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 어텐션이 그렇게 강하다면, 순환(RNN)은 아예 없애도 되지 않을까?</div>
+</section>
+
+<section id="ch4">
+  <h2 class="chap"><span class="num">CH 04</span>트랜스포머 — 순환을 버리다<a href="#ch4" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0702, "Attention Is All You Need". 제목 그대로 RNN·CNN을 없애고 <strong>self-attention</strong>만으로 문장을 처리한다. 모든 단어가 다른 모든 단어와 동시에 견주므로, RNN의 두 벽(장기 의존성·병렬화 불가)이 한 번에 풀렸다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  RNN을 정말 버려도 되나(dispensing with recurrence)? 그러면 <strong>순서 정보</strong>는 어떻게 주지? 왜 하필 sin/cos 위치 인코딩인가?</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  순서는 <strong>위치 인코딩</strong>으로 더한다 — 주기함수(sin/cos)라야 <em>상대 거리</em>가 선형으로 표현되고 학습보다 긴 문장으로도 외삽된다. self-attention은 병렬 학습과 장거리 직접 연결을 얻고, 멀티헤드는 한 문장을 여러 관점(대명사 해소·인과 등)으로 동시에 본다.
+  <span style="color:#667085;">(자세히: <a href="../nlp/day0702_transformer.html">트랜스포머</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 이 트랜스포머를 아주 크게, 아주 많은 텍스트로 학습하면 무엇이 되나. LLM이다.</div>
+</section>
+
+<section id="ch5">
+  <h2 class="chap"><span class="num">CH 05</span>LLM의 시작 — 트랜스포머가 거대해지면<a href="#ch5" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0703엔 교과목 3의 다음 단원, LLM으로 넘어갔다. LLM은 <strong>트랜스포머를 대규모로 사전학습</strong>한 언어 모델이고, 우리는 그것을 API(토큰·컨텍스트 윈도우·프롬프트)로 쓴다. 9주차에서 만난 "정적 임베딩의 한계 → 문맥마다 다른 동적 임베딩(BERT·GPT)"이 곧 이 LLM의 토대였다.</p>
+  <div class="keypoint"><span class="label">배운 점</span>
+  트랜스포머 → 대규모 사전학습 → LLM으로 이어지는 흐름이 한 줄로 꿰였다. 앞으로는 모델을 <em>만드는</em> 쪽보다 <strong>잘 쓰는</strong> 쪽(프롬프트·파라미터·RAG)이 과제가 된다.
+  <span style="color:#667085;">(자세히: <a href="../llm/day0703_llm_intro.html">LLM 개념과 API</a>)</span></div>
+  <div class="bridge"><strong>그래서</strong> — 10주차는 "순서를 차례로 읽던" 시대의 끝이자, "전부 동시에 보고, 거대하게 사전학습하는" 시대의 시작이었다.</div>
+</section>
+
+<section id="ch6">
+  <h2 class="chap"><span class="num">CH 06</span>종합 회고<a href="#ch6" class="anchor-link">#</a></h2>
+  <h3 class="step">잘한 점 / 부족했던 점 / 다음 한 수</h3>
+  <ul>
+    <li><strong>잘한 점</strong> — RNN→어텐션→트랜스포머→LLM의 <em>왜</em>를 논문 노트의 의문(고정 벡터 병목·soft attention·RNN 폐기·위치 인코딩)으로 사슬처럼 꿰었다.</li>
+    <li><strong>부족했던 점</strong> — 이번 주는 코드가 아직 정리되지 않아(git 미반영) 실측 로그가 얕다. 개념 이해는 채웠지만 직접 구현·측정은 다음 과제로 남았다.</li>
+    <li><strong>다음 한 수</strong> — 트랜스포머를 작은 데이터로 직접 학습해 어텐션 가중치를 시각화하고, LLM API로 프롬프트·파라미터(temperature·top-p)를 실측한다.</li>
+  </ul>
+  <div class="keypoint"><span class="label">관통 교훈</span>
+  <ol>
+    <li><strong>병목이 다음 구조를 부른다.</strong> Seq2Seq 고정 벡터 병목 → 어텐션, RNN의 순차성 → 트랜스포머.</li>
+    <li><strong>"순서를 어떻게 다루나"가 핵심.</strong> 차례로 읽기(RNN) → 전부 동시에 보기(self-attention) + 위치 인코딩으로 순서 주입.</li>
+    <li><strong>트랜스포머 = LLM의 토대.</strong> 크게·많이 사전학습하면 문맥을 담는 동적 표현이 되고, 그게 LLM이다.</li>
+  </ol>
+  </div>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>강의 PDF — 자연어처리_텍스트분류 · 자연어처리_번역모델 · 자연어처리_트랜스포머 · LLM개념_API</li>
+      <li>실습 코드 — <code>llm_workspace/nlp_model_project</code> (NSMC/뉴스 LSTM 분류)</li>
+      <li>발행글 — devroro <code>/label/llm</code> (NAVER 분류·번역·트랜스포머)</li>
+      <li>공식 문서 — Bahdanau(어텐션) · Vaswani "Attention Is All You Need"(트랜스포머)</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 10주차 회고 (2026-06-29 ~ 07-03)</p>
+  <p>텍스트 분류에서 번역·트랜스포머·LLM까지 — 순서를 다루는 방식의 진화를 논문 노트의 의문으로 따라갔다. 코드가 정리되면 실측을 보강한다.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>

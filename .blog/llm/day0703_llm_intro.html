@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM 개념과 API — 초거대언어모델의 이해와 사용</title>
+  <meta name="description" content="트랜스포머 사전학습으로서의 LLM, 토큰·컨텍스트·파라미터(temperature·top-p) 개념과 API 사용.">
+  <meta property="og:title" content="LLM 개념과 API — 초거대언어모델의 이해와 사용">
+  <meta property="og:description" content="트랜스포머 사전학습으로서의 LLM, 토큰·컨텍스트·파라미터(temperature·top-p) 개념과 API 사용.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="LLM 개념과 API — 초거대언어모델의 이해와 사용">
+  <meta name="twitter:description" content="트랜스포머 사전학습으로서의 LLM, 토큰·컨텍스트·파라미터(temperature·top-p) 개념과 API 사용.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · LLM(교과목 3 · 단원 3) Day1 · 부트캠프</p>
+  <h1>LLM 개념과 API — 초거대언어모델의 이해와 사용</h1>
+  <p class="deck">지난 단원까지 임베딩·트랜스포머로 "문맥을 벡터로 읽는 법"을 쌓아왔다. 오늘은 그 흐름이 어디로 이어졌는지 — 트랜스포머를 대규모로 사전학습해 하나의 모델로 여러 작업을 처리하는 LLM, 그리고 그것을 코드가 아닌 API 호출로 쓰는 방식(토큰·컨텍스트·파라미터)을 개념 중심으로 정리한다. API 키가 없어 실제 호출 대신 개념과 사용법에 집중한다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-07-03</span>
+    <span><strong>주제</strong>LLM 개념 · API · 파라미터</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 3 · LLM Day1 — LLM개념_API.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 트랜스포머에서 API 한 줄까지</h2>
+    <ol>
+      <li>LLM이란 무엇인가 — 사전학습·스케일이 만든 "하나의 모델, 여러 작업"</li>
+      <li>모델의 종류와 재학습 없이 쓰는 법 — Decoder/Encoder, In-context Learning</li>
+      <li>프롬프트와 예시 개수 — Zero/One/Few-shot, 그리고 환각</li>
+      <li>API로 부른다는 것 — 토큰·Input/Output·컨텍스트와 과금</li>
+      <li>생성 제어 파라미터 — temperature · top-p · max_tokens</li>
+    </ol>
+  </nav>
+
+  <div class="bridge">
+    <p>여기까지 딥러닝 단원에서 RNN·LSTM의 정보 병목을 봤고, 어텐션과 트랜스포머로 "순서를 버리고 문장 전체 관계를 한 번에 읽는" 구조까지 왔다. 그런데 강의 노트를 되짚다 계속 걸린 지점이 있었다. 트랜스포머는 <em>구조</em>일 뿐인데, 어떻게 그게 번역·요약·코드작성을 한꺼번에 하는 <em>하나의 제품</em>이 된 걸까. 오늘 강의는 그 빈칸 — 구조에서 LLM으로 — 을 메우는 시간이었다.</p>
+  </div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span>LLM이란 무엇인가<a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>LLM은 Large Language Model, 대규모 언어 모델이다. 강의는 그 상징으로 2020년 공개된 <strong>GPT-3</strong>를 든다. 1,750억 개 파라미터를 가진 자기회귀(auto-regressive) 언어 모델로, 여기서 자기회귀란 앞의 토큰들을 보고 <strong>다음 토큰을 예측</strong>하는 방식을 뜻한다. 지난 언어 모델 글에서 LSTM이 다음 단어를 확률로 맞추던 그 원리가, 트랜스포머 위에서 압도적 규모로 반복된 것이다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>노트를 정리하며 막혔던 질문. 트랜스포머는 <code>Attention Is All You Need</code>에서 본 '아키텍처'인데, 그 구조 자체가 어떻게 질문답변·번역·요약을 다 하는 하나의 모델이 되나? 구조와 능력 사이에 뭐가 채워진 건가.</p>
+    </div>
+
+    <p>강의가 채워준 빈칸은 <strong>사전학습(Pre-training)</strong>과 <strong>스케일(scale)</strong>이었다. 사전학습은 LLM을 만들 때 가장 먼저 하는 대규모 학습 단계로, 인터넷 문서·책·코드·위키 같은 방대한 텍스트에서 오직 "다음 토큰 맞추기"만 반복한다. 입력이 "인공지능은 데이터를 학습하여"라면 정답은 "패턴" 같은 식이다. 이 단순한 과제를 거대한 데이터로 충분히 반복하면 모델은 문장 구조, 단어 의미 관계, 문맥, 상식적 표현, 코드 패턴, 질문-답변 구조까지 부수적으로 습득한다. 즉 사전학습은 언어의 기본 능력을 통째로 갖추는 과정이다.</p>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>GPT-3가 준 진짜 메시지는 성능 수치가 아니라 <strong>"모델 크기를 크게 키우면 별도의 세부 학습 없이도 여러 작업을 수행한다"</strong>는 관찰이었다. 기존 NLP는 감성분석·번역·요약·질의응답을 <em>작업마다 따로</em> 학습시켜야 했다. LLM 이후로는 하나의 모델이 <strong>프롬프트만 바꿔</strong> 여러 작업을 처리한다. 트랜스포머라는 '구조'가 '제품'이 된 지점이 바로 여기 — 스케일이 붙은 사전학습이었다.</p>
+    </div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span>모델의 종류와 재학습 없이 쓰는 법<a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p>LLM은 하나로 뭉뚱그려지지만 구조와 목적에 따라 갈린다. 앞선 논문 글에서 본 <strong>GPT 계열(생성)</strong>과 <strong>BERT 계열(이해)</strong>의 분기가 여기서 종류표로 정리됐다.</p>
+
+    <table>
+      <thead>
+        <tr><th>종류</th><th>설명</th><th>예시</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Decoder-only</td><td>이전 토큰을 보고 다음 토큰을 생성</td><td>GPT 계열</td></tr>
+        <tr><td>Encoder-only</td><td>문장을 이해하고 분류하는 데 강함</td><td>BERT 계열</td></tr>
+        <tr><td>Encoder-Decoder</td><td>입력 문장을 다른 문장으로 변환</td><td>T5, BART</td></tr>
+        <tr><td>Instruction-tuned</td><td>사람의 지시를 잘 따르도록 추가 학습</td><td>InstructGPT, ChatGPT 계열</td></tr>
+        <tr><td>Multimodal</td><td>텍스트뿐 아니라 이미지·음성 등도 처리</td><td>GPT-4o 계열</td></tr>
+      </tbody>
+    </table>
+
+    <p>GPT 계열은 글쓰기·답변·코드작성·요약·번역·챗봇처럼 <strong>생성형</strong> 작업에, BERT 계열은 문장분류·감성분석·개체명 인식·유사도·검색 랭킹처럼 <strong>이해 기반</strong> 작업에 강하다. 즉 지난 임베딩 글에서 짚은 "고정 임베딩 → 문맥 임베딩(BERT/GPT)"의 두 갈래가, 그대로 오늘의 두 모델 계열로 이어진다.</p>
+
+    <p>그런데 여기서 결정적으로 궁금했던 건 <strong>파인튜닝</strong>과의 관계였다. 작업마다 모델을 다시 학습시키는 게 아니라면, 실제로는 어떻게 원하는 작업을 시키는가?</p>
+
+    <div class="callout">
+      <p><span class="label">정리</span><strong>In-context Learning</strong>이 그 답이다. 모델을 다시 학습(파인튜닝)시키지 않고, <strong>프롬프트 안에 설명이나 예시를 넣어</strong> 원하는 작업을 시키는 방식이다. 예컨대 "다음 문장의 감성을 긍정/부정으로 분류하라"는 지시에 예시 문장 두어 개를 붙이면, 모델은 그 패턴을 보고 마지막 문장의 답을 생성한다. 장점은 명확하다 — 별도 학습 데이터셋을 만들거나 모델을 재학습할 필요가 없다. 사전학습으로 얻은 범용 능력을 프롬프트로 '지시'만 하는 것이다.</p>
+    </div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span>프롬프트와 예시 개수, 그리고 환각<a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p><strong>프롬프트(Prompt)</strong>는 LLM에게 전달하는 입력 지시문이다. 단순 질문일 수도, 역할·조건·출력 형식을 담은 상세 명령일 수도 있다. 강의의 대비가 인상적이었다. 나쁜 프롬프트는 "LLM 설명해줘." 한 줄이고, 좋은 프롬프트는 "너는 인공지능 강사이다. LLM의 개념을 … 정의·학습 방식·Transformer 구조·API 활용·실무 사례를 포함해 설명하라"처럼 <strong>역할과 항목</strong>을 지정한다. 프롬프트 품질이 답변 품질을 좌우한다.</p>
+
+    <p>In-context Learning은 <strong>예시를 몇 개 주느냐</strong>로 세 갈래가 된다.</p>
+
+    <table>
+      <thead>
+        <tr><th>방식</th><th>예시 개수</th><th>특징</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Zero-shot</td><td>0개</td><td>예시 없이 바로 지시</td></tr>
+        <tr><td>One-shot</td><td>1개</td><td>예시 하나로 답변 형식을 보여줌</td></tr>
+        <tr><td>Few-shot</td><td>여러 개</td><td>원하는 답변 패턴을 여러 개로 제시 → 결과가 더 안정적</td></tr>
+      </tbody>
+    </table>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>지난 GPT-3 논문 글(<em>Language Models are Few-Shot Learners</em>)에서 본 제목의 의미가 여기서 맞물렸다. 강의도 같은 점을 짚는다 — 모델을 큰 규모로 확장하면 <strong>few-shot 성능이 크게 향상된다</strong>는 것. 예시를 주기만 해도 재학습 없이 새 작업을 배우는 이 능력 자체가 스케일의 산물이었다. '구조 → 사전학습 → 스케일 → few-shot'으로 흐름이 하나로 꿰였다.</p>
+    </div>
+
+    <p>다만 LLM은 만능이 아니다. <strong>환각(Hallucination)</strong>은 사실이 아닌 내용을 그럴듯하게 생성하는 현상으로, 존재하지 않는 논문 제목이나 없는 API 함수, 출처 없는 통계를 자신 있게 지어낸다. 보완책은 RAG 적용, 공식 문서·DB 조회 기반 답변, 출처 표시, 검증 로직과 사람 검토 단계 추가 등이다. 핵심은 "LLM에게 전부 맡기지 말고 <strong>외부 데이터와 연결</strong>하라"는 것 — 사용자 질문 → 관련 문서 검색 → 검색된 문서를 LLM에 제공 → 근거 기반 답변, 이 구조가 RAG다. (RAG·Function Calling은 뒤 단원의 주제로 예고만.)</p>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span>API로 부른다는 것 — 토큰과 컨텍스트<a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>API 방식은 Python·JavaScript·Streamlit 같은 프로그램에서 LLM 서버를 <strong>호출</strong>하는 방식이다. 기본 흐름은 사용자 입력 → 앱에서 API 요청 생성 → LLM 서버가 응답 생성 → 앱 화면에 출력. 강의의 Python 예시를 개념용으로 옮기면 다음과 같다. <strong>실제 실행 로그가 아니라 사용 형태를 보여주는 의사(擬似) 코드</strong>다 — 이 글에서는 API 키가 없어 호출하지 않았다.</p>
+
+    <pre class="language-python"><code class="language-python">import os
+from openai import OpenAI
+
+# API Key를 코드에 직접 쓰면 노출 위험이 있으므로 환경변수에서 읽는다
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+user_input = "LLM에서 zero-shot과 few-shot의 차이를 설명해줘."
+
+# 모델에게 응답 생성을 요청한다 (개념용 — 실제 호출 아님)
+response = client.responses.create(
+    model="gpt-...",       # 사용할 LLM 모델 지정
+    input=user_input,
+)
+
+print(response.output_text)  # 모델이 생성한 최종 텍스트</code></pre>
+
+    <p>여기서 API를 이해하는 핵심 단위가 <strong>토큰(Token)</strong>이다. LLM은 문장을 토큰 단위로 읽고 생성하며, 과금도 대체로 토큰 사용량 기준이다. 토큰은 <em>단어와 완전히 같지 않다</em> — 영어는 짧은 단어 단위로, 한국어는 조사·어절·부분 문자열 단위로 쪼개질 수 있다. 지난 전처리 글에서 BPE(Byte Pair Encoding) 서브워드 토큰화를 봤던 그 결과물이, API에서는 그대로 <em>비용의 단위</em>가 된다.</p>
+
+    <div class="qbox">
+      <p><span class="label">의문</span>토큰이 곧 비용이라면, "긴 대화를 이어가면" 무엇이 쌓이는 건가? 내가 보낸 질문만 계산되나, 아니면 이전 대화 전체가 매번 다시 들어가나?</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>토큰 유형</th><th>무엇인가</th><th>포함되는 것(예)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Input 토큰</td><td>API에 보낸 모든 입력</td><td>System·User 메시지, 예시, 검색된 문서, <strong>이전 대화 기록</strong>, 코드·표</td></tr>
+        <tr><td>Output 토큰</td><td>모델이 생성한 응답</td><td>설명·코드·요약·번역·분석·JSON 결과</td></tr>
+        <tr><td>Cached 토큰</td><td>이전 입력이 캐시되어 할인 적용될 수 있는 토큰</td><td>반복되는 입력의 일부</td></tr>
+      </tbody>
+    </table>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>의문의 답이 여기 있었다. <strong>이전 대화 기록이 Input 토큰에 포함</strong>된다 — 즉 대화가 길어질수록 매 요청에 과거 맥락이 함께 실려 입력 토큰이 누적된다. 이것이 <strong>컨텍스트 윈도우</strong>(모델이 한 번에 다룰 수 있는 토큰 범위)를 관리해야 하는 이유다. 총 사용 토큰 = Input + Output이므로(예: 입력 1,000 + 출력 500 = 1,500), 비용 절감은 관련 없는 긴 문서 제거, 출력 길이 제한, 요약본 사용, RAG로 필요한 문단만 전달, 시스템 프롬프트 최소화로 이어진다. "좋은 프롬프트 · 정확한 외부 데이터 연결 · 토큰과 비용 관리" — 강의가 꼽은 실무 3요소다.</p>
+    </div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span>생성 제어 파라미터 — 창의성·후보·길이<a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>API 호출에는 답변의 성격을 조절하는 파라미터가 붙는다. 보조 강의자료가 꼽는 세 가지는 <strong>Temperature · Top&nbsp;P · Maximum Tokens</strong>로, 각각 생성의 창의성·후보 단어 범위·출력 길이를 제어한다. 앞서 본 "다음 토큰을 확률로 고른다"는 원리를 떠올리면 셋 다 <em>그 확률 분포를 어떻게 다룰지</em>에 대한 설정임이 보인다.</p>
+
+    <ul>
+      <li><strong>Temperature</strong> — 얼마나 다양한 단어를 고를지. 값이 <em>낮을수록</em> 확률이 가장 높은 단어를 우선 골라 답이 안정적·일관적이고, <em>높을수록</em> 확률이 낮은 단어도 골라 표현이 다양·창의적이 된다.</li>
+      <li><strong>Top&nbsp;P</strong> — 후보 단어의 <em>범위</em>를 누적 확률로 자른다(Nucleus Sampling). 값이 작으면 안정적인 단어만, 크면 다양한 단어까지 후보에 넣는다.</li>
+      <li><strong>Maximum Tokens</strong> — 생성할 최대 출력 길이 제한. 작으면 짧고 빠르고 저렴, 크면 긴 설명이 가능하나 비용·응답시간이 는다.</li>
+    </ul>
+
+    <p>Top&nbsp;P의 감이 잡히지 않았는데, 강의의 예가 명료했다. 다음 단어 확률이 사과 40% · 배 25% · 포도 15% · 딸기 10% … 라면, <code>Top P = 0.5</code>는 누적 50%까지인 {사과, 배}만 후보로 쓰고, <code>Top P = 0.9</code>는 누적 90%까지 넓혀 {사과, 배, 포도, 딸기}를 후보로 삼는다. 즉 "가장 유력한 답만 볼지, 여러 가능성을 함께 볼지"의 조절이다.</p>
+
+    <table>
+      <thead>
+        <tr><th>작업 유형</th><th>Temperature</th><th>Top P</th><th>Max Tokens</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>분류</td><td>0~0.2</td><td>0.8~1.0</td><td>100~300</td><td>항상 같은 결과가 중요</td></tr>
+        <tr><td>정보 추출</td><td>0~0.2</td><td>0.8~1.0</td><td>200~500</td><td>정확성이 중요</td></tr>
+        <tr><td>일반 설명</td><td>0.3~0.5</td><td>0.8~1.0</td><td>500~1000</td><td>자연스러운 답변</td></tr>
+        <tr><td>아이디어 생성</td><td>0.7~1.0</td><td>0.9~1.0</td><td>1000 이상</td><td>다양성이 중요</td></tr>
+        <tr><td>소설 작성</td><td>0.8~1.0</td><td>1.0</td><td>2000 이상</td><td>창의성이 중요</td></tr>
+      </tbody>
+    </table>
+
+    <pre class="language-python"><code class="language-python"># 파라미터를 함께 지정한 형태 (개념용 — 실제 호출 아님)
+response = client.responses.create(
+    model="gpt-...",
+    input="LLM의 주요 파라미터를 설명해줘.",
+    temperature=0.3,          # 안정적·일관성 있는 답변
+    top_p=0.9,                # 누적 90% 후보에서 자연스러운 다양성
+    max_output_tokens=500,    # 응답 길이·비용 제한
+)
+print(response.output_text)</code></pre>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>세 파라미터는 결국 하나의 축으로 이어진다. <strong>정확성이 중요하면 Temperature를 낮게, 창의성이 필요하면 높게</strong>. Top&nbsp;P를 함께 조절해 다양성을 세밀하게 다루고, Max Tokens로 길이와 비용까지 잡는다. 오늘 잡은 그림은 이렇다 — 트랜스포머(구조)를 대규모로 사전학습해(스케일) LLM(제품)이 되고, 그걸 프롬프트로 지시하며 API 한 줄로 부르되(토큰·컨텍스트), 파라미터로 답변의 성격을 조율한다. 다음은 이 두뇌에 도구·기억을 붙이는 에이전트와 RAG로 이어진다.</p>
+    </div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>강의 PDF — LLM개념_API · LLM_파라미터 · LLM_주요기능</li>
+      <li>공식 문서 — (개념: 트랜스포머 사전학습 LM)</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · LLM Day1 (2026-07-03)</p>
+  <p>구조(트랜스포머)에서 제품(LLM)으로, 그리고 코드가 아닌 API 한 줄로. 토큰이 곧 컨텍스트이자 비용이고, 파라미터는 확률 분포를 다루는 손잡이였던 하루.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>번역 모델 구조 — PBMT에서 Seq2Seq, 어텐션까지</title>
+  <meta name="description" content="기계번역의 진화(PBMT→Seq2Seq→어텐션)와 고정 벡터 병목, soft 어텐션의 원리.">
+  <meta property="og:title" content="번역 모델 구조 — PBMT에서 Seq2Seq, 어텐션까지">
+  <meta property="og:description" content="기계번역의 진화(PBMT→Seq2Seq→어텐션)와 고정 벡터 병목, soft 어텐션의 원리.">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="번역 모델 구조 — PBMT에서 Seq2Seq, 어텐션까지">
+  <meta name="twitter:description" content="기계번역의 진화(PBMT→Seq2Seq→어텐션)와 고정 벡터 병목, soft 어텐션의 원리.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p>
+  <h1>번역 모델 구조 — PBMT에서 Seq2Seq, 그리고 어텐션</h1>
+  <p class="deck">기계번역은 규칙·통계(PBMT)에서 신경망(Seq2Seq)으로, 다시 어텐션으로 어떻게 진화했나. 그 전환의 한가운데에 있던 "고정 길이 문맥 벡터 병목"이 정확히 무엇이었는지를 따라가 본다.</p>
+  <div class="meta-row">
+    <span><strong>날짜</strong>2026-07-01</span>
+    <span><strong>주제</strong>기계번역 · Seq2Seq · 어텐션</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+    <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 — 자연어처리_번역모델.pdf</span>
+  </div>
+</header>
+
+<main>
+  <nav class="flow">
+    <h2>이 글의 흐름 — 규칙·통계에서 어텐션까지</h2>
+    <ol>
+      <li>번역이 어려운 이유 — 구절 단위로 쪼개면 무엇이 무너지나 (PBMT)</li>
+      <li>Seq2Seq — 인코더·디코더와 하나의 문맥 벡터로 번역하기</li>
+      <li>학습을 굴리는 장치 — SOS/EOS, 교사 강요, 그리고 출력 시프트</li>
+      <li>고정 길이 벡터 병목 — 왜 긴 문장에서 번역이 무너졌나</li>
+      <li>어텐션 — 소프트 탐색으로 "정렬과 번역을 함께 학습"하기</li>
+    </ol>
+  </nav>
+
+  <div class="bridge"><strong>출발점</strong> — 번역기는 어느 날 갑자기 매끄러워진 게 아니다. 규칙 기반(RBMT), 통계 기반(SMT/PBMT), 신경망 기반(NMT)이라는 세 세대를 거쳤고, 각 단계는 앞 세대가 무너지던 지점을 정확히 겨냥해서 등장했다. 그 무너지던 지점을 하나씩 짚어 본다.</div>
+
+  <section id="ch1">
+    <h2 class="chap"><span class="num">CH 01</span> 구절을 쪼개면 무너지는 것 — PBMT의 한계 <a href="#ch1" class="anchor-link">#</a></h2>
+
+    <p>2006년 무렵의 상용 번역은 <strong>PBMT(Phrase Based Machine Translation)</strong>, 즉 구절 기반 통계 번역이 중심이었다. 문장을 단어보다 큰 구절(Phrase) 단위로 자르고, 방대한 병렬 코퍼스에서 각 구절이 어떤 구절로 번역되는지의 통계적 확률을 계산해 조합하는 방식이다. 사전식으로 하나씩 대응시키던 규칙 기반(RBMT)보다는 유연했지만, 조립식이라는 본질은 그대로였다.</p>
+
+    <p>강의 PDF는 <code>I school go</code> 같은 예로 이 한계를 짚는다. 구절 단위로 각각 옳게 번역해도, 그것을 이어 붙인 결과의 <strong>어순과 전체 문맥</strong>이 어색해진다. 한국어와 영어처럼 어순이 크게 다른 언어쌍에서 이 "번역투"는 특히 두드러졌다.</p>
+
+    <div class="qbox">
+      <span class="label">의문</span>
+      <p>구절별 확률이 다 맞으면 문장도 맞아야 하는 것 아닌가? — 문제는 확률의 정확도가 아니라 <em>단위</em>에 있다. 구절 확률표는 "이 구절 ↔ 저 구절"이라는 국소적 짝만 알 뿐, 문장 전체가 하나의 의미로 흐르는지는 모른다. <code>Bank</code>가 은행인지 강둑인지처럼 문맥으로만 갈리는 중의성 앞에서 조립식 접근은 근본적으로 취약하다.</p>
+    </div>
+
+    <p>그래서 다음 세대의 요구는 분명했다. <strong>문장을 쪼개지 말고 통째로 이해</strong>하는 모델, 입력(원문)부터 출력(번역문)까지 하나의 신경망이 끝에서 끝까지(end-to-end) 처리하는 모델이 필요했다. 그것이 <strong>GNMT(Google Neural Machine Translation)</strong>로 대표되는 신경망 기계번역(NMT)이다.</p>
+
+    <div class="bridge"><strong>다음으로</strong> — "통째로 이해한다"는 말을 구조로 옮기면 인코더·디코더가 된다. 그 골격을 뜯어본다.</div>
+  </section>
+
+  <section id="ch2">
+    <h2 class="chap"><span class="num">CH 02</span> Seq2Seq — 인코더·디코더와 하나의 문맥 벡터 <a href="#ch2" class="anchor-link">#</a></h2>
+
+    <p><strong>Seq2Seq(Sequence-to-Sequence)</strong>는 이름 그대로 하나의 시퀀스(입력 문장)를 받아 다른 시퀀스(번역 문장)를 내놓는 구조다. 입력과 출력의 길이가 서로 달라도 되는 <em>many-to-many</em> 형태이며, GNMT는 이 Seq2Seq 위에 RNN 계열(LSTM)을 얹어 만들어졌다. 구조는 두 덩어리로 나뉜다.</p>
+
+    <ul>
+      <li><strong>인코더(Encoder)</strong> — 출발어 문장을 한 단어씩 읽어 그 의미를 <strong>고정된 크기의 벡터(문맥 벡터, Context Vector)</strong> 하나로 응축한다. 문장을 숫자 뭉치로 암호화하는 과정이다.</li>
+      <li><strong>디코더(Decoder)</strong> — 인코더가 넘겨준 그 벡터를 받아 도착어를 한 단어씩 풀어낸다. 암호를 다시 문장으로 복호화하는 과정이다.</li>
+    </ul>
+
+    <p>RNN 계열을 쓰므로 인코더가 넘기는 것은 실제로는 마지막 시점의 <strong>은닉 상태(Hidden State)</strong>와, LSTM이라면 <strong>셀 상태(Cell State)</strong>다. 이 상태값이 디코더의 초기 상태로 들어간다. 강의 노트의 표현을 빌리면, 이 문맥 벡터는 Word2Vec 같은 단어 벡터와 성격이 다르다.</p>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>문맥 벡터는 <code>[0.1, 0.2, -0.5, …]</code> 같은 실수의 나열이라는 점은 워드 임베딩과 같지만, 담는 것이 다르다. 워드 임베딩이 <em>단어 하나</em>의 의미라면, 문맥 벡터는 <em>문장 전체</em>의 의미·문법 구조·어순 정보가 512·768·1024차원 같은 고차원에 압축된 "디지털 요약본"이다. 같은 <code>Bank</code>라도 문맥에 따라 다른 값이 되는, 문장 수준의 가변적 표현이라는 점이 핵심이다.</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>구분</th><th>PBMT (통계 기반)</th><th>Seq2Seq / NMT (신경망 기반)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>번역 단위</td><td>구절(Phrase)을 쪼개 조립</td><td>문장 전체를 통째로 처리</td></tr>
+        <tr><td>핵심 장치</td><td>구절 번역 확률표</td><td>인코더·디코더 + 문맥 벡터</td></tr>
+        <tr><td>문맥 파악</td><td>국소적(구절 내부에 한정)</td><td>문장 흐름 전체를 반영</td></tr>
+        <tr><td>학습 방식</td><td>부분별 통계 계산 후 조립</td><td>입력→출력 end-to-end 학습</td></tr>
+      </tbody>
+    </table>
+
+    <div class="bridge"><strong>다음으로</strong> — 이 구조를 실제로 훈련시키려면 문장의 시작·끝을 알려주고, 디코더가 "다음 단어"를 배우게 하는 장치가 필요하다.</div>
+  </section>
+
+  <section id="ch3">
+    <h2 class="chap"><span class="num">CH 03</span> 학습을 굴리는 장치 — SOS/EOS와 교사 강요 <a href="#ch3" class="anchor-link">#</a></h2>
+
+    <p>디코더는 "언제부터 생성하고 언제 멈춰야 하는가"를 알아야 한다. 그래서 특수 토큰 <strong>SOS(Start Of Sequence)</strong>와 <strong>EOS(End Of Sequence)</strong>를 쓴다. SOS는 문장의 시작을, EOS는 끝을 표시한다. 디코더는 SOS를 신호로 첫 단어를 만들기 시작하고, EOS를 스스로 내놓으면 생성을 멈춘다.</p>
+
+    <p>학습 시 디코더의 입력과 정답은 <strong>한 칸 어긋난(시프트된)</strong> 관계로 짝지어진다. PDF의 <code>I LOVE YOU</code> 예를 그대로 옮기면 이렇다.</p>
+
+    <div class="callout">
+      <span class="label">정리</span>
+      <p>디코더 입력 <code>&lt;sos&gt; I LOVE YOU</code> ↔ 디코더 정답 <code>I LOVE YOU &lt;eos&gt;</code>. 시점별로 보면 <code>&lt;sos&gt;→I</code>, <code>I→LOVE</code>, <code>LOVE→YOU</code>, <code>YOU→&lt;eos&gt;</code>. 즉 매 시점에서 "지금까지의 정답"을 보고 "바로 다음 단어"를 맞히도록 배운다. 이렇게 정답 시퀀스를 디코더 입력으로 넣어 학습을 안정시키는 것이 <strong>교사 강요(Teacher Forcing)</strong>다.</p>
+    </div>
+
+    <p>출력층은 도착어 어휘 전체(예: 7,000단어)에 대한 확률 분포를 내놓는 <strong>Dense 층</strong>이다. 매 시점 후보 단어들 중 확률이 가장 높은 것을 골라 이어 붙인다. 손실은 정답을 정수 인덱스로 다룰 수 있는 <code>sparse_categorical_crossentropy</code>를 흔히 쓴다(원-핫으로 펼치면 <code>categorical_crossentropy</code>). 길이가 다른 문장들은 <code>&lt;pad&gt;</code>로 맞춰 배치를 구성한다.</p>
+
+    <div class="bridge"><strong>다음으로</strong> — 여기까지가 "기본형 Seq2Seq"다. 잘 도는 듯 보이지만, 문장이 길어지면 조용히 무너진다. 그 지점이 이 글의 중심이다.</div>
+  </section>
+
+  <section id="ch4">
+    <h2 class="chap"><span class="num">CH 04</span> 고정 길이 벡터 병목 — 무엇이 무너졌나 <a href="#ch4" class="anchor-link">#</a></h2>
+
+    <p>기본형 Seq2Seq의 약속은 이랬다. "인코더가 문장 전체를 <strong>하나의 고정 길이 벡터</strong>에 담고, 디코더는 그 벡터만 보고 번역한다." 문제는 이 "하나의 고정 길이"에 있다.</p>
+
+    <div class="qbox">
+      <span class="label">의문</span>
+      <p>5단어 문장도 512개 숫자, 100단어 만연체 문장도 똑같이 512개 숫자에 담아야 한다면? — 짧은 문장에는 여유가 있지만, 문장이 길어질수록 정보가 벡터에 꽉 차서 넘쳐흐른다. 이것이 <strong>정보 소실(Information Loss)</strong>이다. 게다가 RNN 특성상 문장 앞부분의 정보는 뒤로 갈수록 희미해지는 <strong>기울기 소실</strong>까지 겹친다.</p>
+    </div>
+
+    <p>노트에서 특히 마음에 남은 표현은 "학습 코퍼스보다 긴 문장"이었다. 코퍼스(말뭉치)는 모델이 언어를 배우는 디지털 교과서이고, NMT는 보통 원문·번역문이 쌍으로 묶인 <strong>병렬 코퍼스</strong>로 학습한다. 그런데 교과서 속 문장 길이에는 대략의 상한이 있다. 시험(추론)에서 교과서보다 훨씬 긴 지문이 들어오면, 고정 길이 벡터 방식은 그 정보를 다 담지 못해 번역이 급격히 나빠졌다. "학습 때 본 것보다 긴 문장도 잘 처리할 수 있는가"가 곧 다음 세대의 도전 과제였다.</p>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>병목의 정체는 <strong>용량이 아니라 구조</strong>다. 512차원이 부족해서가 아니라, "문장 길이와 무관하게 항상 벡터 하나로 요약을 강제한다"는 설계 자체가 병목이다. 그렇다면 해법의 방향도 자명하다 — 요약을 <em>하나</em>로 강제하지 말고, 인코더가 단어를 읽을 때마다 생기는 <strong>중간 단계 벡터(각 시점의 은닉 상태)들을 모두 보관</strong>해 두었다가 필요할 때 골라 쓰자.</p>
+    </div>
+
+    <div class="bridge"><strong>다음으로</strong> — "필요할 때 골라 쓴다"를 미분 가능한 형태로 구현한 것이 어텐션이다. 소프트 탐색이라는 열쇠를 마지막으로 본다.</div>
+  </section>
+
+  <section id="ch5">
+    <h2 class="chap"><span class="num">CH 05</span> 어텐션 — 소프트 탐색과 "정렬과 번역을 함께 학습" <a href="#ch5" class="anchor-link">#</a></h2>
+
+    <p>어텐션의 핵심 아이디어 한 문장. "디코더가 출력 단어를 예측할 때, 입력 문장 전체를 다시 한 번 훑어보되 <strong>관련 높은 특정 단어에 더 집중</strong>해서 보자." 인코더의 마지막 벡터 하나에 의존하는 대신, 인코더 모든 시점의 은닉 상태를 후보로 두고 매 출력 시점마다 다시 참조한다. 과정은 대략 이렇다.</p>
+
+    <ol>
+      <li><strong>스코어</strong> — 디코더의 현재 상태와 인코더 각 시점 은닉 상태가 얼마나 관련되는지 점수를 매긴다.</li>
+      <li><strong>분포</strong> — 점수에 Softmax를 씌워 합이 1인 확률(집중도)로 바꾼다.</li>
+      <li><strong>어텐션 값</strong> — 그 가중치로 인코더 상태들을 가중합(weighted sum)해 이번 시점 전용 문맥 벡터를 만든다.</li>
+      <li><strong>출력</strong> — 이 문맥 벡터와 디코더 상태를 결합해 다음 단어를 예측한다.</li>
+    </ol>
+
+    <p>여기서 노트를 파고들며 가장 오래 붙들었던 대비가 <strong>소프트 탐색 vs 하드 탐색</strong>이었다.</p>
+
+    <table>
+      <thead>
+        <tr><th>구분</th><th>하드 탐색 (Hard)</th><th>소프트 탐색 (Soft)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>선택 방식</td><td>딱 하나만 선택 (Pick One)</td><td>전체를 비중대로 훑기 (Blurry Look)</td></tr>
+        <tr><td>수학적 형태</td><td>원-핫 벡터와 유사 <code>[0,0,1,0]</code></td><td>확률 분포 <code>[0.01,0.85,…]</code></td></tr>
+        <tr><td>미분 가능성</td><td>불가능 (계단 함수, 기울기 0)</td><td>가능 (부드러운 분포)</td></tr>
+        <tr><td>학습 방법</td><td>샘플링·강화학습 필요</td><td>표준 오차 역전파로 학습</td></tr>
+      </tbody>
+    </table>
+
+    <div class="qbox">
+      <span class="label">의문</span>
+      <p>하드 탐색은 결국 원-핫 인코딩과 같은 거 아닌가? — 직관은 맞다. 하드 어텐션은 여러 은닉 상태 중 하나만 골라 <code>[0,0,1,0]</code> 같은 이진 벡터로 참조하니 원-핫과 논리 구조가 닮았다. 하지만 <strong>0 아니면 1로 뚝 끊기면 기울기가 0</strong>이 되어 역전파로 배울 수가 없다. 그래서 실제 NMT는 이 이진 행렬을 0~1 연속값의 확률 행렬로 <em>확장</em>한 소프트 탐색을 택한다. 하드는 '선택'의 논리, 소프트는 '비중'의 논리다.</p>
+    </div>
+
+    <div class="callout">
+      <span class="label">정리</span>
+      <p>어텐션이 미분 가능하다는 사실이 "<strong>정렬과 번역을 함께 학습</strong>한다"는 표현의 전부다. 과거 통계 방식에서는 "어느 원문 단어가 어느 번역 단어에 대응하는가(정렬, Alignment)"를 사람이 따로 계산해 알려줬다. 소프트 어텐션에서는 디코더가 단어를 만드는 <em>매 순간</em> "지금 원문의 어디를 봐야 할지"를 어텐션 가중치 α로 스스로 정하고, 그 α까지 역전파로 최적화된다. 정렬과 번역이 하나의 신경망 안에서 동시에 학습되는 것이다.</p>
+    </div>
+
+    <div class="keypoint">
+      <span class="label">배운 점</span>
+      <p>어텐션은 병목만 푼 게 아니라 두 가지를 덤으로 줬다. 하나는 <strong>해석 가능성</strong> — 어텐션 맵을 보면 각 번역 단어가 원문의 어디를 참고했는지 시각화된다. 다른 하나는 <strong>계보</strong> — 이 "집중" 아이디어가 이후 <em>Attention Is All You Need</em>의 트랜스포머로 이어지며 현대 LLM의 뿌리가 된다. 오늘의 고정 벡터 병목은, 다음 단원 트랜스포머로 넘어가는 다리이기도 하다.</p>
+    </div>
+
+    <div class="bridge"><strong>다음으로</strong> — 어텐션이 RNN을 보조하던 단계에서 한 걸음 더 나아가, RNN 자체를 걷어내고 어텐션만으로 시퀀스를 다루는 구조가 트랜스포머다. 그것이 이 단원의 종착점이다.</div>
+  </section>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>강의 PDF — 자연어처리_번역모델</li>
+      <li>공식 문서 — Bahdanau et al. 신경망 기계번역(어텐션)</li>
+    </ol>
+  </div>
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-07-01)</p>
+  <p>규칙·통계에서 신경망으로, 다시 어텐션으로 — 번역 모델의 세 전환을 관통한 것은 "문장을 하나의 고정 벡터에 다 담지 말자"는 문제의식이었다. 그 문제의식이 트랜스포머와 오늘의 언어 모델로 이어진다.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+</body>
+</html>
