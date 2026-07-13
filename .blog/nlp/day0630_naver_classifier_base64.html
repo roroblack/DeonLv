@@ -112,15 +112,15 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 
 <div class="page">
 
-<header class="cover"><p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p><h1>NAVER 뉴스 카테고리 분류기 (LSTM) 실험</h1><p class="deck">한국어 뉴스를 카테고리로 분류하는 LSTM 모델을 어떻게 만들고, 무엇이 성능을 가르나. 임베딩 → LSTM → 분류로 이어지는 뼈대는 짧지만, 정확도를 실제로 움직인 것은 모델 구조가 아니라 한국어 전처리였다.</p>
+<header class="cover"><p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p><h1>NAVER 뉴스 카테고리 분류기 (LSTM) — v1~v6 실측 튜닝 기록</h1><p class="deck">한국어 뉴스를 6개 카테고리로 분류하는 LSTM 모델을, 개념이 아니라 실제 튜닝 보고서의 정확도 수치로 따라간다. 임베딩 → LSTM → 분류라는 뼈대는 처음부터 끝까지 그대로였지만, 테스트 정확도는 25%에서 92.83%까지 움직였다. 무엇을 바꿨을 때 올랐는지를 버전별로 관찰한다.</p>
 <div class="meta-row"><span><strong>날짜</strong>2026-06-30</span><span><strong>도구</strong>PyTorch · KoNLPy · Python 3.13.5</span><span><strong>OS</strong>Windows 11 Pro 25H2</span><span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span><span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 — 자연어처리_텍스트분류.pdf</span></div></header>
-<main><nav class="flow"><h2>이 글의 흐름 — 텍스트 분류의 뼈대에서 한국어의 함정까지</h2><ol><li><a href="#ch1">CH 01 · 텍스트 분류라는 문제 정의</a></li><li><a href="#ch2">CH 02 · 임베딩 → LSTM → 분류 뼈대</a></li><li><a href="#ch3">CH 03 · 감성 2진에서 뉴스 6분류로</a></li><li><a href="#ch4">CH 04 · 무엇이 성능을 가르나 — 형태소와 데이터</a></li><li><a href="#ch5">CH 05 · 평가와 다음 단계(BERT 계열)</a></li></ol></nav><div class="bridge"><strong>출발점</strong> — 감성 분석(긍정/부정) LSTM 코드를 기반으로, 입력을 네이버 뉴스로 바꾸고 출력을 다중 카테고리로 확장하면서 어디서 정확도가 새는지 관찰한 기록이다.</div>
+<main><nav class="flow"><h2>이 글의 흐름 — 뼈대는 고정, 정확도는 데이터가 갈랐다</h2><ol><li><a href="#ch1">CH 01 · 텍스트 분류라는 문제와 6분류 설정</a></li><li><a href="#ch2">CH 02 · 임베딩 → LSTM → 분류 뼈대</a></li><li><a href="#ch3">CH 03 · Optuna 튜닝과 초기 버전들 — 왜 떨어졌나</a></li><li><a href="#ch4">CH 04 · 데이터를 키우자 올랐다 — v5~v9 실측</a></li><li><a href="#ch5">CH 05 · 형태소·조기종료·클래스 붕괴 뜯어보기</a></li><li><a href="#ch6">CH 06 · 평가와 다음 단계(BERT 계열)</a></li></ol></nav><div class="bridge"><strong>출발점</strong> — 감성 분석(긍정/부정) LSTM 코드를 기반으로 입력을 네이버 뉴스로, 출력을 6개 카테고리로 확장한 뒤, <code>NAVER_NEWS_LSTM_Classifier</code>의 튜닝 보고서(v1~v6)에 남은 실제 정확도로 "무엇이 성능을 가르나"를 확인한 기록이다.</div>
 
-<section id="ch1"><h2 class="chap"><span class="num">CH 01</span>텍스트 분류라는 문제 정의<a href="#ch1" class="anchor-link">#</a></h2>
+<section id="ch1"><h2 class="chap"><span class="num">CH 01</span>텍스트 분류라는 문제와 6분류 설정<a href="#ch1" class="anchor-link">#</a></h2>
 <h3 class="step">학습 → 입력은 문장, 출력은 미리 정의된 라벨</h3>
-<p>강의 자료는 텍스트 분류를 "문장·문서의 내용을 분석해 미리 정해진 범주(Class) 중 하나 또는 여러 개로 자동 분류하는 작업"으로 정의한다. 입력은 텍스트, 출력은 사전에 정의된 라벨이다. 스팸/정상, 영화 리뷰 긍정/부정이 대표적인 이진 분류이고, IT·교육·건강처럼 세 개 이상 중 하나를 고르면 다중 분류가 된다. 뉴스 카테고리 분류는 후자에 속한다.</p>
-<p>분류 과정은 <strong>텍스트 수집 → 전처리(정제·토큰화·형태소 분석·불용어 제거) → 벡터화 → 모델 학습 → 예측·평가</strong>의 순서로 정리된다. 이 파이프라인에서 딥러닝 모델은 "벡터화된 입력을 받아 예측하는" 한 단계일 뿐이고, 그 앞의 전처리가 한국어에서는 유독 무겁다는 점이 이번 실험의 핵심 주제가 된다.</p>
-<div class="qbox"><span class="label">의문</span>감성 분석(2진)과 뉴스 분류(다중)는 코드 관점에서 얼마나 다른가? 출력 차원만 늘리면 되는가, 아니면 전처리·손실·평가까지 함께 바뀌는가?</div>
+<p>강의 자료는 텍스트 분류를 "문장·문서의 내용을 분석해 미리 정해진 범주(Class) 중 하나 또는 여러 개로 자동 분류하는 작업"으로 정의한다. 입력은 텍스트, 출력은 사전에 정의된 라벨이다. 스팸/정상, 영화 리뷰 긍정/부정이 대표적인 이진 분류이고, 세 개 이상 중 하나를 고르면 다중 분류가 된다. 이번 실험의 대상인 <strong>IT·스포츠·사회·경제·연예·정치</strong> 6개 카테고리 뉴스 분류는 후자다.</p>
+<p>분류 과정은 <strong>텍스트 수집 → 전처리(정제·토큰화·형태소 분석·불용어 제거) → 벡터화 → 모델 학습 → 예측·평가</strong>의 순서로 정리된다. 이 파이프라인에서 딥러닝 모델은 "벡터화된 입력을 받아 예측하는" 한 단계일 뿐이고, 그 앞의 전처리·데이터가 한국어에서 유독 무겁다는 점이 이번 실험의 핵심 주제가 된다.</p>
+<div class="qbox"><span class="label">의문</span>감성 분석(2진)과 뉴스 분류(6분류)는 코드 관점에서 얼마나 다른가? 출력 차원만 늘리면 되는가, 아니면 전처리·손실·평가까지 함께 바뀌는가? 그리고 구조를 그대로 두면 정확도는 무엇으로 움직이는가?</div>
 <div class="bridge"><strong>다음으로</strong> — 그 답을 확인하려면 먼저 기존 감성 분석 모델의 뼈대를 그대로 읽어봐야 한다.</div></section>
 
 <section id="ch2"><h2 class="chap"><span class="num">CH 02</span>임베딩 → LSTM → 분류 뼈대<a href="#ch2" class="anchor-link">#</a></h2>
@@ -137,7 +137,7 @@ dropout          = 0.3
 learning_rate    = 0.001
 max_epochs       = 3
 val_ratio        = 0.2        # 학습 데이터의 20%를 검증으로 분리</pre></div>
-<p>모델 본체는 세 층이다. <code>nn.Embedding</code>이 정수 토큰을 128차원 벡터로 바꾸고, 단방향 <code>nn.LSTM</code>이 시퀀스를 훑고, 마지막 <code>nn.Linear</code>가 클래스 점수를 낸다. 여기서 중요한 세부는 "문장 벡터"를 어떻게 뽑느냐다.</p>
+<p>모델 본체는 세 층이다. <code>nn.Embedding</code>이 정수 토큰을 128차원 벡터로 바꾸고, <code>nn.LSTM</code>이 시퀀스를 훑고, 마지막 <code>nn.Linear</code>가 클래스 점수를 낸다. 여기서 중요한 세부는 "문장 벡터"를 어떻게 뽑느냐다.</p>
 <pre class="language-python"><code class="language-python">def forward(self, input_ids):
     embedded = self.embedding(input_ids)          # (B, L, E)
     output, (hidden, cell) = self.lstm(embedded)  # hidden: (num_layers, B, H)
@@ -145,13 +145,13 @@ val_ratio        = 0.2        # 학습 데이터의 20%를 검증으로 분리</
     sentence_vector = self.dropout(sentence_vector)
     logits = self.classifier(sentence_vector)     # (B, num_classes)
     return logits</code></pre>
-<div class="keypoint"><span class="label">배운 점</span>LSTM의 모든 시점 출력을 쓰는 게 아니라 <code>hidden[-1]</code>, 즉 마지막 층의 최종 은닉상태 하나를 문장 대표 벡터로 쓴다. 시퀀스 전체를 한 벡터로 요약하는 이 지점이 "가변 길이 텍스트 → 고정 차원 분류"의 다리다.</div>
-<div class="callout"><span class="label">함정</span>기존 코드 정비 과정에서, LSTM의 모든 시점 출력에 선형층을 걸고 점수를 <code>sum(dim=1)</code>으로 합산하던 비표준 구조와 출력 차원을 3으로 두고 라벨은 2개(0/1)이던 불일치가 문제로 기록됐다. 표준은 <em>마지막 은닉상태 → 선형층</em>, 그리고 <em>출력 차원 = 실제 클래스 수</em>다. 이 원칙은 다음 장에서 뉴스로 확장할 때 그대로 밟게 된다.</div>
-<div class="bridge"><strong>다음으로</strong> — 이 뼈대에서 무엇을 바꾸면 2진 감성이 6분류 뉴스가 되는지 짚는다.</div></section>
+<div class="keypoint"><span class="label">배운 점</span>LSTM의 모든 시점 출력을 쓰는 게 아니라 <code>hidden[-1]</code>, 즉 마지막 층의 최종 은닉상태 하나를 문장 대표 벡터로 쓴다. 뉴스 분류기 <code>TextLSTMClassifier</code>는 여기에 양방향(Bidirectional) 옵션과 Global Max Pooling을 얹을 수 있게 확장됐지만, "가변 길이 텍스트 → 고정 차원 분류"라는 다리는 그대로다.</div>
+<div class="callout"><span class="label">함정</span>기존 코드 정비 과정에서, LSTM의 모든 시점 출력에 선형층을 걸고 점수를 <code>sum(dim=1)</code>으로 합산하던 비표준 구조와, 출력 차원을 3으로 두고 라벨은 2개(0/1)이던 불일치가 문제로 기록됐다. 표준은 <em>마지막 은닉상태 → 선형층</em>, 그리고 <em>출력 차원 = 실제 클래스 수</em>다. 이 원칙은 다음 장에서 뉴스로 확장할 때 그대로 밟게 된다.</div>
+<div class="bridge"><strong>다음으로</strong> — 이 뼈대에서 무엇을 바꾸면 2진 감성이 6분류 뉴스가 되는지, 그리고 그렇게 바꾼 첫 버전들이 왜 기대만큼 안 나왔는지 짚는다.</div></section>
 
-<section id="ch3"><h2 class="chap"><span class="num">CH 03</span>감성 2진에서 뉴스 6분류로<a href="#ch3" class="anchor-link">#</a></h2>
-<h3 class="step">시행 → 입력 데이터와 출력 차원을 함께 바꾸기</h3>
-<p>실험 보고서 기준, 뉴스 분류는 <strong>IT·스포츠·사회·경제·연예·정치</strong> 6개 카테고리를 다룬다. 2진 분류 코드에서 다중 분류로 넘어갈 때 실제로 손대는 지점은 생각보다 좁고 분명하다.</p>
+<section id="ch3"><h2 class="chap"><span class="num">CH 03</span>Optuna 튜닝과 초기 버전들 — 왜 떨어졌나<a href="#ch3" class="anchor-link">#</a></h2>
+<h3 class="step">시행 → 출력 차원을 6으로, 데이터를 실제 뉴스로 바꾸기</h3>
+<p>2진 분류 코드에서 6분류로 넘어갈 때 실제로 손대는 지점은 생각보다 좁고 분명하다. <code>CrossEntropyLoss</code>와 임베딩·LSTM 뼈대는 그대로 두고, (1) 입력 데이터셋, (2) 마지막 <code>Linear</code>의 출력 차원 2→6, (3) 정확도 메트릭의 task 타입만 바꾼다.</p>
 <table><thead><tr><th>구성 요소</th><th>감성(2진)</th><th>뉴스(6분류)</th></tr></thead><tbody>
 <tr><td>라벨</td><td>0/1 (부정/긍정)</td><td>0~5 (IT·스포츠·사회·경제·연예·정치)</td></tr>
 <tr><td>분류층 출력</td><td><code>Linear(H, 2)</code></td><td><code>Linear(H, 6)</code></td></tr>
@@ -159,35 +159,76 @@ val_ratio        = 0.2        # 학습 데이터의 20%를 검증으로 분리</
 <tr><td>정확도 지표</td><td>task="binary"</td><td>task="multiclass", num_classes=6</td></tr>
 <tr><td>전처리</td><td colspan="2">토큰화 → 정수 인코딩 → 패딩 (동일 파이프라인)</td></tr>
 </tbody></table>
-<p>즉 <code>CrossEntropyLoss</code>와 임베딩·LSTM 뼈대는 손대지 않는다. 바뀌는 건 (1) 입력 데이터셋, (2) 마지막 <code>Linear</code>의 출력 차원 2→6, (3) 정확도 메트릭의 task 타입이다. 강의 자료가 다중 분류를 "세 개 이상의 클래스 중 하나를 선택"으로 정의하듯, 소프트맥스 출력이 카테고리 수만큼 늘어날 뿐 문제의 형태는 같다.</p>
-<div class="qbox"><span class="label">의문</span>구조 변경이 이렇게 얕은데 초기 성능은 왜 낮게 나오는가? 다중 클래스라 어려워진 것인가, 아니면 다른 데서 새는 것인가?</div>
-<div class="bridge"><strong>다음으로</strong> — 실험의 버전별 정확도 추이를 보면, 성능을 실제로 끌어올린 건 모델이 아니라 데이터·전처리 쪽이었다.</div></section>
+<p>여기에 이번 프로젝트는 <strong>Optuna 베이지안 탐색</strong>을 얹었다. embed_dim·hidden_dim·num_layers·bidirectional·dropout·learning_rate·batch_size 같은 하이퍼파라미터를 사람이 손으로 고르지 않고, MedianPruner로 못한 trial은 조기 중단하며 val_acc가 가장 높은 조합을 자동으로 찾는다. v2부터는 전처리 파라미터(max_vocab·max_len)와 옵티마이저(Adam/AdamW·weight_decay)까지 탐색 공간에 넣었다.</p>
+<div class="qbox"><span class="label">의문</span>구조를 표준으로 맞추고 하이퍼파라미터까지 자동 탐색했는데, 초기 버전 정확도는 왜 오히려 낮게 나오는가? 다중 클래스라 어려워진 것인가, 아니면 다른 데서 새는 것인가?</div>
+<h3 class="step">관찰 → v1이 오히려 제일 높았다는 역설</h3>
+<p>보고서에 남은 실측치가 흥미롭다. 내장 샘플 150건으로 돌린 <strong>v1이 테스트 66.67%</strong>로 가장 높았고, 실제 네이버 뉴스를 크롤링해 넣기 시작한 v2·v3에서 오히려 <strong>30.77% → 25.0%</strong>로 떨어졌다.</p>
+<div class="terminal"><div class="terminal-header">reports/tuning_v1~v3.md — 초기 버전 테스트 정확도</div><pre class="terminal-body">v1  SAMPLE_DATA 150건(25/카테고리)   best val 0.7500   test 66.67%
+v2  크롤링 일부 + 샘플 130건          best val 0.6000   test 30.77%
+v3  크롤링 120건(20/카테고리)         best val 0.4737   test 25.00%  ← 최저
 
-<section id="ch4"><h2 class="chap"><span class="num">CH 04</span>무엇이 성능을 가르나 — 형태소와 데이터<a href="#ch4" class="anchor-link">#</a></h2>
-<h3 class="step">관찰 → 버전을 거치며 무엇을 바꿨을 때 올랐나</h3>
-<p>실험 보고서에는 여러 버전에 걸친 검증·테스트 정확도가 기록돼 있다. 초기 버전들은 검증 정확도가 40~50%대에 머물렀고, <strong>데이터를 늘리고 형태소 분석을 붙인 버전에서 눈에 띄게 올라갔다</strong>는 흐름이 핵심이다. 구조를 바꿔서가 아니라 입력 품질을 손봐서 개선됐다는 점이 중요하다.</p>
-<table><thead><tr><th>변경 내용</th><th>관찰된 방향</th></tr></thead><tbody>
-<tr><td>초기 다중 분류(공백 토큰화)</td><td>40~50%대 — 기준선</td></tr>
-<tr><td>데이터 약 3배 확대 + 형태소 분석 적용</td><td>테스트 정확도 뚜렷한 상승</td></tr>
-<tr><td>전처리·하이퍼파라미터 정비 누적</td><td>추가 개선</td></tr>
+# v3 classification_report (macro avg): P 0.10 / R 0.25 / F1 0.13
+# → 스포츠 Recall 1.00, 나머지 카테고리 F1 0.00  (한 클래스로 쏠림)</pre></div>
+<p>보고서는 원인을 데이터에서 찾는다. v1의 샘플 데이터는 카테고리 경계가 깔끔했지만, 실제 크롤링 헤드라인은 "연예인 스포츠 기사", "정치·경제 혼재 기사"처럼 경계가 흐리다. 게다가 v3은 120건 ÷ 6카테고리 = 카테고리당 20건, 그중 학습은 약 13건뿐이라 <strong>데이터 절대량 자체가 부족</strong>했다. 소규모 검증셋(19건)에서는 val_acc가 노이즈에 민감해, lr=0.009864 같은 과대적합 trial이 우연히 val에서 높은 점수를 받아 best로 뽑히기도 했다.</p>
+<div class="callout"><span class="label">함정</span>v3에서는 모델이 <strong>스포츠 하나로만 예측하는 클래스 붕괴(class collapse)</strong>가 관측됐다(스포츠 Recall 1.00, 나머지 5개 F1 0.00). 데이터가 너무 적고 lr이 너무 높으면, 다수·쉬운 클래스로 전부 몰아버리는 게 손실을 낮추는 지름길이 되기 때문이다. 정확도 숫자만 보면 25%지만, 실제로는 "분류를 포기한" 상태에 가깝다. v4에서 learning_rate 상한을 5e-3으로 제한하고 데이터를 카테고리당 50건으로 늘린 뒤 이 붕괴는 사라졌다.</div>
+<div class="bridge"><strong>다음으로</strong> — v3의 진단이 "데이터 부족"이었다면, 데이터를 실제로 몇 배 늘렸을 때 정확도가 어떻게 움직였는지 실측으로 확인한다.</div></section>
+
+<section id="ch4"><h2 class="chap"><span class="num">CH 04</span>데이터를 키우자 올랐다 — v5~v9 실측<a href="#ch4" class="anchor-link">#</a></h2>
+<h3 class="step">관찰 → 아키텍처는 고정, 데이터만 늘렸을 때의 진행</h3>
+<p>보고서의 버전 진행을 한 표로 모으면, 정확도를 실제로 끌어올린 레버가 무엇인지가 드러난다. 모델 구조(임베딩→LSTM→선형층)는 처음부터 동일했고, 바뀐 것은 주로 <strong>데이터 양</strong>과 전처리·조기종료 기준이었다.</p>
+<table><thead><tr><th>버전</th><th>데이터</th><th>토큰화</th><th>주요 변경</th><th>best val_acc</th><th>테스트 정확도</th></tr></thead><tbody>
+<tr><td>BBC 베이스라인</td><td>6,000건(영어·7클래스)</td><td>영어</td><td>기준점</td><td>—</td><td>14.29%</td></tr>
+<tr><td>v3</td><td>120건(20/카)</td><td>명사</td><td>크롤링 전면 도입</td><td>0.4737</td><td>25.0%</td></tr>
+<tr><td>v4</td><td>300건(50/카)</td><td>명사</td><td>lr 상한 제한, 붕괴 해소</td><td>0.5417</td><td>36.7%</td></tr>
+<tr><td>v5</td><td>600건(100/카)</td><td>명사</td><td>BBC 비교 기준점 확정</td><td>0.5729</td><td>41.67%</td></tr>
+<tr><td>v6폴더</td><td>1,800건(300/카)</td><td><strong>형태소</strong></td><td>데이터 3배 + 형태소 도입</td><td>0.6285</td><td>55.83%</td></tr>
+<tr><td>v7폴더</td><td>1,800건</td><td>형태소</td><td>조기종료 val_acc 기준</td><td>0.6354</td><td>58.06%</td></tr>
+<tr><td>v8폴더</td><td>1,800건</td><td>형태소</td><td>lr 낮춤(역효과)</td><td>0.6076</td><td>53.89%</td></tr>
+<tr><td><strong>v9폴더</strong></td><td><strong>3,000건(500/카)</strong></td><td>명사</td><td>데이터 5배 + 40 trials 재탐색</td><td>0.9625</td><td><strong>92.83%</strong></td></tr>
 </tbody></table>
-<p>이유는 강의 자료의 한 문장으로 요약된다. "한국어에서는 조사와 어미가 많기 때문에 형태소 분석이 매우 중요하다." 공백 단위로 자르면 "뉴스가/뉴스를/뉴스는"이 전부 다른 토큰이 되어 사전이 낭비되고 <code>&lt;unk&gt;</code>가 늘어난다. 형태소 분석기(KoNLPy의 Okt·Mecab 등)로 어간과 조사를 분리하면 같은 의미 단어가 하나로 모여 임베딩이 촘촘해진다.</p>
-<div class="keypoint"><span class="label">배운 점</span>기존 감성 코드의 토큰화는 정규식으로 특수문자를 제거한 뒤 <code>split()</code>으로 공백 분할하는 방식이었다. 이 단계를 형태소 분석으로 교체하는 것이 한국어 뉴스 분류에서 가장 큰 성능 레버였다. 모델 층을 늘리는 것보다 앞 단이 먼저다.</div>
-<div class="callout"><span class="label">함정</span><code>min_freq=2</code>로 희귀어를 <code>&lt;unk&gt;</code> 처리하는 설정은, 공백 토큰화 상태에서는 조사 변형까지 희귀어로 몰아 정보를 더 깎을 수 있다. 형태소 분석으로 토큰이 정규화된 뒤에야 이 임계값이 의도대로 "진짜 드문 단어만" 걸러낸다. 전처리와 사전 설정은 함께 조율해야 한다.</div>
-<div class="bridge"><strong>다음으로</strong> — 그러면 이 모델의 성능을 어떻게 읽고, 어디서 한계에 부딪히는지 정리한다.</div></section>
+<p>흐름은 분명하다. 아키텍처를 손대지 않고 <strong>클래스당 100건 → 300건 → 500건</strong>으로 데이터를 키우자 테스트 정확도가 <strong>41.67% → 55.83% → 92.83%</strong>로 올랐다. 보고서의 기여도 정리에 따르면 데이터 3배 확대가 약 +14%p, 데이터 5배 확대 + 재탐색이 약 +34%p로 가장 큰 몫을 차지했다. Optuna 튜닝 자체의 기여는 +3~6%p 수준으로, 데이터 레버가 압도적이었다.</p>
+<div class="terminal"><div class="terminal-header">reports/tuning_v6.md — v9(3,000건) 최종 분류 리포트</div><pre class="terminal-body">카테고리   Precision  Recall   F1
+IT          0.99      1.00    0.995
+경제        1.00      0.82    0.901
+사회        0.74      0.92    0.821   ← v5에서 가장 취약했던 클래스
+스포츠      0.97      0.96    0.965
+연예        0.96      0.94    0.949
+정치        0.97      0.93    0.949
+--------------------------------------
+전체 정확도  92.83%   (600건 중 557건 정답)   BBC 대비 6.5배</pre></div>
+<div class="keypoint"><span class="label">배운 점</span>LSTM은 사전학습 지식이 없어 <em>훈련 데이터에서 한국어 의미를 처음부터</em> 배운다. 그래서 클래스당 샘플이 부족하면 임베딩을 제대로 학습하지 못한다. 보고서의 결론 한 줄 — "데이터가 모든 것이다. 동일한 아키텍처로 데이터를 100→500건/카테고리로 늘리는 것만으로 41.67% → 92.83%로 끌어올렸다." 6클래스 한국어 헤드라인 분류에는 클래스당 최소 300~500건이 필요하다는 것이 실증됐다.</div>
+<div class="bridge"><strong>다음으로</strong> — 데이터가 큰 레버였다면, 형태소 분석과 조기종료 기준 같은 세부 레버는 실제로 얼마나 기여했는지 뜯어본다.</div></section>
 
-<section id="ch5"><h2 class="chap"><span class="num">CH 05</span>평가와 다음 단계(BERT 계열)<a href="#ch5" class="anchor-link">#</a></h2>
+<section id="ch5"><h2 class="chap"><span class="num">CH 05</span>형태소·조기종료·클래스 붕괴 뜯어보기<a href="#ch5" class="anchor-link">#</a></h2>
+<h3 class="step">관찰 → 데이터 다음으로 성능을 움직인 세부 레버들</h3>
+<p>강의 자료의 한 문장이 형태소의 이유를 요약한다. "한국어에서는 조사와 어미가 많기 때문에 형태소 분석이 매우 중요하다." 공백 단위로 자르면 "뉴스가/뉴스를/뉴스는"이 전부 다른 토큰이 되어 사전이 낭비되고 <code>&lt;unk&gt;</code>가 늘어난다. 이 프로젝트는 KoNLPy의 Okt로 토큰을 만드는데, 명사만 뽑는 방식과 형태소(명사+동사+형용사+부사)를 뽑는 방식을 Optuna가 선택하도록 뒀다.</p>
+<pre class="language-python"><code class="language-python"># 명사만 (v5) — 헤드라인당 평균 3~5토큰, 정보 손실 큼
+tokens = okt.nouns("경제부 장관 인플레이션 대책 발표")
+# → ['경제부', '장관', '인플레이션', '대책', '발표']
+
+# 형태소 (v6폴더) — 동사/형용사까지 포함해 문맥 보강
+tokens = [w for w, pos in okt.pos(text)
+          if pos in {'Noun', 'Verb', 'Adjective', 'Adverb'}]
+# → ['경제부', '장관', '인플레이션', '대책', '발표', '했다']</code></pre>
+<p>보고서 기준 형태소 토큰화 도입은 v5 대비 약 +5~8%p 기여로 기록됐다. 다만 흥미로운 반전이 있다. 데이터가 부족한 v6폴더(1,800건)에서는 Optuna가 <code>use_morphemes=True</code>를 골랐지만, 데이터가 충분한 v9(3,000건)에서는 <code>use_morphemes=False</code>(명사만)를 골랐다. 즉 <strong>형태소 분석은 데이터 부족을 보완하는 수단</strong>이고, 데이터가 충분하면 명사만으로도 더 빠르고 안정적이라는 것이다.</p>
+<div class="keypoint"><span class="label">배운 점</span>또 하나의 세부 레버는 <strong>조기종료(Early Stopping) 기준</strong>이었다. v6폴더까지는 val_loss가 최소인 시점에 멈췄는데, 이 순간이 val_acc 최고점과 어긋나 정확도 피크를 놓쳤다. LSTM을 val_acc 최대화 기준으로 저장하도록 바꾼 v7폴더에서 +2.23%p가 올랐다. val_loss는 오분류 샘플의 확률 분포에 민감해서, 손실이 최소인 순간과 정확도가 최고인 순간이 다를 수 있다.</div>
+<div class="callout"><span class="label">함정</span>세부 레버가 항상 좋은 방향으로만 가진 않았다. v8폴더에서 learning_rate를 0.00465 → 0.001로 낮추자 오히려 58.06% → 53.89%로 떨어졌다. ReduceLROnPlateau 스케줄러가 lr을 0.001 → 0.000125로 빠르게 감쇠시켜, 모델이 지역 최솟값에 조기 수렴한 탓이다. "lr은 낮을수록 안전"이라는 직관이 소규모 데이터에서는 역효과를 낼 수 있음을 보여준 회귀 구간이다.</div>
+<p>한 가지 유의점. 개별 보고서(tuning_v1~v5)의 버전 번호와, 종합 보고서(tuning_v6)가 쓰는 "폴더" 번호가 완전히 일치하지는 않는다. 그래서 위 수치들은 특정 버전 이름에 못을 박기보다 <strong>버전별 진행 방향</strong>(데이터↑ → 정확도↑, lr↓ → 회귀)으로 읽는 편이 안전하다. 절대 수치는 각 보고서에 기록된 값 그대로 인용했다.</p>
+<div class="bridge"><strong>다음으로</strong> — 그러면 이 모델의 성능을 어떻게 읽고, 어디서 구조적 한계에 부딪혀 다음 모델로 넘어가는지 정리한다.</div></section>
+
+<section id="ch6"><h2 class="chap"><span class="num">CH 06</span>평가와 다음 단계(BERT 계열)<a href="#ch6" class="anchor-link">#</a></h2>
 <h3 class="step">결론 → 지표로 읽고, 문맥의 벽에서 다음 모델로</h3>
-<p>다중 분류 평가는 정확도 하나로 끝내지 않는다. 강의 자료가 정리한 지표는 Accuracy, Precision, Recall, F1-Score, 그리고 <strong>Confusion Matrix</strong>다. 6개 카테고리에서는 경제와 사회, IT와 연예처럼 어휘가 겹치는 쌍이 서로 혼동되기 쉬운데, 이 오분류 구조는 혼동 행렬로만 드러난다. 클래스별 데이터 수가 다르면 특정 카테고리로 편향될 수 있다는 점(데이터 불균형)도 자료가 명시한 한계다.</p>
-<div class="terminal"><div class="terminal-header">평가 관점 — 다중 분류에서 봐야 할 것</div><pre class="terminal-body">Accuracy       : 전체 정답 비율(불균형이면 과대평가 위험)
-Precision/Recall: 카테고리별로 따로 확인
-F1-Score       : 두 지표의 조화평균
-Confusion Matrix: 어떤 카테고리끼리 헷갈리는지 파악</pre></div>
-<p>LSTM은 단어 순서와 문맥을 어느 정도 학습하지만, 같은 단어가 문장마다 다른 의미로 쓰이는 상황(자료의 예: 금융 "은행" vs 나무 "은행")까지는 하나의 임베딩으로 뭉개 버린다. 자료가 최신 기술로 제시하는 <strong>BERT 계열</strong>(KoBERT·KoELECTRA)은 앞뒤 문맥을 동시에 보는 양방향 학습으로 이 문맥 의존 의미를 구분하고, 적은 데이터로도 파인튜닝만으로 높은 분류 성능을 낸다. 이번 실험의 LSTM은 그 다리를 놓기 위한 기준선인 셈이다.</p>
-<div class="keypoint"><span class="label">배운 점</span>한 줄 목표의 답 — 뉴스 LSTM 분류기는 임베딩→LSTM(마지막 은닉상태)→선형층으로 짧게 만들 수 있지만, 성능을 가른 것은 모델 깊이가 아니라 <em>한국어 형태소 전처리와 데이터 양</em>이었다. 그리고 문맥 의존 의미의 벽에서 다음 모델(BERT 계열)로 넘어가는 이유가 생긴다.</div></section>
+<p>다중 분류 평가는 정확도 하나로 끝내지 않는다. 강의 자료가 정리한 지표는 Accuracy, Precision, Recall, F1-Score, 그리고 <strong>Confusion Matrix</strong>다. 실제로 이 프로젝트에서 가장 오래 취약했던 카테고리는 <code>사회</code>였다. "교육부 정책 발표", "법원 판결"처럼 정치·경제와 경계가 모호한 기사가 많기 때문인데, F1이 v5 수준의 0.24에서 v9의 0.82로 올라간 것은 데이터가 5배로 늘어난 뒤에야 이 모호성을 구분하는 패턴이 학습됐기 때문이다.</p>
+<div class="terminal"><div class="terminal-header">평가 관점 — 다중 분류에서 봐야 할 것</div><pre class="terminal-body">Accuracy        : 전체 정답 비율(불균형이면 과대평가 위험)
+Precision/Recall: 카테고리별로 따로 확인 (사회 F1이 가장 늦게 오름)
+F1-Score        : 두 지표의 조화평균
+Confusion Matrix: 어떤 카테고리끼리 헷갈리는지 파악
+                  (v3에서 스포츠 한 클래스 쏠림 = 클래스 붕괴 탐지)</pre></div>
+<p>LSTM은 단어 순서와 문맥을 어느 정도 학습하지만, 같은 단어가 문장마다 다른 의미로 쓰이는 상황(자료의 예: 금융 "은행" vs 나무 "은행")까지는 하나의 임베딩으로 뭉개 버린다. 자료가 최신 기술로 제시하는 <strong>BERT 계열</strong>(KoBERT·KoELECTRA)은 앞뒤 문맥을 동시에 보는 양방향 학습으로 이 문맥 의존 의미를 구분하고, 적은 데이터로도 파인튜닝만으로 높은 성능을 낸다. 이 프로젝트에서도 KoBERT(<code>klue/bert-base</code>)·KoELECTRA(<code>koelectra-base-v3</code>)를 붙인 탐색이 이어졌는데, 첫 trial부터 val_acc 0.94+를 기록하고 최고 <strong>0.9618(KoELECTRA)</strong>에 이르렀다. 데이터가 300건/카테고리에 불과해도 LSTM의 500건 수준을 가뿐히 넘겼다.</p>
+<div class="keypoint"><span class="label">배운 점</span>한 줄 목표의 답 — 뉴스 LSTM 분류기는 임베딩→LSTM(마지막 은닉상태)→선형층으로 짧게 만들 수 있고, 그 뼈대는 v1부터 v9까지 그대로였다. 성능을 가른 것은 모델 깊이가 아니라 <em>데이터 양(41.67%→92.83%)</em>이었고, 그 다음이 형태소 전처리와 조기종료 기준이었다. 그리고 문맥 의존 의미의 벽에서, 사전학습을 가진 BERT 계열로 넘어가는 이유가 생긴다.</div></section>
 
-<div class="ref-chain"><p class="ref-title">📚 근거 출처</p><ol><li>실습 코드 — <code>llm_workspace/nlp_model_project</code></li><li>강의 PDF — 자연어처리_텍스트분류</li><li>공식 문서 — PyTorch LSTM · KoNLPy</li></ol></div></main>
-<footer><p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-06-30)</p><p>다음 글에서는 같은 뉴스 데이터를 KoBERT로 파인튜닝하며, 문맥 임베딩이 LSTM 기준선을 얼마나 밀어 올리는지 이어서 확인한다.</p></footer>
+<div class="ref-chain"><p class="ref-title">📚 근거 출처</p><ol><li>실습 코드·튜닝 보고서 — <code>llm_workspace/NAVER_NEWS_LSTM_Classifier</code> (reports/tuning_v1~v6)</li><li>강의 PDF — 자연어처리_텍스트분류</li><li>공식 문서 — PyTorch LSTM · KoNLPy</li></ol></div></main>
+<footer><p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-06-30)</p><p>다음 글에서는 같은 뉴스 데이터를 KoBERT·KoELECTRA로 파인튜닝하며, 사전학습 문맥 임베딩이 LSTM의 92.83% 기준선을 어디까지 밀어 올리는지 이어서 확인한다.</p></footer>
 
 </div>
 <nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>

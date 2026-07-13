@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>트랜스포머 — RNN을 버리다 (Attention Is All You Need)</title>
-  <meta name="description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머의 구조와 이유.">
+  <meta name="description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머 — 개념과 실제 nn.Transformer 구현·검증.">
   <meta property="og:title" content="트랜스포머 — RNN을 버리다 (Attention Is All You Need)">
-  <meta property="og:description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머의 구조와 이유.">
+  <meta property="og:description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머 — 개념과 실제 nn.Transformer 구현·검증.">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="트랜스포머 — RNN을 버리다 (Attention Is All You Need)">
-  <meta name="twitter:description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머의 구조와 이유.">
+  <meta name="twitter:description" content="self-attention·멀티헤드·위치 인코딩으로 RNN을 없앤 트랜스포머 — 개념과 실제 nn.Transformer 구현·검증.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
@@ -129,11 +129,11 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 
 <header class="cover">
   <p class="eyebrow">Python · 자연어처리(교과목 3 · 단원 2) · 부트캠프</p>
-  <h1>트랜스포머 — RNN을 버리다 (Attention Is All You Need)</h1>
-  <p class="deck">"순환도 합성곱도 완전히 버리고, 오직 어텐션만." 지난주까지 시퀀스의 뼈대였던 RNN을 아예 걷어낸다는 선언이 처음엔 과격하게 들렸다. 그게 어떻게 가능하고, 무엇이 좋아지며, 순서 정보는 왜 하필 sin·cos로 다시 넣는지 — 오늘은 그 세 물음을 따라갔다.</p>
+  <h1>트랜스포머 — RNN을 버리다, 그리고 직접 짜서 검증하다</h1>
+  <p class="deck">"순환도 합성곱도 완전히 버리고, 오직 어텐션만." 지난주까지 시퀀스의 뼈대였던 RNN을 아예 걷어낸다는 선언이 처음엔 과격하게 들렸다. 그게 어떻게 가능하고, 무엇이 좋아지며, 순서 정보는 어떻게 다시 넣는지 — 세 물음을 따라가고, 오늘은 그 개념이 실제 코드에서 어떤 모양이 되는지까지 밀어붙였다. 문자 단위 영↔한 번역기를 <code>nn.Transformer</code>로 세워 학습·검증한 결과를 논문 옆에 나란히 놓는다.</p>
   <div class="meta-row">
     <span><strong>날짜</strong>2026-07-02</span>
-    <span><strong>주제</strong>Transformer · self-attention · 위치 인코딩</span>
+    <span><strong>도구</strong>PyTorch · Python 3.13.5 · smart_translator</span>
     <span><strong>OS</strong>Windows 11 Pro 25H2</span>
     <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
     <span><strong>커리큘럼</strong>교과목 3 · 단원 2 · 자연어 딥러닝 — 자연어처리_트랜스포머.pdf</span>
@@ -142,19 +142,20 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 
 <main>
   <nav class="flow">
-    <h2>이 글의 흐름 — "RNN을 버린다"는 문장 한 줄을 풀어보기</h2>
+    <h2>이 글의 흐름 — "RNN을 버린다"를 개념에서 실코드까지 밀어보기</h2>
     <ol>
       <li>"dispensing with recurrence" — biRNN이 하던 일과, 그걸 왜 버렸나</li>
       <li>self-attention 한 방 — Q·K·V로 모든 단어를 한 번에 잇기</li>
       <li>연산이 어떻게 달라지나 — 순차 O(N)에서 행렬 곱 1스텝으로</li>
       <li>멀티헤드와 FFN — 관계를 다각도로 보고, 다시 혼자 깊게 생각하기</li>
-      <li>순서를 잃었다 — 왜 sin/cos 위치 인코딩인가</li>
-      <li>공짜는 아니다 — O(N²) 메모리라는 대가와 인코더·디코더 스택</li>
+      <li>순서를 잃었다 — sin/cos 위치 인코딩, 그리고 내 코드는 왜 달랐나</li>
+      <li>개념을 코드로 — <code>nn.Transformer</code> 번역기 구조·설정·마스크</li>
+      <li>공짜는 아니다 — O(N²)의 대가와, 실제 학습·검증이 말해준 것</li>
     </ol>
   </nav>
 
   <div class="bridge">
-    <p>지난 주제의 끝에서, Seq2Seq가 문장 전체를 고정 크기 벡터 하나에 구겨 넣는 병목을 봤고, 그 병목을 뚫으려 디코더가 인코더의 모든 은닉 상태를 돌아보는 <strong>어텐션</strong>이 붙었다는 데까지 왔다. 오늘 읽은 논문은 거기서 한 발 더 나간다. "어텐션이 그렇게 좋으면, 굳이 밑에 깔린 RNN을 유지할 이유가 있나?" 논문의 첫 문단이 그 선언이다 — <em>"a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."</em></p>
+    <p>지난 주제의 끝에서, Seq2Seq가 문장 전체를 고정 크기 벡터 하나에 구겨 넣는 병목을 봤고, 그 병목을 뚫으려 디코더가 인코더의 모든 은닉 상태를 돌아보는 <strong>어텐션</strong>이 붙었다는 데까지 왔다. 오늘 읽은 논문은 거기서 한 발 더 나간다. "어텐션이 그렇게 좋으면, 굳이 밑에 깔린 RNN을 유지할 이유가 있나?" 논문의 첫 문단이 그 선언이다 — <em>"a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."</em> 이번엔 그 선언을 읽는 데서 멈추지 않고, PyTorch의 <code>nn.Transformer</code>로 작은 번역기(<code>smart_translator</code>)를 실제로 세워 개념 하나하나가 어느 줄에 앉는지 확인했다.</p>
   </div>
 
   <section id="ch1">
@@ -171,7 +172,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
     <p>진화 과정으로 보면 어텐션과 biRNN의 관계가 분명해진다. <strong>1단계</strong> 초기 Seq2Seq는 어텐션 없이 RNN이 문장을 고정 벡터 하나로 압축했고, 문장이 길어지면 번역 품질이 처참했다. <strong>2단계</strong>는 "RNN이 앞을 자꾸 까먹으니 원문을 다시 기웃거리게 하자"며 <strong>biRNN 뼈대 위에 어텐션을 보조 장치로</strong> 얹은 과도기다. 품질은 올랐지만 "한 단어씩 순서대로 계산"하는 하드웨어 병목은 그대로였다.</p>
 
     <div class="keypoint">
-      <p><span class="label">배운 점</span><strong>3단계가 트랜스포머다.</strong> 보조 장치였던 어텐션의 성능이 압도적이다 보니, 주객을 뒤집었다 — "쓸모가 다한 환자(biRNN)는 퇴원시키고, 치료제(어텐션)만으로 병원을 차리자." biRNN이 하던 양방향 문맥 파악을, 문장 안 모든 단어가 서로를 <strong>동시에</strong> 쳐다보는 <strong>셀프 어텐션</strong>이 통째로 대체한다. 여기서 한 가지 오해도 교정됐다 — 이건 전처리(토큰화·임베딩)를 바꾼 게 아니라, 그 뒤 <strong>모델 본체(두뇌)의 핵심 연산</strong>에서 RNN을 퇴출한 것이다.</p>
+      <p><span class="label">배운 점</span><strong>3단계가 트랜스포머다.</strong> 보조 장치였던 어텐션의 성능이 압도적이다 보니, 주객을 뒤집었다 — "쓸모가 다한 환자(biRNN)는 퇴원시키고, 치료제(어텐션)만으로 병원을 차리자." biRNN이 하던 양방향 문맥 파악을, 문장 안 모든 단어가 서로를 <strong>동시에</strong> 쳐다보는 <strong>셀프 어텐션</strong>이 통째로 대체한다. 여기서 한 가지 오해도 교정됐다 — 이건 전처리(토큰화·임베딩)를 바꾼 게 아니라, 그 뒤 <strong>모델 본체(두뇌)의 핵심 연산</strong>에서 RNN을 퇴출한 것이다. 뒤에서 볼 내 번역기가 딱 이 3단계를 그대로 코드화한 것으로, 이전 과제의 Seq2Seq RNN을 걷어내고 <code>nn.Transformer</code>로 통째로 갈아끼운 결과다.</p>
     </div>
   </section>
 
@@ -197,7 +198,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
       <p><span class="label">의문</span>②번의 <code>√d_k</code> 나눗셈이 왜 필요한지 처음엔 사족처럼 보였다. 그냥 내적만 하면 안 되나?</p>
     </div>
 
-    <p>차원 <code>d_k</code>가 커지면 내적값의 크기 자체가 커진다. 값이 너무 큰 상태로 softmax에 들어가면 분포가 한쪽으로 뾰족하게 쏠려 기울기가 죽고 학습이 잘 안 된다. <code>√d_k</code>로 나눠 크기를 눌러주는 것 — 이 스케일링이 논문 제목에 '스케일드'가 붙은 이유다. 작지만 학습 안정성을 좌우하는 장치였다.</p>
+    <p>차원 <code>d_k</code>가 커지면 내적값의 크기 자체가 커진다. 값이 너무 큰 상태로 softmax에 들어가면 분포가 한쪽으로 뾰족하게 쏠려 기울기가 죽고 학습이 잘 안 된다. <code>√d_k</code>로 나눠 크기를 눌러주는 것 — 이 스케일링이 논문 제목에 '스케일드'가 붙은 이유다. 작지만 학습 안정성을 좌우하는 장치였다. (내 코드에선 이 어텐션 계산이 통째로 <code>nn.Transformer</code> 내부에 들어 있어 직접 짜지 않았지만, CH 06에서 <code>nhead=4</code>가 이 <code>d_k</code>를 어떻게 쪼개는지 다시 만난다.)</p>
   </section>
 
   <section id="ch3">
@@ -244,12 +245,12 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
     <p>어텐션 블록 바로 위엔 <strong>FFN(Position-Wise Feed-Forward Network)</strong>이 붙는다. 처음엔 "이건 또 뭐지?" 싶었던 블록이다.</p>
 
     <div class="keypoint">
-      <p><span class="label">배운 점</span>어텐션이 <strong>단어 사이의 관계(외적 문맥)</strong>를 다룬다면, FFN은 그렇게 모은 정보를 바탕으로 <strong>각 단어 벡터 하나하나를 독립적으로 깊게 재해석</strong>한다. 구조는 두 층짜리 선형망 <code>FFN(x) = max(0, xW₁+b₁)W₂+b₂</code>로, 512차원을 2,048차원으로 넓혔다가(방을 키워 표현력 확보) 다시 512로 압축한다. 가운데 ReLU 같은 <strong>비선형 활성화</strong>가 핵심 — 어텐션의 <code>QKᵀ</code>는 본질적으로 선형이라, 이것만 쌓으면 아무리 깊어도 복잡한 패턴을 못 배운다. FFN이 데이터를 비틀어 비선형성을 넣어준다. 'Position-Wise'라 부르는 건, 이 단계에선 각 단어가 서로를 신경 쓰지 않고 똑같은 계산기를 독립적으로 통과하기 때문이다. 한 블록은 결국 <strong>[어텐션: 정보 교류] → [FFN: 혼자 깊게 정제]</strong>의 2인 3각으로 굴러간다.</p>
+      <p><span class="label">배운 점</span>어텐션이 <strong>단어 사이의 관계(외적 문맥)</strong>를 다룬다면, FFN은 그렇게 모은 정보를 바탕으로 <strong>각 단어 벡터 하나하나를 독립적으로 깊게 재해석</strong>한다. 구조는 두 층짜리 선형망 <code>FFN(x) = max(0, xW₁+b₁)W₂+b₂</code>로, 논문 기본 모델은 512차원을 2,048차원으로 넓혔다가(방을 키워 표현력 확보) 다시 512로 압축한다. 가운데 ReLU 같은 <strong>비선형 활성화</strong>가 핵심 — 어텐션의 <code>QKᵀ</code>는 본질적으로 선형이라, 이것만 쌓으면 아무리 깊어도 복잡한 패턴을 못 배운다. FFN이 데이터를 비틀어 비선형성을 넣어준다. 'Position-Wise'라 부르는 건, 이 단계에선 각 단어가 서로를 신경 쓰지 않고 똑같은 계산기를 독립적으로 통과하기 때문이다. 한 블록은 결국 <strong>[어텐션: 정보 교류] → [FFN: 혼자 깊게 정제]</strong>의 2인 3각으로 굴러간다. 뒤에서 볼 내 실습 모델은 이 512→2048을 규모만 줄여 <code>d_model=64 → dim_feedforward=128</code>로 그대로 재현한다.</p>
     </div>
   </section>
 
   <section id="ch5">
-    <h2 class="chap"><span class="num">CH 05</span>순서를 잃었다 — 왜 sin/cos 위치 인코딩인가<a href="#ch5" class="anchor-link">#</a></h2>
+    <h2 class="chap"><span class="num">CH 05</span>순서를 잃었다 — sin/cos, 그리고 내 코드는 왜 달랐나<a href="#ch5" class="anchor-link">#</a></h2>
 
     <p>RNN을 버리고 문장을 통째로 넣으면서 부작용이 생겼다. 단어를 순서대로 넣지 않으니 <strong>'순서' 정보 자체가 사라진다.</strong> PDF 3.5절이 이 문제를 이렇게 연다 — "우리 모델은 순환도 합성곱도 포함하지 않으므로, 시퀀스의 순서를 활용하려면 토큰의 상대적·절대적 위치 정보를 어떤 식으로든 주입해야 한다." 그 주입 장치가 <strong>위치 인코딩(Positional Encoding)</strong>이고, 임베딩과 같은 <code>d_model</code> 차원이라 임베딩에 그냥 더할 수 있다.</p>
 
@@ -270,13 +271,99 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
       </tbody>
     </table>
 
+    <div class="qbox">
+      <p><span class="label">의문</span>여기서 실습이 논문과 갈렸다. 내 번역기 코드를 다시 보니 sin·cos가 아니라 <code>nn.Embedding(max_seq_len, d_model)</code>, 즉 <em>학습 가능한 위치 임베딩</em>을 쓰고 있었다. 논문이 그렇게 좋다고 한 sin/cos를 왜 안 썼지? 이건 틀린 건가?</p>
+    </div>
+
+    <p>틀린 게 아니라, 논문이 앞서 언급한 "학습 가능한 위치 임베딩"이라는 <strong>대안 선택지</strong>를 그대로 택한 것이었다. 논문 3.5절은 sin/cos와 학습형(learned) 위치 인코딩을 실험으로 비교하고 <em>"두 방식이 거의 동일한 성능을 냈다"</em>고 밝히면서도, 학습 때 안 본 길이로도 외삽되길 기대해 sin/cos를 택했다고 적는다. 내 실습은 상황이 정반대였다 — 최대 문장이 32자, <code>MAX_SEQ_LEN</code>이 128로 <strong>길이가 고정·유한</strong>하니 외삽이 필요 없고, 위치 개수가 128개뿐이라 임베딩 테이블이 아주 작다. 그래서 구현이 직관적인 학습형을 골랐다. 개념(위치 정보를 임베딩에 더한다)은 그대로 두고, 그 <em>공급 방식</em>만 데이터 규모에 맞게 바꾼 셈이다.</p>
+
     <div class="keypoint">
-      <p><span class="label">배운 점</span>가장 직관적인 그림은 <strong>이진법 시계</strong>였다. 각 차원마다 주파수가 다른 sin·cos를 번갈아 넣는데, <strong>앞쪽 차원(고주파, 초침)</strong>은 단어가 1칸만 바뀌어도 값이 요동쳐 <em>바로 옆 단어와의 세밀한 순서</em>를 구별하고, <strong>뒤쪽 차원(저주파, 시침)</strong>은 수백 칸이 바뀌어야 천천히 변해 <em>문장에서 앞부분인지 뒷부분인지 거시적 위치</em>를 잡는다. 결국 sin/cos는 "값 폭발을 막으면서(−1~1), 상대 거리를 선형으로 쉽게 연산하고, 길이에 구애받지 않는" 세 조건을 한 번에 만족시키는 우아한 해였다.</p>
+      <p><span class="label">배운 점</span>sin/cos의 직관은 <strong>이진법 시계</strong>였다. 각 차원마다 주파수가 다른 sin·cos를 번갈아 넣는데, <strong>앞쪽 차원(고주파, 초침)</strong>은 단어가 1칸만 바뀌어도 값이 요동쳐 <em>바로 옆 단어와의 세밀한 순서</em>를 구별하고, <strong>뒤쪽 차원(저주파, 시침)</strong>은 수백 칸이 바뀌어야 천천히 변해 <em>거시적 위치</em>를 잡는다. 오늘 실습으로 한 겹 더 배운 건, <strong>"위치를 임베딩에 더한다"는 원리는 고정이고, 그 값을 sin/cos 공식으로 <em>계산</em>할지 테이블로 <em>학습</em>할지는 데이터 길이가 유한·무한이냐에 따라 갈리는 설계 선택</strong>이라는 점이었다. 코드가 논문과 다른 지점을 마주치고 나서야, 논문이 왜 그 선택을 '기대(hypothesize)'라고만 적었는지 납득됐다.</p>
     </div>
   </section>
 
   <section id="ch6">
-    <h2 class="chap"><span class="num">CH 06</span>공짜는 아니다 — O(N²) 메모리와 인코더·디코더 스택<a href="#ch6" class="anchor-link">#</a></h2>
+    <h2 class="chap"><span class="num">CH 06</span>개념을 코드로 — nn.Transformer 번역기 해부<a href="#ch6" class="anchor-link">#</a></h2>
+
+    <p>여기서부터가 오늘 보강한 축이다. 앞 다섯 장의 개념 — 임베딩, 위치 정보, 멀티헤드, FFN, 인코더·디코더, 마스크 — 이 실제로 몇 줄의 코드에 어떻게 앉는지, 내가 세운 문자 단위 영↔한 번역기 <code>smart_translator</code>로 확인했다. 핵심은 모델 본체 <code>src/model.py</code>다.</p>
+
+    <pre class="language-python"><code>class TransformerTranslator(nn.Module):
+    def __init__(self, vocab_size, d_model, nhead,
+                 num_encoder_layers, num_decoder_layers,
+                 dim_feedforward, dropout, pad_index=0, max_seq_len=128):
+        super().__init__()
+        # ① 입력·출력용 토큰 임베딩(따로) + ② 학습형 위치 임베딩
+        self.source_embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_index)
+        self.target_embedding = nn.Embedding(vocab_size, d_model, padding_idx=pad_index)
+        self.position_embedding = nn.Embedding(max_seq_len, d_model)
+        self.dropout = nn.Dropout(dropout)
+
+        # ③ 인코더-디코더 스택 통째로 (멀티헤드+FFN+Add&Norm 내장)
+        self.transformer = nn.Transformer(
+            d_model=d_model, nhead=nhead,
+            num_encoder_layers=num_encoder_layers,
+            num_decoder_layers=num_decoder_layers,
+            dim_feedforward=dim_feedforward,
+            dropout=dropout, batch_first=True,
+        )
+        self.output_layer = nn.Linear(d_model, vocab_size)  # ④ logits로 사영
+
+    def _add_positions(self, token_ids, embedding):
+        positions = torch.arange(token_ids.size(1), device=token_ids.device)
+        positions = positions.unsqueeze(0).expand(*token_ids.shape)
+        token_vectors = embedding(token_ids) * math.sqrt(self.d_model)  # √d_model 스케일
+        position_vectors = self.position_embedding(positions)
+        return self.dropout(token_vectors + position_vectors)  # 임베딩 + 위치</code></pre>
+
+    <p>개념이 코드로 어떻게 내려앉는지 한 줄씩 짚으면 이렇다. <strong>①</strong> CH 05에서 본 "임베딩과 같은 차원이라 그냥 더한다"가 <code>token_vectors + position_vectors</code> 한 줄이다. <strong>②</strong> 그 앞의 <code>* math.sqrt(self.d_model)</code>는 논문 3.4절의 <em>"임베딩 가중치에 √d_model을 곱한다"</em>는 규정을 그대로 옮긴 것 — 임베딩 크기가 위치 신호에 묻히지 않게 키운다. <strong>③</strong> 멀티헤드·FFN·Add&amp;Norm·잔차 연결은 전부 <code>nn.Transformer</code> 안에 들어 있어, 개념만 알면 인자만 넘겨 조립된다. <strong>④</strong> 마지막 <code>Linear(d_model, vocab_size)</code>가 디코더 출력을 어휘 크기의 logits로 펴서 다음 문자를 고른다.</p>
+
+    <p>실제 이 모델에 넘긴 하이퍼파라미터(<code>src/config.py</code>)를 논문 기본값과 나란히 놓으면, "같은 구조를 규모만 줄인 것"이 분명해진다.</p>
+
+    <table>
+      <thead>
+        <tr><th>구성 요소</th><th>내 실습 설정</th><th>논문 base 대응</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>d_model</code> (임베딩 차원)</td><td>64</td><td>512</td></tr>
+        <tr><td><code>nhead</code> (멀티헤드 수)</td><td>4</td><td>8</td></tr>
+        <tr><td><code>dim_feedforward</code> (FFN)</td><td>128</td><td>2,048</td></tr>
+        <tr><td>인코더·디코더 층수</td><td>각 1층</td><td>각 6층</td></tr>
+        <tr><td><code>dropout</code></td><td>0.0 (작은 실습셋)</td><td>0.1</td></tr>
+        <tr><td><code>max_seq_len</code> / 어휘</td><td>128 / vocab 223</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <p>여기서 CH 02·04의 개념이 숫자로 잡힌다. <code>d_model=64</code>를 <code>nhead=4</code>가 나눠 쓰니 헤드당 <code>d_k=16</code>이고 — 그래서 config 주석에도 "<code>d_model</code>은 <code>nhead</code>로 나누어떨어져야 한다"고 적혀 있다 — softmax 안 <code>√d_k</code>는 <code>√16=4</code>가 된다. FFN은 64를 128로 넓혔다 다시 64로 줄이는, 논문 512→2048→512의 축소판이다. 층수를 각 1층으로 둔 건 데이터가 144쌍뿐이라 6층은 과하기 때문이다.</p>
+
+    <p>마지막으로, 개념으로만 봤던 <strong>마스크</strong> 두 종류가 코드에선 명시적 함수로 나온다. 디코더가 미래 정답을 훔쳐보지 못하게 하는 <strong>causal(future) mask</strong>와, <code>&lt;PAD&gt;</code> 자리를 어텐션에서 빼는 <strong>padding mask</strong>다.</p>
+
+    <pre class="language-python"><code>@staticmethod
+def make_future_mask(size, device):
+    # 상삼각을 True로 → 미래 위치를 가림 (디코더 self-attention)
+    return torch.triu(torch.ones(size, size, dtype=torch.bool, device=device), diagonal=1)
+
+def make_padding_mask(self, token_ids):
+    return token_ids.eq(self.pad_index)  # PAD 위치 True → 어텐션에서 제외
+
+def forward(self, source, decoder_input):
+    src = self._add_positions(source, self.source_embedding)
+    tgt = self._add_positions(decoder_input, self.target_embedding)
+    out = self.transformer(
+        src=src, tgt=tgt,
+        tgt_mask=self.make_future_mask(decoder_input.size(1), decoder_input.device),
+        src_key_padding_mask=self.make_padding_mask(source),
+        tgt_key_padding_mask=self.make_padding_mask(decoder_input),
+        memory_key_padding_mask=self.make_padding_mask(source),
+    )
+    return self.output_layer(out)</code></pre>
+
+    <div class="keypoint">
+      <p><span class="label">배운 점</span>다섯 장의 개념이 <code>model.py</code> 90여 줄에 거의 1:1로 대응했다. 임베딩+위치(더하기), √d_model 스케일, 멀티헤드·FFN·Add&amp;Norm(<code>nn.Transformer</code>가 흡수), 인코더-디코더 이원 구조, 그리고 causal·padding 두 마스크까지. 라이브러리가 감춘 건 어텐션의 <em>행렬 연산</em>뿐이고, 설계 결정(차원·헤드·층수·위치 방식·마스크)은 전부 내가 개념을 알아야 채울 수 있는 빈칸이었다. "논문을 읽는다"와 "구조를 세운다" 사이의 거리가 생각보다 짧다는 걸 이 파일에서 처음 실감했다.</p>
+    </div>
+  </section>
+
+  <section id="ch7">
+    <h2 class="chap"><span class="num">CH 07</span>공짜는 아니다 — O(N²)의 대가와, 검증이 말해준 것<a href="#ch7" class="anchor-link">#</a></h2>
 
     <p>거리에 무관한 다이렉트 연산에는 대가가 있다. 모든 단어가 서로를 보는 어텐션 맵은 N×N 크기다.</p>
 
@@ -284,18 +371,35 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
       <p><span class="label">의문</span>모든 단어를 한 판에 펼쳐 관계를 다 계산한다면, 문장이 길어질수록 용량 부하가 감당 못 하게 커지는 것 아닌가?</p>
     </div>
 
-    <p>정확한 지적이다. 이게 어텐션의 <strong>O(N²) 메모리 복잡도</strong>다. 4단어면 4×4=16칸이지만, 1,000단어면 100만 칸, 10,000단어면 1억 칸이 필요하다. RNN/CNN이 문장 길이와 무관하게 거의 일정한 메모리를 쓰는 것과 정반대다. 토큰 수가 10배면 판넬은 100배로 급증해 OOM(메모리 부족)이 난다. 트랜스포머는 <strong>"연산 단계(시간)를 줄이는 대신 거대한 행렬을 유지할 공간(메모리)을 대거 희생한 모델"</strong>인 셈이다. (실무에선 HBM 같은 고대역폭 메모리, FlashAttention처럼 행렬을 블록으로 쪼개 계산하는 기법, Sparse/Linear Attention 등으로 이 부하를 눌러왔다.)</p>
+    <p>정확한 지적이다. 이게 어텐션의 <strong>O(N²) 메모리 복잡도</strong>다. 4단어면 4×4=16칸이지만, 1,000단어면 100만 칸, 10,000단어면 1억 칸이 필요하다. RNN/CNN이 문장 길이와 무관하게 거의 일정한 메모리를 쓰는 것과 정반대다. 토큰 수가 10배면 판넬은 100배로 급증해 OOM(메모리 부족)이 난다. 트랜스포머는 <strong>"연산 단계(시간)를 줄이는 대신 거대한 행렬을 유지할 공간(메모리)을 대거 희생한 모델"</strong>인 셈이다. (실무에선 HBM 같은 고대역폭 메모리, FlashAttention처럼 행렬을 블록으로 쪼개 계산하는 기법, Sparse/Linear Attention 등으로 이 부하를 눌러왔다.) 내 실습이 O(N²)에 안 데인 건 순전히 규모 덕이다 — 최대 문장 길이가 32자라 어텐션 맵이 커봐야 32×32뿐이라, 이 대가가 드러날 지점 아래에서 놀았다.</p>
 
-    <p>마지막으로 전체 골격을 정리해 두면, 트랜스포머는 <strong>인코더 스택</strong>과 <strong>디코더 스택</strong>으로 나뉜다. 인코더 블록은 <code>[Multi-Head Attention] → [FFN]</code>으로 문장 전체 관계를 한 번에 계산한다. 디코더 블록은 미래 단어를 미리 못 보게 가리는 <strong>Masked Multi-Head Attention</strong>과, 인코더의 정보를 받아오는 인코더-디코더 어텐션으로 이원화된다. 순환 구조가 사라진 자리에서 층을 깊게 쌓을 수 있게 해주는 게 각 블록을 우회하는 <strong>잔차 연결(Residual)</strong>과 <strong>Add &amp; Norm</strong>이다 — 이 덕에 논문 기본 모델은 인코더·디코더 각 N=6층을 안정적으로 적층했다.</p>
+    <p>전체 골격을 정리해 두면, 트랜스포머는 <strong>인코더 스택</strong>과 <strong>디코더 스택</strong>으로 나뉜다. 인코더 블록은 <code>[Multi-Head Attention] → [FFN]</code>으로 문장 전체 관계를 한 번에 계산한다. 디코더 블록은 미래 단어를 가리는 <strong>Masked Multi-Head Attention</strong>(CH 06의 future mask)과, 인코더의 정보를 받아오는 인코더-디코더 어텐션으로 이원화된다. 순환 구조가 사라진 자리에서 층을 깊게 쌓게 해주는 게 <strong>잔차 연결(Residual)</strong>과 <strong>Add &amp; Norm</strong>이고, 이 덕에 논문 기본 모델은 각 N=6층을 안정적으로 적층했다.</p>
+
+    <p>그래서 실제로 돌려보면 어땠나. 이 구조가 학습되는지, 개념대로 동작하는지를 검증 리포트로 확인했다.</p>
+
+    <table>
+      <thead>
+        <tr><th>검증 항목</th><th>결과</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>정적 검사 (py_compile)</td><td>주요 6개 파일 전부 통과</td></tr>
+        <tr><td>체크포인트 호환성</td><td><code>model_type=char_transformer</code>, meta ↔ 현재 구현 일치</td></tr>
+        <tr><td>모델 크기</td><td><code>smart_translator.pt</code> 556,035 bytes (약 556KB)</td></tr>
+        <tr><td>학습 최종 loss</td><td>150 epoch 후 0.0545 (초기 4.78 → 수렴)</td></tr>
+        <tr><td>앱 경로 정확도(lookup 우선)</td><td>288/288 방향 통과 (후보 정답 기준 100%)</td></tr>
+        <tr><td>순수 Transformer 생성만</td><td>263/288 (91.32%)</td></tr>
+      </tbody>
+    </table>
 
     <div class="callout">
-      <p><span class="label">정리</span>오늘 하루를 한 줄로 요약하면 — RNN을 버릴 수 있었던 건 self-attention이 biRNN의 양방향 문맥 파악을 <strong>거리와 무관한 한 번의 행렬 곱</strong>으로 대체했기 때문이고, 그 대가로 얻은 병렬화·장거리 강점이 O(N²) 메모리라는 비용을 치르고도 남았기 때문이다. 잃어버린 순서 정보는 sin/cos로 되메웠다. 이 구조 위에서 GPT·BERT를 비롯한 오늘날의 모든 대형 언어 모델이 출발했다.</p>
+      <p><span class="label">정리</span>검증에서 가장 배운 건 <strong>순수 생성 91.32%와 앱 경로 100%의 틈</strong>이었다. 순수 Transformer 생성은 <code>see you tomorrrrr…</code>처럼 문자를 반복하거나 <code>thirsty→thisty</code>로 철자를 흘리는 실패가 남았는데, 이는 144쌍이라는 작은 문자 단위 데이터셋과 greedy decoding의 한계였다. 개념(구조)은 옳게 학습됐지만(loss 0.0545, 556KB 체크포인트 정상), 소형 데이터에서 생성 품질은 별개 문제라는 것 — 그래서 앱은 CSV exact lookup을 먼저 태우고 없을 때만 생성을 쓰는 이중 경로로 288/288을 안정화했다. 오늘 하루를 한 줄로 요약하면 — RNN을 버릴 수 있었던 건 self-attention이 biRNN의 양방향 문맥 파악을 <strong>거리와 무관한 한 번의 행렬 곱</strong>으로 대체했기 때문이고, 그 대가로 얻은 병렬화·장거리 강점이 O(N²) 메모리 비용을 치르고도 남았기 때문이다. 잃어버린 순서 정보는 위치 임베딩으로 되메웠다. 그리고 그 모든 개념이 <code>nn.Transformer</code> 90여 줄에 그대로 앉는다는 걸, 논문 옆에서 직접 세워 확인했다. 이 구조 위에서 GPT·BERT를 비롯한 오늘날의 모든 대형 언어 모델이 출발했다.</p>
     </div>
   </section>
 
   <div class="ref-chain">
     <p class="ref-title">📚 근거 출처</p>
     <ol>
+      <li>실습 코드·검증 — <code>llm_workspace/smart_translator_project</code> (src/model.py · transformer_validation_report)</li>
       <li>강의 PDF — 자연어처리_트랜스포머</li>
       <li>공식 문서 — Vaswani et al. "Attention Is All You Need"</li>
     </ol>
@@ -304,7 +408,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 
 <footer>
   <p><strong>SK 네트웍스 AI Family 32기</strong> · 자연어처리 (2026-07-02)</p>
-  <p>"순환을 완전히 버린다"는 한 문장을 풀어보니, 병렬화·장거리라는 이득과 O(N²) 메모리라는 대가, 그리고 sin/cos로 순서를 되메우는 설계가 한 묶음으로 딸려 나왔다. 과격해 보이던 선언이 왜 표준이 됐는지 납득한 하루.</p>
+  <p>"순환을 완전히 버린다"는 한 문장을 개념에서 코드까지 밀어보니, 병렬화·장거리라는 이득과 O(N²) 메모리라는 대가, sin/cos(혹은 학습형) 위치 인코딩, 그리고 <code>nn.Transformer</code> 90여 줄이 한 묶음으로 딸려 나왔다. 논문이 왜 표준이 됐는지, 그 구조를 직접 세워 288/288로 확인하고서야 납득한 하루.</p>
 </footer>
 
 </div>
