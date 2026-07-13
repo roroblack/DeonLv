@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로</title>
-  <meta name="description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
+  <meta name="description" content="NAVER 분류 튜닝·번역 검증·트랜스포머 구성 실측 — SK네트웍스 AI Family 32기 10주차 회고.">
   <meta property="og:title" content="10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로">
-  <meta property="og:description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
+  <meta property="og:description" content="NAVER 분류 튜닝·번역 검증·트랜스포머 구성 실측 — SK네트웍스 AI Family 32기 10주차 회고.">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로">
-  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
+  <meta name="twitter:description" content="NAVER 분류 튜닝·번역 검증·트랜스포머 구성 실측 — SK네트웍스 AI Family 32기 10주차 회고.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
@@ -130,14 +130,14 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 <header class="cover">
   <p class="eyebrow">Python · 10주차 회고 · 교과목 3 단원 2·3 자연어처리·LLM · 부트캠프</p>
   <h1>번역에서 트랜스포머, 그리고 LLM으로 — 10주차 회고</h1>
-  <p class="deck">9주차가 "말을 숫자로(형태소·임베딩·LSTM)"였다면, 10주차(0629~0703)는 <strong>그 숫자로 문장을 옮기고(번역), 순환을 버리고(트랜스포머), 거대해지는(LLM)</strong> 길이었다.
+  <p class="deck">9주차가 "말을 숫자로(형태소·임베딩·LSTM)"였다면, 10주차(0629~0703)는 그 숫자로 문장을 옮기고(번역), 순환을 버리고(트랜스포머), 거대해지는(LLM) 길이었다.
   한국어 뉴스 분류 실전으로 시작해, 고정 벡터 병목을 어텐션으로 풀고, RNN을 아예 없앤 트랜스포머까지 간 뒤, 그 트랜스포머가 커지면 LLM이 된다는 데서 한 주가 끝났다.
   한 줄 목표는 — <strong>"순서를 어떻게 다루는가 — 차례로 읽기(RNN)에서 전부 동시에 보기(self-attention)로."</strong>
-  이번 주는 강의 자료·논문 노트 기반의 개념 정리가 중심이라, 실측 로그보다 <em>왜 그렇게 설계됐는가</em>의 사슬을 따라간다.</p>
+  각 장은 그 주에 실제로 걸렸던 의문과, 프로젝트 로그에 남은 실측치를 따라간다.</p>
   <div class="meta-row">
     <span><strong>기간</strong>2026-06-29 ~ 07-03</span>
     <span><strong>범위</strong>텍스트 분류(NAVER) · 번역 모델 · 트랜스포머 · LLM 개념</span>
-    <span><strong>자료</strong>강의 PDF · 논문 노트 · 발행글(devroro /label/llm)</span>
+    <span><strong>자료</strong>강의 PDF · 논문 노트 · 실습 프로젝트 로그</span>
     <span><strong>OS</strong>Windows 11 Pro 25H2</span>
     <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
   </div>
@@ -147,7 +147,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
   <h2>이 글의 흐름 — 순서를 다루는 방식의 진화</h2>
   <ol>
     <li><a href="#ch1">CH 01 · 출발 — LSTM으로는 어디까지</a></li>
-    <li><a href="#ch2">CH 02 · NAVER 뉴스 분류 — 텍스트 분류 실전</a></li>
+    <li><a href="#ch2">CH 02 · NAVER 뉴스 분류 — 데이터가 가른 92.83%</a></li>
     <li><a href="#ch3">CH 03 · 번역 모델 — 고정 벡터 병목과 어텐션</a></li>
     <li><a href="#ch4">CH 04 · 트랜스포머 — 순환을 버리다</a></li>
     <li><a href="#ch5">CH 05 · LLM의 시작 — 트랜스포머가 거대해지면</a></li>
@@ -156,44 +156,56 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 </nav>
 
 <div class="bridge">
-  <strong>한 주의 출발</strong> — 9주차 끝에서 LSTM은 문장을 <em>차례로</em> 읽어 하나의 벡터로 압축했다.
+  <strong>한 주의 출발</strong> — 9주차 끝에서 LSTM은 문장을 차례로 읽어 하나의 벡터로 압축했다.
   그 압축이 만든 병목이 이번 주의 출발점이다 — 어텐션이 그 병목을 풀고, 트랜스포머가 순환 자체를 없애며, 그 끝에 LLM이 있었다.
 </div>
 
 <section id="ch1">
   <h2 class="chap"><span class="num">CH 01</span>출발 — LSTM으로는 어디까지<a href="#ch1" class="anchor-link">#</a></h2>
-  <p>텍스트를 다루는 모델은 9주차까지 RNN·LSTM이었다. 순서대로 읽어 은닉 상태에 기억을 쌓는 구조는 직관적이지만, 두 가지 벽이 있었다 — <strong>장기 의존성</strong>(뒤로 갈수록 앞이 희석)과 <strong>병렬화 불가</strong>(앞을 계산해야 뒤를 계산). 이번 주는 이 벽을 하나씩 넘는 이야기다.</p>
+  <p>9주차까지 텍스트를 다루는 모델은 RNN·LSTM이었다. 순서대로 읽어 은닉 상태에 기억을 쌓는 구조는 직관적이지만, 두 가지 벽이 있었다 — 장기 의존성(뒤로 갈수록 앞이 희석)과 병렬화 불가(앞을 계산해야 뒤를 계산). LSTM이 Cell State라는 고속도로로 기억을 얼마간 지켜도, "차례로 읽는다"는 전제 자체는 그대로였다.</p>
+  <p>이번 주는 이 전제를 하나씩 무너뜨리는 이야기다. 순서는 다음과 같이 잡혔다 — 먼저 배운 LSTM을 실전 분류(NAVER 뉴스)에 부딪혀 그 한계와 진짜 레버를 확인하고, 번역에서 고정 벡터 병목을 정면으로 만나 어텐션으로 풀고, 그 어텐션만으로 RNN을 걷어낸 트랜스포머를 직접 세운 뒤, 그 구조가 커져 LLM이 되는 지점까지 간다. 다섯 개의 실습·개념이 "순서를 어떻게 다루나"라는 한 물음으로 꿰였다.</p>
   <div class="qbox"><span class="label">의문</span>
-  차례로 읽는 것 말고 다른 방법이 있을까? 문장의 모든 단어를 한 번에 서로 견주면 안 되나?</div>
-  <div class="bridge"><strong>다음으로</strong> — 그 전에, 배운 LSTM을 실전 분류에 부딪혀 봤다.</div>
+  차례로 읽는 것 말고 다른 방법이 있을까? 문장의 모든 단어를 한 번에 서로 견주면 안 되나 — 그러면 순서 정보는 어떻게 다시 넣지?</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  이 물음 하나가 한 주 전체의 척추가 됐다. 병목(고정 벡터) → 어텐션, 순차성(RNN) → self-attention, 잃어버린 순서 → 위치 인코딩. 각 단계는 앞 단계가 무너지던 지점을 정확히 겨냥해 등장했고, 나는 그걸 개념으로만 읽지 않고 분류·번역·트랜스포머 세 프로젝트의 로그로 확인하려 했다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 그 전에, 배운 LSTM을 실전 분류에 부딪혀 무엇이 성능을 가르는지부터 봤다.</div>
 </section>
 
 <section id="ch2">
-  <h2 class="chap"><span class="num">CH 02</span>NAVER 뉴스 분류 — 텍스트 분류 실전<a href="#ch2" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>0630엔 한국어 뉴스를 카테고리(IT·스포츠·사회·경제·연예·정치)로 나누는 LSTM 분류기를 다뤘다. IMDB 감성 2분류(긍/부정)에서 출발한 코드를, 출력 차원을 늘리고 지표 타입을 맞춰 다중 분류로 확장했다.</p>
+  <h2 class="chap"><span class="num">CH 02</span>NAVER 뉴스 분류 — 데이터가 가른 92.83%<a href="#ch2" class="anchor-link">#</a></h2>
+  <p>0630엔 한국어 뉴스를 6개 카테고리(IT·스포츠·사회·경제·연예·정치)로 나누는 LSTM 분류기를 다뤘다. NSMC 감성 2분류(긍/부정) 코드에서 출발해, 마지막 Linear의 출력 차원을 2→6으로 늘리고 정확도 지표를 multiclass로 맞추면 뼈대는 그대로 넘어왔다. 임베딩 → LSTM(마지막 은닉상태) → 선형층이라는 구조는 v1부터 v9까지 한 번도 바뀌지 않았다. 바뀐 것은 데이터와 전처리였다.</p>
+  <p>여기서 첫 의문이 생겼다. 구조를 표준으로 맞추고 Optuna로 하이퍼파라미터까지 자동 탐색했는데, 초기 버전 정확도가 오히려 낮았다. 내장 샘플 150건으로 돌린 v1이 테스트 66.67%로 가장 높았고, 실제 뉴스를 크롤링해 넣기 시작한 v2·v3에서 30.77% → 25.0%로 떨어졌다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  왜 소표본 v1(66.67%)이 제일 높았나? 다중 클래스라 어려워진 건가, 아니면 데이터가 부족해 착시가 생긴 건가 — 진짜 레버는 모델인가 데이터인가?</div>
   <div class="terminal">
     <div class="terminal-header">NAVER_NEWS_LSTM_Classifier — 튜닝 버전별 정확도 (BBC 베이스라인 14.29%)</div>
-    <pre class="terminal-body">v1  66.67%   (소표본)      v5  41.67% (600건)     v6폴더 55.83% (1,800건)
-v7  58.06%                v8  53.89% (lr 회귀)    v9  92.83% (3,000건) ⭐
-KoELECTRA 파인튜닝 val_acc 최고 0.9618  |  형태소 적용·데이터 확대가 상승을 견인</pre>
+    <pre class="terminal-body">v1  66.67%  (샘플 150건)   v3  25.00% (120건)   v4  36.67% (300건)
+v5  41.67% (600건)         v6폴더 55.83% (1,800건·형태소)   v7  58.06%
+v8  53.89% (lr 낮춰 회귀)   v9  92.83% (3,000건) ⭐   557/600 정답
+KoELECTRA 파인튜닝 val_acc 최고 0.9618 (300건/카테고리로 LSTM 500건 넘김)</pre>
   </div>
+  <p>답은 데이터였다. v1의 샘플은 카테고리 경계가 깔끔했지만 실제 크롤링 헤드라인은 "연예인 스포츠 기사"처럼 경계가 흐렸고, v3은 120건 ÷ 6카테고리라 학습이 카테고리당 약 13건뿐이라 절대량이 부족했다. 구조를 손대지 않고 클래스당 100건 → 300건 → 500건으로 데이터만 키우자 41.67% → 55.83% → 92.83%로 올랐다. 보고서 기여도 정리로도 데이터 확대가 가장 큰 몫(3배 약 +14%p, 5배+재탐색 약 +34%p)이었고 Optuna 튜닝 자체는 +3~6%p였다.</p>
   <figure class="shot">
     <img src="../img/w10_naver_tuning.png" alt="NAVER 뉴스 분류 튜닝 버전별 정확도">
-    <figcaption>NAVER 뉴스 6분류 LSTM — 튜닝 버전별 정확도. 소표본 v1(66.67%)의 착시를 지나 데이터 3,000건·형태소 적용의 v9에서 92.83% (실측)</figcaption>
+    <figcaption>NAVER 뉴스 6분류 LSTM — 튜닝 버전별 정확도. 소표본 v1(66.67%)의 착시를 지나 데이터 3,000건·재탐색의 v9에서 92.83% (실측)</figcaption>
   </figure>
+  <p>데이터 다음 레버는 형태소와 조기종료였다. 공백으로 자르면 "뉴스가/뉴스를/뉴스는"이 전부 다른 토큰이 되어 사전이 낭비되므로, KoNLPy Okt로 형태소를 쪼갰다. 흥미로운 반전은 데이터가 부족한 v6폴더(1,800건)에선 Optuna가 형태소를 골랐지만, 충분한 v9(3,000건)에선 명사만으로도 안정적이라 형태소를 안 골랐다는 점이다. 조기종료 기준을 val_loss 최소에서 val_acc 최대로 바꾼 v7에선 +2.23%p가 올랐다. 반대로 v8에서 lr을 0.00465→0.001로 낮췄더니 스케줄러가 lr을 너무 빨리 감쇠시켜 오히려 58.06%→53.89%로 떨어졌다 — "lr은 낮을수록 안전"이 소규모 데이터에선 역효과였다.</p>
+  <div class="callout"><span class="label">함정</span>
+  가장 낮았던 v3에선 모델이 스포츠 하나로만 예측하는 클래스 붕괴(class collapse)가 관측됐다 — 스포츠 Recall 1.00, 나머지 5개 F1 0.00. 데이터가 너무 적고 lr이 높으면 쉬운 한 클래스로 전부 몰아버리는 게 손실을 낮추는 지름길이 되기 때문이다. 정확도 25%는 "분류를 포기한" 상태에 가까웠고, v4에서 lr 상한을 5e-3으로 제한하고 데이터를 늘리자 사라졌다.</div>
   <div class="keypoint"><span class="label">배운 점</span>
-  성능을 가른 건 모델 크기가 아니라 <strong>데이터 양과 형태소 분석</strong>이었다 — 600건 41.67%에서 3,000건 92.83%로. 한국어는 조사·어미가 많아 형태소 단위로 자를 때 분류가 뚜렷이 좋아졌다. 8·9주차의 "전처리·토큰 단위가 결과를 가른다"가 실전에서 재확인됐다.
+  성능을 가른 건 모델 크기가 아니라 데이터 양과 전처리였다. LSTM은 사전학습 지식이 없어 한국어 의미를 훈련 데이터에서 처음부터 배우므로, 클래스당 샘플이 부족하면 임베딩을 제대로 못 세운다. 8·9주차의 "전처리·토큰 단위가 결과를 가른다"가 실전에서 재확인됐고, 같은 데이터를 사전학습 문맥 임베딩(KoELECTRA)으로 넘기면 300건만으로 LSTM의 500건 수준을 넘어선다는 게 BERT 계열로 가는 이유가 됐다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0630_naver_classifier.html">NAVER 뉴스 분류기</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 분류를 넘어 "문장을 다른 문장으로 옮기는" 번역으로 갔다. 여기서 LSTM의 병목이 정면으로 드러난다.</div>
 </section>
 
 <section id="ch3">
   <h2 class="chap"><span class="num">CH 03</span>번역 모델 — 고정 벡터 병목과 어텐션<a href="#ch3" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>0701엔 기계번역의 진화를 훑었다 — 규칙·통계 기반(PBMT)에서 신경망(Seq2Seq)으로, 다시 어텐션으로. Seq2Seq는 인코더가 원문을 <strong>하나의 고정 길이 벡터</strong>로 압축해 디코더에 넘기는데, 문장이 길수록 이 벡터가 병목이 됐다.</p>
-  <div class="qbox"><span class="label">의문 → 해결</span>
-  왜 원문 전체를 한 벡터에 욱여넣나? 디코더가 단어를 낼 때마다 <strong>원문의 필요한 부분을 다시 골라 보면</strong> 되지 않나 — 이것이 어텐션(soft, 미분 가능한 '가중 보기')이었다.</div>
+  <p>0701엔 기계번역의 진화를 훑었다 — 규칙·통계 기반(PBMT)에서 신경망(Seq2Seq)으로, 다시 어텐션으로. PBMT는 문장을 구절 단위로 쪼개 통계 확률로 조립하는 방식이라, 구절별로 옳게 번역해도 이어 붙인 어순과 문맥이 어색해졌다. 그래서 다음 세대는 문장을 쪼개지 말고 통째로 이해하자는 Seq2Seq로 갔고, 인코더가 원문을 하나의 고정 길이 벡터(문맥 벡터)로 압축해 디코더에 넘겼다.</p>
+  <p>문제는 그 "하나의 고정 길이"였다. 5단어 문장도 512개 숫자, 100단어 만연체도 똑같이 512개 숫자에 담아야 한다면 긴 문장에서 정보가 넘쳐흘렀다. 여기서 핵심을 하나 배웠다 — 병목의 정체는 용량이 아니라 구조였다. 512차원이 부족해서가 아니라, "문장 길이와 무관하게 항상 벡터 하나로 요약을 강제한다"는 설계 자체가 병목이었다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  왜 원문 전체를 한 벡터에 욱여넣나? 디코더가 단어를 낼 때마다 원문의 필요한 부분을 다시 골라 보면 되지 않나 — 그런데 "골라 본다"를 어떻게 미분 가능하게 만들지?</div>
+  <p>그 답이 어텐션이었다. 인코더 모든 시점의 은닉 상태를 후보로 두고, 디코더가 매 출력 시점마다 스코어→softmax→가중합으로 그때 필요한 문맥 벡터를 새로 만든다. 하드 탐색(하나만 딱 고름)은 원-핫처럼 값이 뚝 끊겨 기울기가 0이라 못 배우지만, 소프트 탐색(0~1 연속 확률로 비중대로 훑기)은 표준 역전파로 학습된다. 그래서 "정렬(어디를 볼지)과 번역(무엇을 낼지)을 함께 학습"한다는 말이 성립했다 — 과거 통계 방식에서 사람이 따로 계산하던 정렬을, 어텐션 가중치 α로 모델이 스스로 정하고 그 α까지 최적화된다.</p>
+  <p>이 계보를 실습 프로젝트 <code>smart_translator</code>에서 손으로 확인했다. 문자 단위 Seq2Seq RNN으로 만들어 둔 한↔영 번역기를, CSV 144쌍에 <code>&lt;EN2KO&gt;</code>·<code>&lt;KO2EN&gt;</code> 방향 토큰을 붙여 288 방향쌍으로 확장하고 Transformer로 통째로 교체했다.</p>
   <div class="terminal">
     <div class="terminal-header">smart_translator_project — Seq2Seq RNN → Transformer 교체 후 검증</div>
     <pre class="terminal-body">학습 로그  Epoch[001/150] loss 4.7774 … Epoch[150/150] loss 0.0545
@@ -201,35 +213,46 @@ KoELECTRA 파인튜닝 val_acc 최고 0.9618  |  형태소 적용·데이터 확
 검증       exact-lookup 우선 288/288(1.0000) · 순수 생성 263/288(0.9132) · 판정 PASS</pre>
   </div>
   <div class="keypoint"><span class="label">배운 점</span>
-  어텐션은 "정렬(어디를 볼지)과 번역(무엇을 낼지)을 함께 학습"하는 장치였다. 8주차 IMDB에서 "마지막 시점 대신 전 구간 요약(mean+max)"을 골랐던 직관이, 번역에선 "매 시점 원문 전체를 가중 참조"로 확장된 것이다. 실제 번역기는 정확 일치는 조회로, 없으면 Transformer 생성으로 이원화했다.
+  8주차 IMDB에서 "마지막 시점 대신 전 구간 요약(mean+max pooling)"을 골라 64%→86%를 얻었던 직관이, 번역에선 "매 시점 원문 전체를 가중 참조"로 확장된 것이었다. 그리고 검증에서 하나 더 배웠다 — 순수 Transformer 생성은 91.32%에 그쳐 <code>see you tomorrrr…</code>처럼 반복하거나 철자를 흘렸는데(144쌍·greedy decoding의 한계), 앱은 CSV에 있으면 translation memory로 먼저 답하고 없을 때만 생성해 288/288을 안정화했다. 모델 성능과 제품 품질은 다른 문제였다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0701_translation_model.html">번역 모델 구조</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 어텐션이 그렇게 강하다면, 순환(RNN)은 아예 없애도 되지 않을까?</div>
 </section>
 
 <section id="ch4">
   <h2 class="chap"><span class="num">CH 04</span>트랜스포머 — 순환을 버리다<a href="#ch4" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>0702, "Attention Is All You Need". 제목 그대로 RNN·CNN을 없애고 <strong>self-attention</strong>만으로 문장을 처리한다. 모든 단어가 다른 모든 단어와 동시에 견주므로, RNN의 두 벽(장기 의존성·병렬화 불가)이 한 번에 풀렸다.</p>
+  <p>0702, "Attention Is All You Need". 초록의 한 문장 <em>"dispensing with recurrence and convolutions entirely"</em> — 순환과 합성곱을 완전히 없앤다 — 을 읽으며 처음엔 걸렸다. 그동안 biRNN이 하던 일이 뭐였는데 그걸 생략하겠다는 건가. 정리해 보니 biRNN이 하던 일은 결국 "이 단어 주변에 어떤 단어가 같이 쓰였나"를 정방향·역방향으로 훑어 양방향 문맥을 만드는 것이었고, 트랜스포머는 그걸 문장 안 모든 단어가 서로를 동시에 쳐다보는 self-attention으로 통째로 대체했다.</p>
+  <p>self-attention은 각 단어를 Query·Key·Value 세 역할로 복제해 <code>softmax(QKᵀ/√d_k)·V</code>로 계산한다. 여기서 RNN을 버려 얻은 두 이득이 나온다 — 병렬화와 장거리다. biRNN은 t−1이 끝나야 t를 계산하니 N단어면 N단계를 기다리지만, 트랜스포머는 N×N 어텐션 맵을 GPU가 한 번의 행렬 곱으로 동시에 계산한다. 첫 단어와 만 번째 단어의 관계도 거리 페널티 없이 한 스텝에 나온다. 이 둘은 사실 "모든 단어를 한 평면에 펼쳐 직접 관계를 매긴다"는 같은 구조의 두 얼굴이었다.</p>
   <div class="qbox"><span class="label">의문</span>
-  RNN을 정말 버려도 되나(dispensing with recurrence)? 그러면 <strong>순서 정보</strong>는 어떻게 주지? 왜 하필 sin/cos 위치 인코딩인가?</div>
+  RNN을 정말 버려도 되나(dispensing with recurrence)? 그러면 순서 정보는 어떻게 주지? 논문은 sin/cos 위치 인코딩을 쓰는데, 왜 하필 주기함수인가?</div>
   <div class="terminal">
     <div class="terminal-header">smart_translator_project/src/model.py · config.py — 실제 Transformer 구성</div>
     <pre class="terminal-body">TransformerTranslator: nn.Transformer(d_model=64, nhead=4, enc/dec 각 1층, dim_ff=128)
-d_k = 64/4 = 16 → 스케일 √d_k = 4  |  vocab 223 · max_seq_len 128 · 학습 위치임베딩
+d_k = 64/4 = 16 → 스케일 √d_k = 4  |  vocab 223 · max_seq_len 128 · 학습형 위치임베딩
 모델 크기 556,035 bytes · 최종 loss 0.0545 · 검증 PASS(char_transformer)</pre>
   </div>
+  <p>순서는 위치 인코딩으로 임베딩에 더한다. 논문은 sin/cos를 쓴다 — 유계(−1~1)라 값이 임베딩을 압도하지 않고, 삼각함수 덧셈정리로 상대 거리 규칙을 쉽게 배우며, 주기함수라 학습 때 안 본 길이도 외삽된다. 그런데 실습에서 논문과 갈렸다. 내 코드는 sin/cos가 아니라 <code>nn.Embedding(max_seq_len, d_model)</code>, 즉 학습형 위치 임베딩을 쓰고 있었다. 처음엔 틀린 줄 알았는데, 논문 3.5절이 두 방식을 실험으로 비교하고 "거의 동일한 성능"이라 적으면서도 외삽을 기대해 sin/cos를 택했다고 밝힌 대목을 보고 납득했다. 내 실습은 최대 문장 32자·<code>max_seq_len</code> 128로 길이가 유한하니 외삽이 필요 없어 구현이 간단한 학습형을 골랐을 뿐이다.</p>
+  <p>config를 논문 base와 나란히 놓으면 "같은 구조를 규모만 줄인 것"이 분명해진다 — <code>d_model</code> 64(논문 512), <code>nhead</code> 4(8), FFN 128(2,048), 층수 각 1(각 6). <code>d_model=64</code>를 <code>nhead=4</code>가 나눠 헤드당 <code>d_k=16</code>이 되고, softmax 안 <code>√d_k</code>는 √16=4다. 다섯 장의 개념(임베딩+위치·√d_model 스케일·멀티헤드·FFN·마스크)이 <code>model.py</code> 90여 줄에 거의 1:1로 앉았고, 라이브러리가 감춘 건 어텐션의 행렬 연산뿐, 차원·헤드·층수·위치 방식 같은 설계 결정은 전부 개념을 알아야 채우는 빈칸이었다.</p>
   <div class="keypoint"><span class="label">배운 점</span>
-  순서는 <strong>위치 인코딩</strong>으로 더한다 — 논문은 sin/cos을 쓰지만 실제 코드는 학습형 위치임베딩(<code>nn.Embedding</code>)을 썼다(짧은 길이라 외삽 불필요). self-attention은 병렬 학습과 장거리 직접 연결을 얻고, 멀티헤드는 한 문장을 여러 관점(대명사 해소·인과 등)으로 동시에 본다.
+  RNN을 버릴 수 있었던 건 self-attention이 biRNN의 양방향 문맥 파악을 거리와 무관한 한 번의 행렬 곱으로 대체했기 때문이고, 그 대가로 얻은 병렬화·장거리가 <strong>O(N²) 메모리</strong> 비용을 치르고도 남았기 때문이다(1,000단어면 100만 칸). 내 실습은 최대 32자라 32×32 어텐션 맵으로 이 대가가 드러나는 지점 아래에 머물렀다. "논문을 읽는다"와 "구조를 세운다" 사이의 거리가 생각보다 짧다는 걸, 288/288 검증까지 직접 굴려 확인했다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0702_transformer.html">트랜스포머</a>)</span></div>
-  <div class="bridge"><strong>다음으로</strong> — 이 트랜스포머를 아주 크게, 아주 많은 텍스트로 학습하면 무엇이 되나. LLM이다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 이 트랜스포머를 아주 크게, 아주 많은 텍스트로 사전학습하면 무엇이 되나. LLM이다.</div>
 </section>
 
 <section id="ch5">
   <h2 class="chap"><span class="num">CH 05</span>LLM의 시작 — 트랜스포머가 거대해지면<a href="#ch5" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>0703엔 교과목 3의 다음 단원, LLM으로 넘어갔다. LLM은 <strong>트랜스포머를 대규모로 사전학습</strong>한 언어 모델이고, 우리는 그것을 API(토큰·컨텍스트 윈도우·프롬프트)로 쓴다. 9주차에서 만난 "정적 임베딩의 한계 → 문맥마다 다른 동적 임베딩(BERT·GPT)"이 곧 이 LLM의 토대였다.</p>
+  <p>0703엔 교과목 3의 다음 단원, LLM으로 넘어갔다. 노트를 정리하다 계속 걸린 지점이 있었다 — 트랜스포머는 <code>Attention Is All You Need</code>에서 본 '구조'일 뿐인데, 그게 어떻게 번역·요약·질의응답을 한꺼번에 하는 '하나의 제품'이 됐나. 강의가 채워준 빈칸은 사전학습(Pre-training)과 스케일이었다. 인터넷 문서·책·코드에서 오직 "다음 토큰 맞추기"만 대규모로 반복하면 문장 구조·의미 관계·상식·코드 패턴까지 부수적으로 습득한다. GPT-3(1,750억 파라미터)가 준 메시지는 성능 수치가 아니라 "크기를 키우면 별도 세부 학습 없이 프롬프트만 바꿔 여러 작업을 한다"는 관찰이었다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  트랜스포머라는 '구조'와, 번역·요약을 다 하는 '능력' 사이에 뭐가 채워진 건가? 그리고 예전처럼 "작업마다 따로 학습"은 실제로 어떻게 하나?</div>
+  <p>그 "따로 학습"을 직접 돌려봤다. <code>Bert_sentiment_project</code>에서 사전학습 백본(KoELECTRA) 위에 분류 헤드를 얹어 NSMC 감성분석을 파인튜닝했다. 핵심은 <code>requires_grad</code>로 어느 층을 얼리고 학습시킬지 정하는 동결 전략이었다.</p>
+  <div class="terminal">
+    <div class="terminal-header">Bert_sentiment_project — KoELECTRA 동결 전략별 실측 (NSMC)</div>
+    <pre class="terminal-body">전략3(부분학습) 학습가능 7.68M/112.9M(6.8%)  test acc 0.7558  f1 0.7588  샘플 3/6
+전략0(풀 파인튜닝) 학습가능 112.9M(100%)       test acc 0.8713  f1 0.8683  샘플 6/6
+독립 표본 NSMC 공식 테스트 5,000개 → 0.843  |  공개 사전학습 모델 동일셋 0.900</pre>
+  </div>
+  <p>부분학습(6.8%만)은 빠른 대신 백본이 얼어붙어 과소적합돼 일반 문장에서 '긍정'으로 치우쳤다(6개 중 3개). 백본 전체를 푼 전략 0에서 75.6%→87.1%로 오르고 편향도 사라졌다. 무엇을 얼리고 무엇을 학습시키느냐가 곧 성능·시간의 trade-off라는 걸 표가 아니라 내 로그로 봤다. 그리고 이 파인튜닝이 채워준 빈칸이 컸다 — 트랜스포머(구조) → 사전학습 백본(BERT/GPT) → 분류 헤드 붙여 미세조정 → 특화 제품(감성분석기). 여기에 "작업마다 따로"가 아니라 "하나로 프롬프트만 바꿔"가 붙으면 LLM이 된다. GPT는 같은 전이학습 사고를 사전학습 규모로 대체했을 뿐이다.</p>
   <div class="keypoint"><span class="label">배운 점</span>
-  트랜스포머 → 대규모 사전학습 → LLM으로 이어지는 흐름이 한 줄로 꿰였다. 앞으로는 모델을 <em>만드는</em> 쪽보다 <strong>잘 쓰는</strong> 쪽(프롬프트·파라미터·RAG)이 과제가 된다.
+  9주차의 "정적 임베딩의 한계 → 문맥마다 다른 동적 임베딩(BERT·GPT)"이 곧 LLM의 토대였고, 파인튜닝(가중치를 바꿔 새 작업)과 In-context Learning(가중치 고정, 프롬프트 예시로 few-shot)이 같은 목표의 두 방법이라는 게 하나로 꿰였다. 앞으로는 모델을 만드는 쪽보다 잘 쓰는 쪽(프롬프트·파라미터·토큰/컨텍스트·RAG)이 과제가 된다. API는 키가 없어 개념으로 다뤘지만, 토큰이 곧 컨텍스트이자 비용이라는 그림까지 잡았다.
   <span style="color:#667085;">(자세히: <a href="../llm/day0703_llm_intro.html">LLM 개념과 API</a>)</span></div>
   <div class="bridge"><strong>그래서</strong> — 10주차는 "순서를 차례로 읽던" 시대의 끝이자, "전부 동시에 보고, 거대하게 사전학습하는" 시대의 시작이었다.</div>
 </section>
@@ -238,25 +261,27 @@ d_k = 64/4 = 16 → 스케일 √d_k = 4  |  vocab 223 · max_seq_len 128 · 학
   <h2 class="chap"><span class="num">CH 06</span>종합 회고<a href="#ch6" class="anchor-link">#</a></h2>
   <h3 class="step">잘한 점 / 부족했던 점 / 다음 한 수</h3>
   <ul>
-    <li><strong>잘한 점</strong> — RNN→어텐션→트랜스포머→LLM의 <em>왜</em>를 논문 노트의 의문(고정 벡터 병목·soft attention·RNN 폐기·위치 인코딩)으로 사슬처럼 꿰었다.</li>
-    <li><strong>부족했던 점</strong> — 이번 주는 코드가 아직 정리되지 않아(git 미반영) 실측 로그가 얕다. 개념 이해는 채웠지만 직접 구현·측정은 다음 과제로 남았다.</li>
-    <li><strong>다음 한 수</strong> — 트랜스포머를 작은 데이터로 직접 학습해 어텐션 가중치를 시각화하고, LLM API로 프롬프트·파라미터(temperature·top-p)를 실측한다.</li>
+    <li><strong>잘한 점</strong> — RNN→어텐션→트랜스포머→LLM의 <em>왜</em>를 개념으로만 읽지 않고, NAVER 분류(92.83%)·번역기(288/288)·BERT 파인튜닝(75.6→87.1%) 세 프로젝트의 실측 로그로 뒷받침했다.</li>
+    <li><strong>부족했던 점</strong> — 트랜스포머는 <code>nn.Transformer</code>로 조립만 했고 어텐션 행렬 연산을 직접 짜 본 건 아니라, 어텐션 가중치를 눈으로 확인하는 시각화까지는 못 갔다.</li>
+    <li><strong>다음 한 수</strong> — 작은 데이터로 트랜스포머를 직접 학습해 어텐션 맵을 시각화하고, LLM API로 프롬프트·파라미터(temperature·top-p)를 실측한다. 번역기의 순수 생성 91%는 beam search·subword 토큰화로 밀어 올려 본다.</li>
   </ul>
   <div class="keypoint"><span class="label">관통 교훈</span>
   <ol>
-    <li><strong>병목이 다음 구조를 부른다.</strong> Seq2Seq 고정 벡터 병목 → 어텐션, RNN의 순차성 → 트랜스포머.</li>
-    <li><strong>"순서를 어떻게 다루나"가 핵심.</strong> 차례로 읽기(RNN) → 전부 동시에 보기(self-attention) + 위치 인코딩으로 순서 주입.</li>
-    <li><strong>트랜스포머 = LLM의 토대.</strong> 크게·많이 사전학습하면 문맥을 담는 동적 표현이 되고, 그게 LLM이다.</li>
+    <li><strong>병목이 다음 구조를 부른다.</strong> Seq2Seq 고정 벡터 병목 → 어텐션, RNN의 순차성 → 트랜스포머. 각 세대는 앞 세대가 무너지던 지점을 겨냥해 등장했다.</li>
+    <li>"순서를 어떻게 다루나"가 핵심이었다. 차례로 읽기(RNN) → 전부 동시에 보기(self-attention) + 위치 인코딩으로 순서 주입. 그 대가가 O(N²) 메모리였다.</li>
+    <li>실전에서 성능을 가른 건 모델이 아니라 데이터·전처리였다(NAVER 41.67→92.83%). 그리고 모델 성능(생성 91%)과 제품 품질(lookup 100%)은 별개 문제였다.</li>
+    <li>트랜스포머 = LLM의 토대. 크게·많이 사전학습하면 프롬프트만 바꿔 여러 작업을 하는 LLM이 되고, 파인튜닝과 few-shot은 같은 목표의 두 방법이다.</li>
   </ol>
   </div>
 
   <div class="ref-chain">
     <p class="ref-title">📚 근거 출처</p>
     <ol>
+      <li>실습 코드·튜닝 보고서 — <code>llm_workspace/NAVER_NEWS_LSTM_Classifier</code> (reports/tuning_v1~v8)</li>
+      <li>실습 코드·검증 보고서 — <code>llm_workspace/smart_translator_project</code> (src/model.py · transformer_validation_report)</li>
+      <li>실습 코드 — <code>llm_workspace/Bert_sentiment_project</code> (KoELECTRA 동결 전략별 NSMC 파인튜닝)</li>
       <li>강의 PDF — 자연어처리_텍스트분류 · 자연어처리_번역모델 · 자연어처리_트랜스포머 · LLM개념_API</li>
-      <li>실습 코드 — <code>llm_workspace/nlp_model_project</code> (NSMC/뉴스 LSTM 분류)</li>
-      <li>발행글 — devroro <code>/label/llm</code> (NAVER 분류·번역·트랜스포머)</li>
-      <li>공식 문서 — Bahdanau(어텐션) · Vaswani "Attention Is All You Need"(트랜스포머)</li>
+      <li>공식 문서·논문 — Bahdanau(어텐션) · Vaswani "Attention Is All You Need" · HuggingFace transformers</li>
     </ol>
   </div>
 </section>
@@ -265,7 +290,7 @@ d_k = 64/4 = 16 → 스케일 √d_k = 4  |  vocab 223 · max_seq_len 128 · 학
 
 <footer>
   <p><strong>SK 네트웍스 AI Family 32기</strong> · 10주차 회고 (2026-06-29 ~ 07-03)</p>
-  <p>텍스트 분류에서 번역·트랜스포머·LLM까지 — 순서를 다루는 방식의 진화를 논문 노트의 의문으로 따라갔다. 코드가 정리되면 실측을 보강한다.</p>
+  <p>텍스트 분류에서 번역·트랜스포머·LLM까지 — 순서를 다루는 방식의 진화를, 세 프로젝트의 실측 로그(92.83% · 288/288 · 75.6→87.1%)로 따라간 한 주였다.</p>
 </footer>
 
 </div>
