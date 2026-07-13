@@ -145,7 +145,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
   <section id="ch1">
     <h2 class="chap"><span class="num">CH 01</span>LLM이란 무엇인가<a href="#ch1" class="anchor-link">#</a></h2>
 
-    <p>LLM은 Large Language Model, 대규모 언어 모델이다. 강의는 그 상징으로 2020년 공개된 <strong>GPT-3</strong>를 든다. 1,750억 개 파라미터를 가진 자기회귀(auto-regressive) 언어 모델로, 여기서 자기회귀란 앞의 토큰들을 보고 <strong>다음 토큰을 예측</strong>하는 방식을 뜻한다. 지난 언어 모델 글에서 LSTM이 다음 단어를 확률로 맞추던 그 원리가, 트랜스포머 위에서 압도적 규모로 반복된 것이다.</p>
+    <p>LLM은 Large Language Model, 대규모 언어 모델이다. 강의는 그 상징으로 2020년 공개된 <strong>GPT-3</strong>를 든다. 1,750억 개 파라미터를 가진 자기회귀(auto-regressive) 언어 모델로, 여기서 자기회귀란 앞의 토큰들을 보고 <strong>다음 토큰을 예측</strong>하는 방식을 뜻한다. 지난 언어 모델 글에서 LSTM이 다음 단어를 확률로 맞추던 그 원리가, 트랜스포머 위에서 대규모로 반복된 것이다.</p>
 
     <div class="qbox">
       <p><span class="label">의문</span>노트를 정리하며 막혔던 질문. 트랜스포머는 <code>Attention Is All You Need</code>에서 본 '아키텍처'인데, 그 구조 자체가 어떻게 질문답변·번역·요약을 다 하는 하나의 모델이 되나? 구조와 능력 사이에 뭐가 채워진 건가.</p>
@@ -244,7 +244,7 @@ for name, param in backbone_params:              # classifier는 항상 학습
 
     <p>GPT 계열은 글쓰기·답변·코드작성·요약·번역·챗봇처럼 <strong>생성형</strong> 작업에, BERT 계열은 문장분류·감성분석·개체명 인식·유사도·검색 랭킹처럼 <strong>이해 기반</strong> 작업에 강하다. 즉 지난 임베딩 글에서 짚은 "고정 임베딩 → 문맥 임베딩(BERT/GPT)"의 두 갈래가, 그대로 오늘의 두 모델 계열로 이어진다. 방금 CH02에서 이해 계열 하나를 직접 파인튜닝한 셈이다.</p>
 
-    <p>그런데 여기서 결정적으로 궁금했던 건, CH02에서 한 <strong>파인튜닝</strong>과의 관계였다. 작업마다 모델을 그렇게 다시 학습시키지 않는다면, 실제로는 어떻게 원하는 작업을 시키는가?</p>
+    <p>그런데 여기서 특히 궁금했던 건, CH02에서 한 <strong>파인튜닝</strong>과의 관계였다. 작업마다 모델을 그렇게 다시 학습시키지 않는다면, 실제로는 어떻게 원하는 작업을 시키는가?</p>
 
     <div class="callout">
       <p><span class="label">정리</span><strong>In-context Learning</strong>이 그 답이다. 모델을 다시 학습(파인튜닝)시키지 않고, <strong>프롬프트 안에 설명이나 예시를 넣어</strong> 원하는 작업을 시키는 방식이다. 예컨대 "다음 문장의 감성을 긍정/부정으로 분류하라"는 지시에 예시 문장 두어 개를 붙이면, 모델은 그 패턴을 보고 마지막 문장의 답을 생성한다. CH02에서는 감성분석기를 만들려고 데이터셋을 모아 25분을 학습시켰지만, 충분히 큰 LLM은 <strong>같은 분류를 프롬프트 예시 몇 줄로</strong> 해낸다. 별도 학습 데이터셋도, 재학습도 필요 없다 — 사전학습으로 얻은 범용 능력을 프롬프트로 '지시'만 하는 것이다.</p>

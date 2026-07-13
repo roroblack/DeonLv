@@ -176,7 +176,7 @@ val_ratio        = 0.2        # 학습 데이터의 20%를 검증으로 분리</
 </tbody></table>
 <p>여기에 이번 프로젝트는 <strong>Optuna 베이지안 탐색</strong>을 얹었다. embed_dim·hidden_dim·num_layers·bidirectional·dropout·learning_rate·batch_size 같은 하이퍼파라미터를 사람이 손으로 고르지 않고, MedianPruner로 못한 trial은 조기 중단하며 val_acc가 가장 높은 조합을 자동으로 찾는다. v2부터는 전처리 파라미터(max_vocab·max_len)와 옵티마이저(Adam/AdamW·weight_decay)까지 탐색 공간에 넣었다.</p>
 <div class="qbox"><span class="label">의문</span>구조를 표준으로 맞추고 하이퍼파라미터까지 자동 탐색했는데, 초기 버전 정확도는 왜 오히려 낮게 나오는가? 다중 클래스라 어려워진 것인가, 아니면 다른 데서 새는 것인가?</div>
-<h3 class="step">관찰 → v1이 오히려 제일 높았다는 역설</h3>
+<h3 class="step">관찰 → v1이 오히려 제일 높았다는 의외의 결과</h3>
 <p>보고서에 남은 실측치가 흥미롭다. 내장 샘플 150건으로 돌린 <strong>v1이 테스트 66.67%</strong>로 가장 높았고, 실제 네이버 뉴스를 크롤링해 넣기 시작한 v2·v3에서 오히려 <strong>30.77% → 25.0%</strong>로 떨어졌다.</p>
 <div class="terminal"><div class="terminal-header">reports/tuning_v1~v3.md — 초기 버전 테스트 정확도</div><pre class="terminal-body">v1  SAMPLE_DATA 150건(25/카테고리)   best val 0.7500   test 66.67%
 v2  크롤링 일부 + 샘플 130건          best val 0.6000   test 30.77%
@@ -201,7 +201,7 @@ v3  크롤링 120건(20/카테고리)         best val 0.4737   test 25.00%  ←
 <tr><td>v8폴더</td><td>1,800건</td><td>형태소</td><td>lr 낮춤(역효과)</td><td>0.6076</td><td>53.89%</td></tr>
 <tr><td><strong>v9폴더</strong></td><td><strong>3,000건(500/카)</strong></td><td>명사</td><td>데이터 5배 + 40 trials 재탐색</td><td>0.9625</td><td><strong>92.83%</strong></td></tr>
 </tbody></table>
-<p>흐름은 분명하다. 아키텍처를 손대지 않고 <strong>클래스당 100건 → 300건 → 500건</strong>으로 데이터를 키우자 테스트 정확도가 <strong>41.67% → 55.83% → 92.83%</strong>로 올랐다. 보고서의 기여도 정리에 따르면 데이터 3배 확대가 약 +14%p, 데이터 5배 확대 + 재탐색이 약 +34%p로 가장 큰 몫을 차지했다. Optuna 튜닝 자체의 기여는 +3~6%p 수준으로, 데이터 레버가 압도적이었다.</p>
+<p>흐름은 분명하다. 아키텍처를 손대지 않고 <strong>클래스당 100건 → 300건 → 500건</strong>으로 데이터를 키우자 테스트 정확도가 <strong>41.67% → 55.83% → 92.83%</strong>로 올랐다. 보고서의 기여도 정리에 따르면 데이터 3배 확대가 약 +14%p, 데이터 5배 확대 + 재탐색이 약 +34%p로 가장 큰 몫을 차지했다. Optuna 튜닝 자체의 기여는 +3~6%p 수준으로, 데이터 레버가 가장 컸다.</p>
 <div class="terminal"><div class="terminal-header">reports/tuning_v6.md — v9(3,000건) 최종 분류 리포트</div><pre class="terminal-body">카테고리   Precision  Recall   F1
 IT          0.99      1.00    0.995
 경제        1.00      0.82    0.901

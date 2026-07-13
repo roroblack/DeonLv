@@ -172,7 +172,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
     <p>진화 과정으로 보면 어텐션과 biRNN의 관계가 분명해진다. <strong>1단계</strong> 초기 Seq2Seq는 어텐션 없이 RNN이 문장을 고정 벡터 하나로 압축했고, 문장이 길어지면 번역 품질이 처참했다. <strong>2단계</strong>는 "RNN이 앞을 자꾸 까먹으니 원문을 다시 기웃거리게 하자"며 <strong>biRNN 뼈대 위에 어텐션을 보조 장치로</strong> 얹은 과도기다. 품질은 올랐지만 "한 단어씩 순서대로 계산"하는 하드웨어 병목은 그대로였다.</p>
 
     <div class="keypoint">
-      <p><span class="label">배운 점</span><strong>3단계가 트랜스포머다.</strong> 보조 장치였던 어텐션의 성능이 압도적이다 보니, 주객을 뒤집었다 — "쓸모가 다한 환자(biRNN)는 퇴원시키고, 치료제(어텐션)만으로 병원을 차리자." biRNN이 하던 양방향 문맥 파악을, 문장 안 모든 단어가 서로를 <strong>동시에</strong> 쳐다보는 <strong>셀프 어텐션</strong>이 통째로 대체한다. 여기서 한 가지 오해도 교정됐다 — 이건 전처리(토큰화·임베딩)를 바꾼 게 아니라, 그 뒤 <strong>모델 본체(두뇌)의 핵심 연산</strong>에서 RNN을 퇴출한 것이다. 뒤에서 볼 내 번역기가 딱 이 3단계를 그대로 코드화한 것으로, 이전 과제의 Seq2Seq RNN을 걷어내고 <code>nn.Transformer</code>로 통째로 갈아끼운 결과다.</p>
+      <p><span class="label">배운 점</span><strong>3단계가 트랜스포머다.</strong> 보조 장치였던 어텐션의 성능이 두드러지다 보니 주객이 바뀌었다 — "보조 장치였던 어텐션만으로 모델 본체를 구성한 것이다." biRNN이 하던 양방향 문맥 파악을, 문장 안 모든 단어가 서로를 <strong>동시에</strong> 쳐다보는 <strong>셀프 어텐션</strong>이 통째로 대체한다. 여기서 한 가지 오해도 교정됐다 — 이건 전처리(토큰화·임베딩)를 바꾼 게 아니라, 그 뒤 <strong>모델 본체(두뇌)의 핵심 연산</strong>에서 RNN을 퇴출한 것이다. 뒤에서 볼 내 번역기가 딱 이 3단계를 그대로 코드화한 것으로, 이전 과제의 Seq2Seq RNN을 걷어내고 <code>nn.Transformer</code>로 통째로 갈아끼운 결과다.</p>
     </div>
   </section>
 
@@ -265,7 +265,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
         <tr><th>성질</th><th>내용</th><th>얻는 것</th></tr>
       </thead>
       <tbody>
-        <tr><td>유계성 (−1~1)</td><td>몇 번째 단어든 출력이 −1~1로 유지</td><td>값 폭발 없이 임베딩 의미를 안 해침</td></tr>
+        <tr><td>유계성 (−1~1)</td><td>몇 번째 단어든 출력이 −1~1로 유지</td><td>값이 과도하게 커지지 않고 임베딩 의미를 안 해침</td></tr>
         <tr><td>선형 상대거리</td><td>삼각함수 덧셈정리로, <code>pos+k</code>의 값이 <code>pos</code> 값에 회전행렬을 곱한 선형 결합으로 표현됨</td><td>모델이 "상대 거리 k"의 규칙을 거리와 무관하게 쉽게 학습</td></tr>
         <tr><td>외삽 (Extrapolation)</td><td>주기함수는 무한히 이어짐</td><td>학습 때 안 본 501·1,000번째 위치도 즉석에서 에러 없이 계산</td></tr>
       </tbody>
@@ -371,7 +371,7 @@ def forward(self, source, decoder_input):
       <p><span class="label">의문</span>모든 단어를 한 판에 펼쳐 관계를 다 계산한다면, 문장이 길어질수록 용량 부하가 감당 못 하게 커지는 것 아닌가?</p>
     </div>
 
-    <p>정확한 지적이다. 이게 어텐션의 <strong>O(N²) 메모리 복잡도</strong>다. 4단어면 4×4=16칸이지만, 1,000단어면 100만 칸, 10,000단어면 1억 칸이 필요하다. RNN/CNN이 문장 길이와 무관하게 거의 일정한 메모리를 쓰는 것과 정반대다. 토큰 수가 10배면 판넬은 100배로 급증해 OOM(메모리 부족)이 난다. 트랜스포머는 <strong>"연산 단계(시간)를 줄이는 대신 거대한 행렬을 유지할 공간(메모리)을 대거 희생한 모델"</strong>인 셈이다. (실무에선 HBM 같은 고대역폭 메모리, FlashAttention처럼 행렬을 블록으로 쪼개 계산하는 기법, Sparse/Linear Attention 등으로 이 부하를 눌러왔다.) 내 실습이 O(N²)에 안 데인 건 순전히 규모 덕이다 — 최대 문장 길이가 32자라 어텐션 맵이 커봐야 32×32뿐이라, 이 대가가 드러날 지점 아래에서 놀았다.</p>
+    <p>정확한 지적이다. 이게 어텐션의 <strong>O(N²) 메모리 복잡도</strong>다. 4단어면 4×4=16칸이지만, 1,000단어면 100만 칸, 10,000단어면 1억 칸이 필요하다. RNN/CNN이 문장 길이와 무관하게 거의 일정한 메모리를 쓰는 것과 정반대다. 토큰 수가 10배면 판넬은 100배로 늘어 OOM(메모리 부족)이 난다. 트랜스포머는 <strong>"연산 단계(시간)를 줄이는 대신 거대한 행렬을 유지할 공간(메모리)을 대거 희생한 모델"</strong>인 셈이다. (실무에선 HBM 같은 고대역폭 메모리, FlashAttention처럼 행렬을 블록으로 쪼개 계산하는 기법, Sparse/Linear Attention 등으로 이 부하를 눌러왔다.) 내 실습이 O(N²) 부하를 겪지 않은 건 규모 덕이다 — 최대 문장 길이가 32자라 어텐션 맵이 커봐야 32×32뿐이라, 이 대가가 드러나는 지점 아래에 머물렀다.</p>
 
     <p>전체 골격을 정리해 두면, 트랜스포머는 <strong>인코더 스택</strong>과 <strong>디코더 스택</strong>으로 나뉜다. 인코더 블록은 <code>[Multi-Head Attention] → [FFN]</code>으로 문장 전체 관계를 한 번에 계산한다. 디코더 블록은 미래 단어를 가리는 <strong>Masked Multi-Head Attention</strong>(CH 06의 future mask)과, 인코더의 정보를 받아오는 인코더-디코더 어텐션으로 이원화된다. 순환 구조가 사라진 자리에서 층을 깊게 쌓게 해주는 게 <strong>잔차 연결(Residual)</strong>과 <strong>Add &amp; Norm</strong>이고, 이 덕에 논문 기본 모델은 각 N=6층을 안정적으로 적층했다.</p>
 
