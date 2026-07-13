@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로</title>
-  <meta name="description" content="텍스트 분류·번역·트랜스포머·LLM 시작 — 순서를 차례로 읽기에서 전부 동시에 보기로.">
+  <meta name="description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
   <meta property="og:title" content="10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로">
-  <meta property="og:description" content="텍스트 분류·번역·트랜스포머·LLM 시작 — 순서를 차례로 읽기에서 전부 동시에 보기로.">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="10주차 회고 — 번역에서 트랜스포머, 그리고 LLM으로">
-  <meta name="twitter:description" content="텍스트 분류·번역·트랜스포머·LLM 시작 — 순서를 차례로 읽기에서 전부 동시에 보기로.">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 10주차 회고. NAVER 분류(92.83%)·번역(288/288·loss 0.0545)·트랜스포머(실제 구성)·LLM 시작.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
@@ -172,8 +172,18 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
   <h2 class="chap"><span class="num">CH 02</span>NAVER 뉴스 분류 — 텍스트 분류 실전<a href="#ch2" class="anchor-link">#</a></h2>
   <h3 class="step">회수</h3>
   <p>0630엔 한국어 뉴스를 카테고리(IT·스포츠·사회·경제·연예·정치)로 나누는 LSTM 분류기를 다뤘다. IMDB 감성 2분류(긍/부정)에서 출발한 코드를, 출력 차원을 늘리고 지표 타입을 맞춰 다중 분류로 확장했다.</p>
+  <div class="terminal">
+    <div class="terminal-header">NAVER_NEWS_LSTM_Classifier — 튜닝 버전별 정확도 (BBC 베이스라인 14.29%)</div>
+    <pre class="terminal-body">v1  66.67%   (소표본)      v5  41.67% (600건)     v6폴더 55.83% (1,800건)
+v7  58.06%                v8  53.89% (lr 회귀)    v9  92.83% (3,000건) ⭐
+KoELECTRA 파인튜닝 val_acc 최고 0.9618  |  형태소 적용·데이터 확대가 상승을 견인</pre>
+  </div>
+  <figure class="shot">
+    <img src="../img/w10_naver_tuning.png" alt="NAVER 뉴스 분류 튜닝 버전별 정확도">
+    <figcaption>NAVER 뉴스 6분류 LSTM — 튜닝 버전별 정확도. 소표본 v1(66.67%)의 착시를 지나 데이터 3,000건·형태소 적용의 v9에서 92.83% (실측)</figcaption>
+  </figure>
   <div class="keypoint"><span class="label">배운 점</span>
-  성능을 가른 건 모델 크기가 아니라 <strong>데이터 양과 형태소 분석</strong>이었다 — 한국어는 조사·어미가 많아 형태소 단위로 자를 때 분류가 뚜렷이 좋아졌다. 8주차·9주차의 "전처리·토큰 단위가 결과를 가른다"가 실전에서 재확인됐다.
+  성능을 가른 건 모델 크기가 아니라 <strong>데이터 양과 형태소 분석</strong>이었다 — 600건 41.67%에서 3,000건 92.83%로. 한국어는 조사·어미가 많아 형태소 단위로 자를 때 분류가 뚜렷이 좋아졌다. 8·9주차의 "전처리·토큰 단위가 결과를 가른다"가 실전에서 재확인됐다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0630_naver_classifier.html">NAVER 뉴스 분류기</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 분류를 넘어 "문장을 다른 문장으로 옮기는" 번역으로 갔다. 여기서 LSTM의 병목이 정면으로 드러난다.</div>
 </section>
@@ -184,8 +194,14 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
   <p>0701엔 기계번역의 진화를 훑었다 — 규칙·통계 기반(PBMT)에서 신경망(Seq2Seq)으로, 다시 어텐션으로. Seq2Seq는 인코더가 원문을 <strong>하나의 고정 길이 벡터</strong>로 압축해 디코더에 넘기는데, 문장이 길수록 이 벡터가 병목이 됐다.</p>
   <div class="qbox"><span class="label">의문 → 해결</span>
   왜 원문 전체를 한 벡터에 욱여넣나? 디코더가 단어를 낼 때마다 <strong>원문의 필요한 부분을 다시 골라 보면</strong> 되지 않나 — 이것이 어텐션(soft, 미분 가능한 '가중 보기')이었다.</div>
+  <div class="terminal">
+    <div class="terminal-header">smart_translator_project — Seq2Seq RNN → Transformer 교체 후 검증</div>
+    <pre class="terminal-body">학습 로그  Epoch[001/150] loss 4.7774 … Epoch[150/150] loss 0.0545
+데이터     CSV 144쌍 → &lt;EN2KO&gt;/&lt;KO2EN&gt; 방향토큰 288 방향쌍
+검증       exact-lookup 우선 288/288(1.0000) · 순수 생성 263/288(0.9132) · 판정 PASS</pre>
+  </div>
   <div class="keypoint"><span class="label">배운 점</span>
-  어텐션은 "정렬(어디를 볼지)과 번역(무엇을 낼지)을 함께 학습"하는 장치였다. 8주차 IMDB에서 "마지막 시점 대신 전 구간 요약(mean+max)"을 골랐던 직관이, 번역에선 "매 시점 원문 전체를 가중 참조"로 확장된 것이다.
+  어텐션은 "정렬(어디를 볼지)과 번역(무엇을 낼지)을 함께 학습"하는 장치였다. 8주차 IMDB에서 "마지막 시점 대신 전 구간 요약(mean+max)"을 골랐던 직관이, 번역에선 "매 시점 원문 전체를 가중 참조"로 확장된 것이다. 실제 번역기는 정확 일치는 조회로, 없으면 Transformer 생성으로 이원화했다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0701_translation_model.html">번역 모델 구조</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 어텐션이 그렇게 강하다면, 순환(RNN)은 아예 없애도 되지 않을까?</div>
 </section>
@@ -196,8 +212,14 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
   <p>0702, "Attention Is All You Need". 제목 그대로 RNN·CNN을 없애고 <strong>self-attention</strong>만으로 문장을 처리한다. 모든 단어가 다른 모든 단어와 동시에 견주므로, RNN의 두 벽(장기 의존성·병렬화 불가)이 한 번에 풀렸다.</p>
   <div class="qbox"><span class="label">의문</span>
   RNN을 정말 버려도 되나(dispensing with recurrence)? 그러면 <strong>순서 정보</strong>는 어떻게 주지? 왜 하필 sin/cos 위치 인코딩인가?</div>
+  <div class="terminal">
+    <div class="terminal-header">smart_translator_project/src/model.py · config.py — 실제 Transformer 구성</div>
+    <pre class="terminal-body">TransformerTranslator: nn.Transformer(d_model=64, nhead=4, enc/dec 각 1층, dim_ff=128)
+d_k = 64/4 = 16 → 스케일 √d_k = 4  |  vocab 223 · max_seq_len 128 · 학습 위치임베딩
+모델 크기 556,035 bytes · 최종 loss 0.0545 · 검증 PASS(char_transformer)</pre>
+  </div>
   <div class="keypoint"><span class="label">배운 점</span>
-  순서는 <strong>위치 인코딩</strong>으로 더한다 — 주기함수(sin/cos)라야 <em>상대 거리</em>가 선형으로 표현되고 학습보다 긴 문장으로도 외삽된다. self-attention은 병렬 학습과 장거리 직접 연결을 얻고, 멀티헤드는 한 문장을 여러 관점(대명사 해소·인과 등)으로 동시에 본다.
+  순서는 <strong>위치 인코딩</strong>으로 더한다 — 논문은 sin/cos을 쓰지만 실제 코드는 학습형 위치임베딩(<code>nn.Embedding</code>)을 썼다(짧은 길이라 외삽 불필요). self-attention은 병렬 학습과 장거리 직접 연결을 얻고, 멀티헤드는 한 문장을 여러 관점(대명사 해소·인과 등)으로 동시에 본다.
   <span style="color:#667085;">(자세히: <a href="../nlp/day0702_transformer.html">트랜스포머</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 이 트랜스포머를 아주 크게, 아주 많은 텍스트로 학습하면 무엇이 되나. LLM이다.</div>
 </section>

@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>6월 월간 회고 — 표 데이터에서 신경망으로, 다시 텍스트로</title>
-  <meta name="description" content="머신러닝 마무리·딥러닝·자연어처리·팀프로젝트2를 관통한 사슬 — 모델보다 문제를 어떻게 세우느냐.">
+  <meta name="description" content="SK 네트웍스 AI Family 32기 6월 월간 회고. 머신러닝·딥러닝·자연어처리·팀프로젝트2를 관통한 실측 사슬 — pooling 86.16%·라벨 LSTM 0.930·FastText 0.9527.">
   <meta property="og:title" content="6월 월간 회고 — 표 데이터에서 신경망으로, 다시 텍스트로">
-  <meta property="og:description" content="머신러닝 마무리·딥러닝·자연어처리·팀프로젝트2를 관통한 사슬 — 모델보다 문제를 어떻게 세우느냐.">
+  <meta property="og:description" content="SK 네트웍스 AI Family 32기 6월 월간 회고. 머신러닝·딥러닝·자연어처리·팀프로젝트2를 관통한 실측 사슬 — pooling 86.16%·라벨 LSTM 0.930·FastText 0.9527.">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="6월 월간 회고 — 표 데이터에서 신경망으로, 다시 텍스트로">
-  <meta name="twitter:description" content="머신러닝 마무리·딥러닝·자연어처리·팀프로젝트2를 관통한 사슬 — 모델보다 문제를 어떻게 세우느냐.">
+  <meta name="twitter:description" content="SK 네트웍스 AI Family 32기 6월 월간 회고. 머신러닝·딥러닝·자연어처리·팀프로젝트2를 관통한 실측 사슬 — pooling 86.16%·라벨 LSTM 0.930·FastText 0.9527.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
@@ -130,9 +130,9 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 <header class="cover">
   <p class="eyebrow">Python · 6월 월간 회고 · 부트캠프</p>
   <h1>6월의 기록 — 표 데이터에서 신경망으로, 다시 텍스트로</h1>
-  <p class="deck">4~5월(월간 m1)이 파이썬·데이터베이스·데이터 분석·머신러닝의 입구였다면, 6월은 <strong>모델을 직접 쌓고, "잘 됐다"를 무엇으로 믿을지</strong>를 배운 달이다.
-  머신러닝을 닫고(0601~0605) → 딥러닝 두 주(0608~0619) → 자연어처리(0624~0626)로 넘어갔고, 그 사이 팀 프로젝트2(이탈 예측, 0618~0623)로 실전 검증까지 했다.
-  한 줄로 6월을 요약하면 — <strong>"모델을 바꾸는 것보다, 문제(라벨·손실·평가)를 어떻게 세우느냐가 결과를 정한다."</strong> 각 주의 실측은 주간 회고에 있고, 여기선 한 달을 관통한 사슬만 회수한다.</p>
+  <p class="deck">4~5월(월간 m1)이 파이썬·DB·데이터 분석·머신러닝 입문의 입구였다면, 6월은 <strong>모델을 직접 쌓고, "잘 학습됐다"를 무엇으로 믿을지</strong>를 손과 숫자로 배운 달이다.
+  머신러닝을 닫고(0601~0605) → 딥러닝 두 주(0608~0619) → 자연어처리(0624~0626)로 갔고, 한가운데엔 팀 프로젝트2(이탈 예측, 0618~0623)가 있었다.
+  한 줄로 요약하면 — <strong>"모델을 바꾸는 것보다, 문제(라벨·손실·평가)를 어떻게 세우느냐가 결과를 정한다."</strong> 아래 회수하는 수치는 모두 그달 실습에서 직접 돌린 실측이다.</p>
   <div class="meta-row">
     <span><strong>기간</strong>2026-06-01 ~ 06-30</span>
     <span><strong>범위</strong>머신러닝 마무리 · 딥러닝 · 자연어처리 · 팀 프로젝트2</span>
@@ -145,12 +145,13 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 <nav class="flow">
   <h2>이 글의 흐름 — 6월 한 달의 사슬</h2>
   <ol>
-    <li><a href="#ch1">CH 01 · 6월의 출발 — fit 한 줄에서 층을 쌓는 손으로</a></li>
-    <li><a href="#ch2">CH 02 · 머신러닝을 닫으며 — 트리·앙상블·비지도</a></li>
-    <li><a href="#ch3">CH 03 · 딥러닝 두 주 — 역전파에서 검증·고도화까지</a></li>
-    <li><a href="#ch4">CH 04 · 자연어로 — 말을 숫자로, 의미를 좌표로</a></li>
-    <li><a href="#ch5">CH 05 · 팀 프로젝트2 — 라벨이 승자를 정한다</a></li>
-    <li><a href="#ch6">CH 06 · 6월 관통 교훈</a></li>
+    <li><a href="#ch1">CH 01 · 6월 학습 로드맵 — 무엇을, 어떤 숫자로 배웠나</a></li>
+    <li><a href="#ch2">CH 02 · 6주차 · 머신러닝을 닫으며 — 과대적합과 규제</a></li>
+    <li><a href="#ch3">CH 03 · 7주차 · 딥러닝의 부품 — 활성화·기울기 소실·손실함수</a></li>
+    <li><a href="#ch4">CH 04 · 8주차 · 역전파에서 검증·고도화까지</a></li>
+    <li><a href="#ch5">CH 05 · 9주차 · 자연어 — 의미가 좌표가 되다</a></li>
+    <li><a href="#ch6">CH 06 · 팀 프로젝트2 · 라벨이 승자를 정한다</a></li>
+    <li><a href="#ch7">CH 07 · 종합 회고 — 6월의 네 교훈</a></li>
   </ol>
 </nav>
 
@@ -160,89 +161,130 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 </div>
 
 <section id="ch1">
-  <h2 class="chap"><span class="num">CH 01</span>6월의 출발 — fit 한 줄에서 층을 쌓는 손으로<a href="#ch1" class="anchor-link">#</a></h2>
-  <p>6월을 관통한 질문은 세 번 모양을 바꿨다. 머신러닝에선 "이 점수를 믿어도 되나(과대적합)", 딥러닝에선 "무엇을 조절하면 학습이 되나·됐는지 어떻게 아나", 자연어에선 "말을 어떻게 숫자로 바꾸고 그 숫자가 의미를 담나". 세 질문은 결국 하나로 모였다 — <strong>모델이 아니라 문제를 어떻게 정의하는가.</strong></p>
+  <h2 class="chap"><span class="num">MAP</span>6월 학습 로드맵 — 무엇을, 어떤 숫자로 배웠나<a href="#ch1" class="anchor-link">#</a></h2>
+  <p>한 달을 관통한 질문은 세 번 모양을 바꿨다 — 머신러닝의 "이 점수를 믿어도 되나(과대적합)", 딥러닝의 "무엇을 조절하면 학습이 되나·됐는지 어떻게 아나", 자연어의 "말을 어떻게 숫자로 바꾸고 그 숫자가 의미를 담나". 세 질문은 결국 하나로 모였다 — <strong>모델이 아니라 문제를 어떻게 정의하는가.</strong> 각 구간의 헤드라인 실측을 먼저 지도로 편다.</p>
   <table>
-    <thead><tr><th>주차</th><th>기간</th><th>주제</th><th>한 줄 결과</th></tr></thead>
+    <thead><tr><th>주차</th><th>기간</th><th>주제</th><th>헤드라인 실측</th></tr></thead>
     <tbody>
-      <tr><td>6주차</td><td>0527~0605</td><td>머신러닝(트리·앙상블·비지도)</td><td>과대적합을 규제로 되살리다</td></tr>
-      <tr><td>7주차</td><td>0608~0612</td><td>딥러닝 — 활성화·손실·CNN</td><td>선택이 학습을 가른다</td></tr>
-      <tr><td class="hl">팀플2</td><td>0618~0623</td><td>고객 이탈 예측(GAJIMA)</td><td>라벨이 승자를 정한다</td></tr>
-      <tr><td>8주차</td><td>0615~0619</td><td>역전파·검증·고도화</td><td>점수 하나를 믿지 말 것</td></tr>
-      <tr><td>9주차</td><td>0624~0626</td><td>자연어처리(형태소·임베딩·LSTM)</td><td>의미가 좌표가 되다</td></tr>
+      <tr><td>6주차</td><td>0601~0605</td><td>ML 마무리(트리·앙상블·PCA·비지도)</td><td>과대적합 시 test R² 크게 하락 → 규제로 회복</td></tr>
+      <tr><td>7주차</td><td>0608~0612</td><td>DL 부품(활성화·손실·CNN)</td><td>Sigmoid loss 0.273에서 멈춤(미분 0.25로 기울기 소실)</td></tr>
+      <tr><td>8주차</td><td>0615~0619</td><td>역전파·검증·고도화</td><td>pooling last 64.08% → mean+max <strong>86.16%</strong></td></tr>
+      <tr><td class="hl">팀플2</td><td>0618~0623</td><td>고객 이탈 예측(GAJIMA)</td><td>세션 라벨 LSTM <strong>0.930</strong> vs GBM 0.929</td></tr>
+      <tr><td>9주차</td><td>0624~0626</td><td>NLP(형태소·임베딩·LSTM)</td><td>Word2Vec 0.8741 vs FastText <strong>0.9527</strong></td></tr>
     </tbody>
   </table>
-  <div class="bridge"><strong>다음으로</strong> — 먼저 5월부터 이어온 머신러닝을 닫았다.</div>
+  <div class="bridge"><strong>다음으로</strong> — 5월부터 이어온 머신러닝을 닫는 데서 6월이 시작됐다.</div>
 </section>
 
 <section id="ch2">
-  <h2 class="chap"><span class="num">CH 02</span>머신러닝을 닫으며 — 트리·앙상블·비지도<a href="#ch2" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>6월 초(0601~0605)는 머신러닝의 마지막 구간이었다. 결정트리·앙상블(배깅·부스팅·랜덤포레스트), 차원 축소(PCA), 비지도학습(k-means·연관규칙)까지 훑으며,
-  5월에 만난 "과대적합"의 해법(규제·앙상블)을 손에 익혔다. 핵심은 <strong>단일 모델의 분산을 여러 모델·차원 축소로 다스리는 법</strong>이었다.</p>
+  <h2 class="chap"><span class="num">W6</span>머신러닝을 닫으며 — 과대적합과 규제<a href="#ch2" class="anchor-link">#</a></h2>
+  <h3 class="step">회수 — 학습</h3>
+  <p>6월 초는 머신러닝의 마지막 구간이었다. 결정트리·앙상블(배깅·부스팅·랜덤포레스트), 차원 축소(PCA), 비지도학습(k-means·연관규칙)을 훑으며, 5월에 만난 <strong>과대적합</strong>의 해법(규제·앙상블)을 손에 익혔다.</p>
+  <h3 class="step">의문 → 실측</h3>
+  <div class="qbox"><span class="label">의문</span>
+  모델을 더 복잡하게(다항 차수↑) 만들면 훈련 점수는 오르는데, 시험 점수는 왜 무너질까?</div>
+  <p>다항 회귀의 차수를 1→9로 올리자 훈련 곡선은 점점 데이터에 밀착했지만, test 점수는 <strong>크게 떨어졌다</strong>. 훈련에만 맞춘 모델이 새 데이터에서 무너지는 과대적합을, 규제(Ridge)로 계수 크기를 눌러 되살렸다.</p>
   <div class="keypoint"><span class="label">배운 점</span>
-  머신러닝의 성능은 대개 <strong>모델 종류와 규제</strong>가 지배했고, 정형·표 데이터에선 그래디언트 부스팅(GBM)이 강했다 — 이 사실이 뒤의 팀 프로젝트2에서 결정적 복선이 된다.
-  <span style="color:#667085;">(자세히: <a href="retrospective_w6.html">6주차 회고</a>)</span></div>
+  머신러닝의 성능은 대개 <strong>모델 종류와 규제</strong>가 지배했고, 정형·표 데이터에선 그래디언트 부스팅(GBM)이 강했다 — 이 사실이 뒤 팀 프로젝트2의 앞선 복선이 된다.
+  <span style="color:#667085;">(자세히: <a href="retrospective_w6.html">6주차 회고</a> · <a href="../ml/day0527_ml_intro.html">fit이 정하는 것</a>)</span></div>
   <div class="bridge"><strong>다음으로</strong> — 표 데이터를 벗어나 신경망을 직접 쌓기 시작했다.</div>
 </section>
 
 <section id="ch3">
-  <h2 class="chap"><span class="num">CH 03</span>딥러닝 두 주 — 역전파에서 검증·고도화까지<a href="#ch3" class="anchor-link">#</a></h2>
-  <h3 class="step">7주차 — 부품을 만지다</h3>
-  <p>첫 주(0608~0612)는 신경망의 부품이었다. 활성화함수 하나(tanh→ReLU)가 학습의 성패를 갈랐고, Sigmoid의 미분 최대값 0.25가 <strong>기울기 소실</strong>을 만들었으며, 다중분류엔 CrossEntropy가 MSE보다 "틀린 확신"을 더 세게 고쳤다.</p>
-  <h3 class="step">8주차 — 부품이 스스로 고쳐지는 원리, 그리고 검증</h3>
-  <p>둘째 주(0615~0619)는 그 부품이 어떻게 스스로 고쳐지는지(<strong>역전파</strong>: grad가 −16이면 그만큼 민다, w 3→5 수렴)와, "잘 학습됐다"를 무엇으로 믿을지였다.
-  같은 LSTM도 시퀀스 요약을 last→mean+max로 바꾸자 64.08%→86.16%가 됐고, 과적합 방어를 강하게 걸자 오히려 절대 정확도가 떨어지는 역설(TF 0.8036→0.7230)을 만났다.
-  고도화는 정확도를 0.9561→0.9649로 올렸지만 손실은 되레 늘어(0.1048→0.1551), <strong>점수 하나로 판단하면 안 된다</strong>는 걸 배웠다.</p>
+  <h2 class="chap"><span class="num">W7</span>딥러닝의 부품 — 활성화·기울기 소실·손실함수<a href="#ch3" class="anchor-link">#</a></h2>
+  <h3 class="step">회수 — 의문 → 실측</h3>
+  <p>첫 주(0608~0612)는 신경망의 부품이었다. 활성화함수 하나(tanh→ReLU)가 학습의 성패를 갈랐고, 왜 그런지를 기울기로 확인했다.</p>
+  <div class="terminal">
+    <div class="terminal-header">activation_functions — two-moons 동일 조건, 활성화함수별 최종 손실/정확도</div>
+    <pre class="terminal-body">Tanh       loss 0.0332   acc 1.000
+ReLU       loss 0.0249   acc 1.000
+LeakyReLU  loss 0.0248   acc 1.000
+Sigmoid    loss 0.2730   acc 0.935   ← 미분 최대 0.25 → 층 지날수록 기울기 소실</pre>
+  </div>
   <div class="keypoint"><span class="label">배운 점</span>
-  딥러닝의 성패는 절댓값이 아니라 <strong>균형</strong>(GAN의 감별자 균형, 과적합의 train-val 간격)이고, 좋은 모델은 정확도·손실·혼동행렬·F1·ROC를 <strong>함께</strong> 봐야 보인다.
-  <span style="color:#667085;">(자세히: <a href="retrospective_w7.html">7주차</a> · <a href="retrospective_w8.html">8주차 회고</a>)</span></div>
-  <div class="bridge"><strong>다음으로</strong> — 이미지·표를 넘어 텍스트로 옮겨 갔다.</div>
+  Sigmoid만 손실이 한 자릿수 높은 곳에 멈췄다. 미분 최대값이 <strong>0.25</strong>라 층을 거칠수록 기울기가 죽는 <strong>기울기 소실</strong> 때문이다. 다중분류엔 CrossEntropy가 MSE보다 "틀린 확신"을 더 세게 고친다는 것도 이때 확인했다.
+  <span style="color:#667085;">(자세히: <a href="retrospective_w7.html">7주차</a> · <a href="../dl/day0609_activation.html">활성화함수와 기울기 소실</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 부품이 어떻게 스스로 고쳐지는지(역전파)와, 그 결과를 무엇으로 믿을지로 넘어갔다.</div>
 </section>
 
 <section id="ch4">
-  <h2 class="chap"><span class="num">CH 04</span>자연어로 — 말을 숫자로, 의미를 좌표로<a href="#ch4" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>9주차(0624~0626)는 텍스트였다. 한국어는 공백으로 못 나눠 형태소가 토큰의 단위였고(Okt↔Kkma 트레이드오프),
-  횟수 기반(BOW·TF-IDF)은 의미를 못 담아 분산 표현으로 넘어갔다 — Word2Vec에서 '대회'와 '올림픽'이 <strong>0.8741</strong>로 가까워졌고, 서브워드를 쓰는 FastText는 <strong>0.9527</strong>로 더 잘 잡았다.
-  정적 임베딩('배'를 평균 하나로 뭉갬)의 한계에서 동적 임베딩(BERT·GPT)으로 가는 길, LSTM의 장기 의존성과 어텐션까지가 자연스럽게 이어졌다.</p>
+  <h2 class="chap"><span class="num">W8</span>역전파에서 검증·고도화까지<a href="#ch4" class="anchor-link">#</a></h2>
+  <h3 class="step">회수 — 역전파</h3>
+  <p>둘째 주(0615~0619)는 <code>loss.backward()</code> 안을 열었다. <code>x=2, w=3, target=10</code>에서 grad는 <strong>−16</strong>, 즉 "w를 키우면 손실이 16의 기울기로 준다"는 방향·세기였고, 반복하자 w는 3에서 5로 수렴했다.</p>
+  <div class="terminal">
+    <div class="terminal-header">6월 8주차 핵심 실측 모음 (backprop · pooling · GAN · 과적합 · 고도화)</div>
+    <pre class="terminal-body">[역전파]  w.grad = -16.0  →  epoch01 w3.8 loss16.0 … epoch14 w4.998 loss0.0000
+[IMDB pooling]  last 64.08%  →  mean 85.61%  →  mean+max 86.16% (f1 86.04)
+[DCGAN 균형]  C1 D(real)0.754/D(fake)0.247 건강  vs  C5 0.929/0.078 무너짐
+[과적합 예상밖] Fashion-MNIST 기준 0.8036 → 강한정규화 0.7230 (작은데이터·짧은에폭)
+[고도화]  유방암 기본 acc0.9561/loss0.1048  →  개선 acc0.9649/loss0.1551 (정확도↑·손실↑)</pre>
+  </div>
+  <figure class="shot">
+    <img src="../img/w8_imdb_pooling.png" alt="IMDB LSTM pooling 전략별 정확도">
+    <figcaption>같은 LSTM인데 시퀀스 요약을 last→mean+max로 바꾼 것만으로 64.08%→86.16% (8주차 실측)</figcaption>
+  </figure>
   <div class="keypoint"><span class="label">배운 점</span>
-  "말을 숫자로" 바꾸는 사다리(형태소 → 횟수 → 분산 표현 → 시퀀스 모델)를 한 칸씩 올랐고, <strong>단어를 어떤 단위로 보느냐가 의미의 품질을 갈랐다.</strong>
-  <span style="color:#667085;">(자세히: <a href="retrospective_w9.html">9주차 회고</a>)</span></div>
-  <div class="bridge"><strong>다음으로</strong> — 6월 한가운데엔 이 모든 걸 실전에 부딪힌 팀 프로젝트2가 있었다.</div>
+  성패는 절댓값이 아니라 <strong>균형</strong>이었다 — GAN은 D(real)/D(fake)=0.75/0.25, 과적합은 train-val 간격. 그리고 고도화에서 정확도는 올랐는데(0.9561→0.9649) 손실은 되레 늘어(0.1048→0.1551), <strong>점수 하나로 판단하면 틀린다</strong>는 걸 배웠다.
+  <span style="color:#667085;">(자세히: <a href="retrospective_w8.html">8주차 회고</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 이미지·표를 넘어 텍스트로 옮겨 갔다.</div>
 </section>
 
 <section id="ch5">
-  <h2 class="chap"><span class="num">CH 05</span>팀 프로젝트2 — 라벨이 승자를 정한다<a href="#ch5" class="anchor-link">#</a></h2>
-  <h3 class="step">회수</h3>
-  <p>0618~0623, 정규 수업과 병행해 <strong>가입 고객 이탈 예측</strong>(가지마/GAJIMA)을 팀으로 했다. Bank Churn 작은 데이터에선 GBM이 AUC 0.870으로 1위,
-  REES46 화장품 로그 2,069만 건으로 키워도 <strong>계정 이탈(recency 집계) 라벨</strong>에선 여전히 GBM(0.803→0.826)이 시퀀스 DL을 앞섰다.
-  그런데 문제를 <strong>"세션 즉시 이탈"(순서가 살아 있는 실시간 라벨)</strong>로 재정의하자 결과가 뒤집혀, <strong>시퀀스 DL(LSTM AUC 0.930)이 GBM(0.929)을 처음으로 넘었다.</strong></p>
-  <div class="keypoint"><span class="label">깨달음</span>
-  6월의 가장 큰 배움. "고도화 = 더 센 모델"이 아니라 <strong>라벨(문제)의 성격이 어떤 모델이 이길지를 정한다</strong> — recency엔 GBM, 순서엔 시퀀스 DL.
-  <span style="color:#667085;">(자세히: <a href="retrospective_w9_2.html">팀프로젝트2 회고</a>)</span></div>
-  <div class="bridge"><strong>그래서</strong> — 딥러닝의 "선택이 결과를 가른다"와, 팀플의 "문제 정의가 승자를 정한다"가 6월 끝에서 하나로 만났다.</div>
+  <h2 class="chap"><span class="num">W9</span>자연어 — 의미가 좌표가 되다<a href="#ch5" class="anchor-link">#</a></h2>
+  <h3 class="step">회수 — 의문 → 실측</h3>
+  <p>9주차(0624~0626)는 텍스트였다. 한국어는 공백으로 못 나눠 형태소가 토큰의 단위였고, 횟수 기반(BOW·TF-IDF)은 의미를 못 담아 분산 표현으로 넘어갔다. "횟수로는 못 하던 의미 유사도가 학습한 임베딩에선 숫자로 나오나?"를 직접 물었다.</p>
+  <div class="terminal">
+    <div class="terminal-header">word2vec_모델 — '대회' 유사도 (직접 학습 vocab 77)</div>
+    <pre class="terminal-body">most_similar('대회') = [('데이터',0.8950), ('선수',0.8785), … , ('올림픽',0.8741), …]
+similarity('대회','올림픽') = 0.87414414   (Word2Vec)
+similarity('대회','올림픽') = 0.95275533   (FastText, 서브워드 n-gram)</pre>
+  </div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  '대회'와 '올림픽'이 <strong>0.874</strong>로 가까워졌고, 서브워드를 쓰는 FastText는 <strong>0.953</strong>으로 더 잘 잡았다. <strong>단어를 어떤 단위로 보느냐가 의미의 품질을 갈랐다.</strong> 정적 임베딩('배'를 평균 하나로 뭉갬)의 한계에서 동적 임베딩·어텐션으로 가는 길도 이때 트였다.
+  <span style="color:#667085;">(자세히: <a href="retrospective_w9.html">9주차 회고</a> · <a href="../nlp/day0625_word2vec.html">Word2Vec·FastText</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 6월 한가운데엔 이 모든 걸 실전에 부딪힌 팀 프로젝트2가 있었다.</div>
 </section>
 
 <section id="ch6">
-  <h2 class="chap"><span class="num">CH 06</span>6월 관통 교훈<a href="#ch6" class="anchor-link">#</a></h2>
-  <h3 class="step">출발 질문 회수</h3>
-  <p>6월을 열며 던진 "층을 직접 쌓으면 무엇이 결과를 가르나"는, 한 달을 돌아 <strong>"모델보다 문제를 어떻게 세우느냐"</strong>로 회수됐다.</p>
+  <h2 class="chap"><span class="num">TP2</span>팀 프로젝트2 — 라벨이 승자를 정한다<a href="#ch6" class="anchor-link">#</a></h2>
+  <h3 class="step">회수 — 의문 → 실측 → 반전</h3>
+  <p>0618~0623, 정규 수업과 병행해 <strong>가입 고객 이탈 예측</strong>(가지마/GAJIMA)을 팀으로 했다. 작은 데이터(Bank)부터 REES46 화장품 로그 2,069만 건까지 키우며, "데이터를 키우면 시퀀스 DL이 정형 모델을 넘는가?"를 물었다.</p>
+  <div class="terminal">
+    <div class="terminal-header">팀프로젝트2 — 라벨 성격별 최고 모델 ROC-AUC</div>
+    <pre class="terminal-body">Bank Churn 베이스라인        GBM 0.870 (MLP 0.862 · RF 0.855 · LogReg 0.777)
+REES46 계정이탈(recency)      GBM 0.803  |  다개월 GBM 0.826   ← ML 우세
+REES46 세션 즉시이탈(순서형)  LSTM 0.930  >  GBM 0.929        ← DL이 처음으로 더 높음
+(recency 중요도 0.094로 가장 큼 → 순서가 라벨을 안 가르면 시퀀스 DL 강점 죽음)</pre>
+  </div>
+  <figure class="shot">
+    <img src="../img/w92_label_winner.png" alt="라벨 성격별 최고 모델 — ML vs DL">
+    <figcaption>같은 데이터, 다른 라벨. recency형은 GBM, 순서가 살아 있는 세션형에선 LSTM(0.930)이 GBM(0.929)보다 더 높았다 (팀플2 실측)</figcaption>
+  </figure>
+  <div class="keypoint"><span class="label">깨달음</span>
+  6월의 가장 큰 배움. "고도화 = 더 센 모델"이 아니라 <strong>라벨(문제)의 성격이 어떤 모델이 이길지를 정한다</strong> — recency엔 GBM, 순서엔 시퀀스 DL. 모델 교체가 아니라 문제 재정의였다.
+  <span style="color:#667085;">(자세히: <a href="retrospective_w9_2.html">팀프로젝트2 회고</a>)</span></div>
+  <div class="bridge"><strong>그래서</strong> — 딥러닝의 "선택이 결과를 가른다"와 팀플의 "문제 정의가 승자를 정한다"가 6월 끝에서 하나로 만났다.</div>
+</section>
+
+<section id="ch7">
+  <h2 class="chap"><span class="num">FIN</span>종합 회고 — 6월의 네 교훈<a href="#ch7" class="anchor-link">#</a></h2>
+  <h3 class="step">출발 목표 회수</h3>
+  <p>6월을 열며 던진 "층을 직접 쌓으면 무엇이 결과를 가르나"는, 한 달을 돌아 <strong>"모델보다 문제를 어떻게 세우느냐"</strong>로 회수됐다. 로드맵의 헤드라인 실측이 그 사슬을 그대로 증명한다.</p>
   <div class="keypoint"><span class="label">6월 관통 교훈 네 가지</span>
   <ol>
-    <li><strong>선택이 학습을 가른다.</strong> 활성화·손실·최적화·pooling 하나가 64%↔86%, 학습됨↔정체를 갈랐다.</li>
-    <li><strong>성패는 절댓값이 아니라 균형이다.</strong> GAN의 감별자, 과적합의 train-val 간격, 고도화의 정확도-손실 트레이드오프.</li>
-    <li><strong>점수 하나를 믿지 말 것.</strong> 정확도·손실·혼동행렬·F1·ROC를 함께 봐야 "어떤 오류를 내는 모델"이 보인다.</li>
-    <li><strong>라벨이 승자를 정한다.</strong> 같은 데이터라도 문제를 어떻게 세우느냐(recency↔순서)가 GBM↔시퀀스 DL의 승부를 갈랐다.</li>
+    <li><strong>선택이 학습을 가른다.</strong> 활성화(Sigmoid 0.25 소실)·손실(CE vs MSE)·pooling(64.08→86.16%) 하나가 결과를 갈랐다.</li>
+    <li><strong>성패는 절댓값이 아니라 균형이다.</strong> GAN 감별자 0.75/0.25, 과적합 train-val 간격, 고도화 정확도↑·손실↑ 트레이드오프(0.9561→0.9649 / 0.1048→0.1551).</li>
+    <li><strong>점수 하나를 믿지 말 것.</strong> 정확도·손실·혼동행렬·F1·ROC를 함께 봐야 "어떤 오류를 내는 모델인가"가 보인다.</li>
+    <li><strong>라벨이 승자를 정한다.</strong> 같은 데이터라도 recency↔순서로 문제를 어떻게 세우느냐가 GBM(0.826)↔LSTM(0.930)의 우열을 갈랐다.</li>
   </ol>
   </div>
-  <div class="bridge"><strong>다음 달로</strong> — 자연어의 끝(트랜스포머)이 곧 LLM의 시작이다. 7월은 번역·트랜스포머에서 LLM·프롬프트로 넘어간다.</div>
+  <div class="bridge"><strong>다음 달로</strong> — 자연어의 끝(트랜스포머)이 곧 LLM의 시작이다. 7월은 번역·트랜스포머에서 LLM·프롬프트·에이전트로 넘어간다.</div>
 
   <div class="ref-chain">
     <p class="ref-title">📚 근거 출처</p>
     <ol>
-      <li>주간 회고 — <code>retro/retrospective_w6~w9 · w9_2</code> (각 주의 실측·로그 원본)</li>
-      <li>실습 코드·리포트 — <code>ml_workspace/from_colab_deep_learning · from_colab_llm</code>, <code>llm_workspace</code>, <code>team_project_churn/reports</code></li>
+      <li>주간 회고(실측 원본) — <code>retro/retrospective_w6 · w7 · w8 · w9 · w9_2</code></li>
+      <li>실습 코드·리포트 — <code>ml_workspace/from_colab_deep_learning · from_colab_llm</code>, <code>llm_workspace</code>, <code>team_project_churn/reports</code>(09·11)</li>
       <li>강의 PDF — 머신러닝·딥러닝·자연어처리 단원 자료(.study/pdf)</li>
     </ol>
   </div>
@@ -252,7 +294,7 @@ figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); 
 
 <footer>
   <p><strong>SK 네트웍스 AI Family 32기</strong> · 6월 월간 회고 (2026-06-01 ~ 06-30)</p>
-  <p>머신러닝 마무리 → 딥러닝 → 자연어처리 → 팀 프로젝트2. 본문 수치·로그는 각 주간 회고의 실측이며, 여기선 한 달의 사슬만 회수했다.</p>
+  <p>머신러닝 마무리 → 딥러닝 → 자연어처리 → 팀 프로젝트2. 회수한 수치는 모두 각 주 실습의 실측이며, 차트는 그 실측값을 시각화했다.</p>
 </footer>
 
 </div>

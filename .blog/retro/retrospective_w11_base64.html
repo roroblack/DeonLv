@@ -1,0 +1,302 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
+:root {
+  color-scheme: light;
+  --ink:#1f2933; --muted:#667085; --line:#d7dee8;
+  --paper:#ffffff; --surface:#ffffff;
+  --accent:#52A97E; --accent-2:#E8875A; --accent-3:#5B9BD5; --accent-4:#9178C4;
+  --accent-soft:#EBF7F1; --warn-soft:#FFF1E8;
+  --code-bg:#1e1e1e; --code-ink:#e5e7eb;
+  --shadow:none;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Nanum Gothic Coding","Segoe UI",Arial,sans-serif;
+  line-height:1.78; font-size:16px; }
+a { color:var(--accent-3); text-underline-offset:3px; }
+.page { width:min(880px, calc(100% - 32px)); margin:0 auto; }
+header.cover { padding:48px 0 24px; border-bottom:3px solid var(--ink); }
+.eyebrow { font-size:0.9rem; color:var(--muted); letter-spacing:0.06em;
+  text-transform:uppercase; margin:0 0 8px; }
+h1 { font-size:2rem; line-height:1.32; margin:6px 0 12px; letter-spacing:-0.01em; }
+.deck { font-size:1.05rem; color:#374151; margin:0 0 18px; }
+.meta-row { display:flex; flex-wrap:wrap; gap:12px 18px;
+  font-size:0.92rem; color:var(--muted); padding-top:10px;
+  border-top:1px solid var(--line); }
+.meta-row strong { color:var(--ink); margin-right:4px; }
+main { padding:36px 0 60px; }
+nav.toc { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+nav.toc h2 { font-size:0.95rem; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav.toc ol { margin:0; padding-left:1.3em; font-size:0.95rem; }
+nav.toc a { color:var(--ink); text-decoration:none; border-bottom:1px dashed transparent; }
+nav.toc a:hover { border-bottom-color:var(--accent-3); }
+section { margin:48px 0 0; }
+h2.chap { font-size:1.45rem; margin:0 0 14px; padding:14px 0 8px;
+  border-top:3px solid var(--ink); }
+h2.chap .num { display:inline-block; border:2px solid var(--accent-2);
+  color:var(--accent-2); padding:1px 8px; font-size:0.8rem;
+  margin-right:10px; vertical-align:middle; letter-spacing:0.04em; }
+h2.chap .anchor-link { float:right; color:var(--muted); font-weight:400;
+  text-decoration:none; opacity:0; transition:opacity .15s; }
+h2.chap:hover .anchor-link { opacity:1; }
+h3.step { margin:22px 0 10px; font-size:1.05rem; letter-spacing:0.04em;
+  color:var(--accent-3); border-left:4px solid var(--accent-3); padding-left:10px; }
+p { margin:10px 0; }
+ul, ol { padding-left:1.4em; }
+li { margin:4px 0; }
+strong { color:var(--ink); }
+.qbox { border-left:4px solid var(--accent-3); background:#EBF4FF;
+  padding:12px 16px; margin:14px 0; }
+.qbox .label { display:inline-block; background:var(--accent-3); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.keypoint { border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:12px 16px; margin:14px 0; }
+.keypoint .label { display:inline-block; background:var(--accent); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.callout { border-left:4px solid var(--accent-2); background:var(--warn-soft);
+  padding:12px 16px; margin:14px 0; }
+.callout .label { display:inline-block; background:var(--accent-2); color:#fff;
+  padding:1px 8px; font-size:0.78rem; font-weight:700;
+  margin-right:10px; letter-spacing:0.04em; }
+.bridge { border-left:4px solid var(--muted); background:#F4F6F9;
+  padding:10px 14px; margin:18px 0 4px; font-size:0.94rem; color:#374151; }
+.bridge strong { color:var(--ink); }
+blockquote.cite { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:12px 16px; margin:14px 0; font-style:normal; }
+blockquote.cite .src { display:block; color:var(--muted);
+  font-size:0.9em; margin-top:6px; }
+code { font-family:"Cascadia Code","Consolas","D2Coding",monospace;
+  background:#EEF0F6; padding:1px 5px; font-size:0.92em; }
+pre { background:var(--code-bg); color:var(--code-ink); padding:16px;
+  overflow-x:auto; font-size:0.88rem; line-height:1.55; margin:14px 0;
+  border:1px solid #2a2a2a; }
+pre code { background:transparent; padding:0; color:inherit;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; }
+.terminal { margin:14px 0; border:1px solid #2a2a2a; }
+.terminal-header { background:#2d2d2d; color:#cbd5e1; padding:6px 12px;
+  font-size:0.82rem; font-family:"Cascadia Code","Consolas",monospace; }
+.terminal-header::before { content:'PS> '; color:var(--accent-2); font-weight:700; }
+.terminal-body { background:#1e1e1e; color:#e5e7eb; padding:14px 16px;
+  margin:0; overflow-x:auto; font-size:0.86rem; line-height:1.55;
+  font-family:"Cascadia Code","Consolas","D2Coding",monospace; white-space:pre; }
+table { border-collapse:collapse; width:100%; margin:14px 0; font-size:0.95rem; }
+th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+th { background:#EEF0F5; color:var(--ink); }
+.hl { background:#EBF7F1; }
+footer { padding:30px 0 60px; border-top:3px solid var(--ink); margin-top:50px;
+  color:var(--muted); font-size:0.9rem; }
+footer p { margin:6px 0; }
+.ref-chain { border-left:4px solid var(--accent-4); background:#F7F5FD;
+  padding:14px 18px; margin:24px 0; }
+.ref-chain .ref-title { color:var(--accent-4); font-weight:700;
+  margin:0 0 8px; letter-spacing:0.04em; }
+.ref-chain ol { padding-left:1.4em; margin:0; }
+.ref-chain li { margin:4px 0; font-size:0.93rem; }
+figure.shot { margin:14px 0 18px; border:1px solid var(--line); background:#fff; padding:8px; }
+figure.shot img { display:block; width:100%; height:auto; max-width:760px; margin:0 auto; }
+figure.shot figcaption { margin-top:8px; font-size:0.86rem; color:var(--muted); text-align:center; letter-spacing:0.02em; }
+.flow { border-top:3px solid var(--ink); border-bottom:1px solid var(--line);
+  padding:14px 0 18px; margin:0 0 30px; }
+.flow h2 { font-size:0.95rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+.flow ol { margin:0; padding-left:1.3em; }
+.flow li { margin:6px 0; }
+.flow .turn { color:var(--accent-2); font-weight:700; }
+  </style>
+
+<div class="page">
+
+<header class="cover">
+  <p class="eyebrow">Python · 11주차 회고 · 교과목 3 단원 4 프롬프트 엔지니어링·에이전트 · 부트캠프</p>
+  <h1>LLM을 만드는 쪽에서 쓰는 쪽으로 — 11주차 회고</h1>
+  <p class="deck">10주차가 "트랜스포머에서 LLM으로" 넘어가는 다리였다면, 11주차(0706~0710)는 <strong>LLM을 실제로 다루는 기술</strong>이었다.
+  출력을 제어하고(파라미터), 프롬프트를 설계하고(역할·few-shot·CoT), 도구를 붙이고(Function Calling·ReAct), 지식을 검색해 붙이고(RAG), 마지막에 그 모든 걸 하나의 쇼핑몰 에이전트로 통합했다.
+  한 줄 목표는 — <strong>"모델을 만드는 것에서, 모델을 잘 쓰는 것으로."</strong> 스테이지마다 전용 콘솔 실습으로 부품을 익힌 뒤 통합 프로젝트로 합쳤고, 코드·설계·측정값은 실제 프로젝트에서 인용한다.</p>
+  <div class="meta-row">
+    <span><strong>기간</strong>2026-07-06 ~ 07-10</span>
+    <span><strong>범위</strong>LLM 파라미터·프롬프트 · Function Calling·ReAct · RAG·Vector DB · 종합 에이전트</span>
+    <span><strong>도구</strong>OpenAI API · FastAPI · LangChain · FAISS · Python 3.13.5</span>
+    <span><strong>OS</strong>Windows 11 Pro 25H2</span>
+    <span><strong>HW</strong>Asrock x600 · Ryzen 8600G · RTX 4070 Super 12GB</span>
+  </div>
+</header>
+<main>
+<nav class="flow">
+  <h2>이 글의 흐름 — LLM을 쓰는 기술의 사슬</h2>
+  <ol>
+    <li><a href="#ch1">CH 01 · 출발 — 트랜스포머를 넘어, 쓰는 기술로</a></li>
+    <li><a href="#ch2">CH 02 · 제어 — 파라미터와 프롬프트 엔지니어링</a></li>
+    <li><a href="#ch3">CH 03 · 행동 — Function Calling과 ReAct 루프</a></li>
+    <li><a href="#ch4">CH 04 · 지식 — Vector DB와 RAG</a></li>
+    <li><a href="#ch5">CH 05 · 통합 — ReAct 커머스 에이전트</a></li>
+    <li><a href="#ch6">CH 06 · 종합 회고</a></li>
+  </ol>
+</nav>
+
+<div class="bridge">
+  <strong>한 주의 출발</strong> — 10주차 끝에서 "트랜스포머를 크게 사전학습하면 LLM"이라는 데까지 왔다.
+  11주차는 그 LLM을 <strong>가져다 쓰는</strong> 한 주였다. 스테이지마다 콘솔 실습으로 부품 하나씩 익히고, 마지막에 쇼핑몰 에이전트로 합쳤다.
+</div>
+
+<section id="ch1">
+  <h2 class="chap"><span class="num">CH 01</span>출발 — 트랜스포머를 넘어, 쓰는 기술로<a href="#ch1" class="anchor-link">#</a></h2>
+  <p>지금까지는 모델을 <em>만드는</em> 쪽이었다 — 형태소로 자르고, 임베딩으로 벡터화하고, LSTM·트랜스포머를 학습시켰다. 11주차는 방향이 바뀌었다. 이미 학습된 거대한 LLM을 <strong>API로 가져다</strong>, 어떻게 원하는 대로 움직이게 할지가 과제였다.</p>
+  <div class="qbox"><span class="label">의문</span>
+  LLM은 프롬프트 한 줄이면 답을 준다. 그런데 왜 파라미터·도구·검색·에이전트 같은 층이 더 필요할까?</div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  프롬프트만으로는 <strong>출력의 일관성(파라미터)·최신 지식(RAG)·실제 행동(도구)</strong>을 보장할 수 없었다. 이 세 결핍이 이번 주의 세 챕터(제어·행동·지식)를 그대로 만들었고, 마지막에 하나로 합쳐졌다.
+  <span style="color:#667085;">(스테이지별 콘솔 실습 → 통합 프로젝트)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 먼저 출력을 원하는 모양으로 다듬는 제어부터.</div>
+</section>
+
+<section id="ch2">
+  <h2 class="chap"><span class="num">CH 02</span>제어 — 파라미터와 프롬프트 엔지니어링<a href="#ch2" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0706엔 출력을 조율하는 두 손잡이를 익혔다. <strong>파라미터</strong>(temperature·top-p로 다양성/일관성 조절)와 <strong>프롬프트 설계</strong>(역할·few-shot 예시·CoT 유도). 특히 분류처럼 정답이 하나면 <code>temperature=0</code>으로 고정하고, 헷갈리는 짝은 few-shot 경계 예시로 잡았다.</p>
+  <div class="terminal">
+    <div class="terminal-header">app/prompts · lab — 작업 유형별 실제 파라미터 사용</div>
+    <pre class="terminal-body">분류(classifier)   temperature=0    max_tokens=16    ← 정답 하나, 일관성 최우선
+대화/생성          temperature=0.2  max_tokens=200   ← 약간의 다양성 허용
+인젝션 방어        사용자 입력을 &lt;&lt;&lt; … &gt;&gt;&gt; 로 감싸 역할 지시와 분리
+few-shot           오분류 짝(Counter)에서 경계 예시 자동 추천(suggest_fewshot_candidates)</pre>
+  </div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  프롬프트는 "잘 부탁하기"가 아니라 <strong>설계</strong>였다 — 역할 고정, 경계 예시, 사용자 입력을 <code>&lt;&lt;&lt; &gt;&gt;&gt;</code>로 감싸는 인젝션 방어, 그리고 어려운 문제엔 단계적 추론(CoT)을 유도. 콘솔 실습(prompt_console·cot_console)으로 부품을 익혔다.
+  <span style="color:#667085;">(자세히: <a href="../llm/day0706_llm_params_prompt.html">파라미터·프롬프트 엔지니어링</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 제어된 출력을 넘어, LLM이 실제로 <em>행동</em>하게 하려면 도구가 필요했다.</div>
+</section>
+
+<section id="ch3">
+  <h2 class="chap"><span class="num">CH 03</span>행동 — Function Calling과 ReAct 루프<a href="#ch3" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0707엔 LLM에 손발을 달았다. <strong>Function Calling</strong>으로 도구(재고 조회·가격 계산 등)의 스키마를 주면, LLM이 "어떤 도구를 어떤 인자로 부를지"를 정한다. 이걸 <strong>ReAct(Reason+Act)</strong> 루프로 감싸 — 생각→도구 호출→관찰→다시 생각 — 반복하게 했다.</p>
+  <div class="terminal">
+    <div class="terminal-header">app/agent/react.py + tools/commerce_tools.py — ReAct 루프 구조(도구명·계약 실제)</div>
+    <pre class="terminal-body">도구 6종: get_stock · get_price · get_order_status · search_knowledge_base · …
+[구조 예시]  사용자 "재고 있어?"
+  → LLM 판단: tool_call get_stock(product_id=…)
+  → 관찰:     {"ok": true, "stock": 12}          (실패도 {"ok": false, "error": …} 로 통일)
+  → LLM 응답: "재고 12개"     ← 실패 관측이면 루프가 인자 고쳐 재호출
+안전장치: 중복 호출 서명 차단 · 문맥 trim(head+tail 짝) · TypeError→bad_arguments</pre>
+  </div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  좋은 도구는 <strong>실패도 구조화된 관찰</strong>(<code>{"ok": false, ...}</code>)로 돌려줘야 루프가 스스로 고쳤다. 중복 호출·문맥 길이·잘못된 인자 같은 현실 문제를 안전장치로 다뤘다(function_calling_console·agent_loop·planning 실습).
+  <span style="color:#667085;">(자세히: <a href="../llm/day0707_function_calling_agent.html">Function Calling·ReAct</a>)</span></div>
+  <div class="bridge"><strong>다음으로</strong> — 도구로 행동은 하되, LLM이 모르는 최신·전용 지식은 어떻게 줄까.</div>
+</section>
+
+<section id="ch4">
+  <h2 class="chap"><span class="num">CH 04</span>지식 — Vector DB와 RAG<a href="#ch4" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0708엔 LLM에 외부 지식을 붙였다. 문서를 <strong>임베딩</strong>(9주차 Word2Vec의 확장 — 문장 임베딩 ko-sroberta)해 <strong>Vector DB(FAISS)</strong>에 넣고, 질문으로 <strong>유사 검색</strong>해 상위 문서를 프롬프트에 끼우는 <strong>RAG</strong>다. 이것이 커머스 에이전트에선 상품·정책 지식 검색 도구가 됐다.</p>
+  <div class="terminal">
+    <div class="terminal-header">_unified_mall_agent_project/app/rag — 실제 RAG 설정·동작</div>
+    <pre class="terminal-body">임베딩  jhgan/ko-sroberta-multitask (normalize=True)  ·  스토어 FAISS(save/load_local)
+청킹    CHUNK_SIZE 400 · OVERLAP 50   |   검색 RAG_TOP_K 3 · RAG_MAX_DISTANCE 1.5
+검증 예  질의 "ReAct 에이전트 무한루프 방지" → loop_safety.txt 1순위 (거리 작을수록 유사)</pre>
+  </div>
+  <div class="keypoint"><span class="label">배운 점</span>
+  9주차의 "의미가 좌표가 된다"가 여기서 실전이 됐다 — 임베딩 좌표의 거리로 관련 문서를 찾는다. FAISS의 거리(작을수록 유사)·정규화·거리 임계로 엉뚱한 검색을 막는 게 핵심이었다(rag_console·embedding_console·vector_db 실습).
+  <span style="color:#667085;">(자세히: <a href="../llm/day0708_rag_vectordb.html">Vector DB·RAG</a>)</span></div>
+  <div class="bridge"><strong>그래서</strong> — 제어(프롬프트)·행동(도구)·지식(RAG)이 갖춰졌다. 마지막은 이 셋을 하나로 합치는 일이었다.</div>
+</section>
+
+<section id="ch5">
+  <h2 class="chap"><span class="num">CH 05</span>통합 — ReAct 커머스 에이전트<a href="#ch5" class="anchor-link">#</a></h2>
+  <h3 class="step">회수</h3>
+  <p>0709, 종착점. 형태소·임베딩·분류·BERT·트랜스포머·LLM·프롬프트·Function Calling·RAG를 <strong>하나의 쇼핑몰 에이전트</strong>(FastAPI)로 통합했다. 여섯 도구가 모두 같은 계약(<code>dict</code>)을 돌려주니, DB 조회·환율 계산·FAISS 검색을 한 ReAct 루프가 조합했고, 수동 경로와 LangChain 경로가 같은 도구·응답 스키마를 공유했다.</p>
+  <div class="terminal">
+    <div class="terminal-header">_unified_mall_agent_project — 통합 아키텍처(스테이지 → 모듈)</div>
+    <pre class="terminal-body">엔드포인트  /chat(수동 ReAct)  ·  /lc-chat(LangChain)  → 같은 6도구·AgentResponse 공유
+도구 계약   get_stock·get_price·search_knowledge_base … 모두 {"ok": …} dict 반환(성공/실패 동일 형식)
+스테이지    형태소→임베딩→분류→BERT→Transformer→LLM→프롬프트→FunctionCalling→RAG→ReAct 통합
+검증        pytest 124 케이스 통과 (핵심 경로·실패 관측·라우터)</pre>
+  </div>
+  <div class="keypoint"><span class="label">깨달음</span>
+  한 학기의 조각들이 <strong>부품 → 통합</strong>으로 꿰였다. 각 스테이지 콘솔 실습이 부품이었고, 통합 프로젝트가 그 부품을 조립한 완성품이었다. "잘 쓰는 것"은 곧 <strong>여러 능력을 하나의 일관된 인터페이스로 합치는 설계</strong>였다.
+  <span style="color:#667085;">(자세히: <a href="../llm/day0709_react_commerce_agent.html">종합 — ReAct 커머스 에이전트</a>)</span></div>
+  <div class="bridge"><strong>그래서</strong> — 11주차는 교과목3의 마침표이자, 조각들이 하나의 제품으로 모이는 순간이었다.</div>
+</section>
+
+<section id="ch6">
+  <h2 class="chap"><span class="num">CH 06</span>종합 회고<a href="#ch6" class="anchor-link">#</a></h2>
+  <h3 class="step">잘한 점 / 부족했던 점 / 다음 한 수</h3>
+  <ul>
+    <li><strong>잘한 점</strong> — 스테이지별 콘솔 실습으로 부품을 하나씩 익힌 뒤 통합 프로젝트로 합쳐, "왜 이 층이 필요한가"를 결핍(일관성·행동·지식)으로 설명할 수 있게 됐다.</li>
+    <li><strong>부족했던 점</strong> — LLM API 실제 대화 로그를 글에 충분히 담지 못했다(구조·설계·측정값 중심). MCP·LangGraph는 자료 부족으로 다루지 못했다.</li>
+    <li><strong>다음 한 수</strong> — 통합 에이전트의 실제 대화 세션(도구 호출 추적)을 캡처해 사례로 붙이고, MCP·LangGraph로 멀티 에이전트를 확장한다.</li>
+  </ul>
+  <div class="keypoint"><span class="label">관통 교훈</span>
+  <ol>
+    <li><strong>프롬프트는 설계다.</strong> 역할·경계 예시·인젝션 방어·CoT — 부탁이 아니라 구조.</li>
+    <li><strong>도구엔 계약이 필요하다.</strong> 성공·실패를 같은 형식(dict)으로 돌려줘야 ReAct 루프가 스스로 고친다.</li>
+    <li><strong>RAG는 임베딩의 실전이다.</strong> 9주차의 의미 좌표가 여기서 문서 검색이 됐다.</li>
+    <li><strong>부품에서 통합으로.</strong> 잘 쓰는 것은 여러 능력을 하나의 일관된 인터페이스로 합치는 설계다.</li>
+  </ol>
+  </div>
+
+  <div class="ref-chain">
+    <p class="ref-title">📚 근거 출처</p>
+    <ol>
+      <li>실습 코드 — <code>llm_workspace/</code> 스테이지별 콘솔 프로젝트(prompt·cot·function_calling·tool_system·agent_loop·planning·embedding·rag·rag_qa) + <code>_unified_mall_agent_project</code>(통합 캡스톤)</li>
+      <li>일자별 글 — <code>llm/day0706~0709</code> (각 주제 실측·코드)</li>
+      <li>강의 PDF — LLM개념_API·파라미터·주요기능, ReAct·VectorDB·LangChain</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><strong>SK 네트웍스 AI Family 32기</strong> · 11주차 회고 (2026-07-06 ~ 07-10)</p>
+  <p>LLM 파라미터·프롬프트에서 Function Calling·RAG를 거쳐 종합 커머스 에이전트까지 — 모델을 만드는 쪽에서 잘 쓰는 쪽으로 넘어간 한 주. 코드·설계는 실제 프로젝트의 것이다.</p>
+</footer>
+
+</div>
+<nav id="hubnav" style="width:min(880px,calc(100% - 32px));margin:24px auto 40px;font-size:0.92rem;text-align:center;border-top:1px solid #d7dee8;padding-top:16px;font-family:'Nanum Gothic Coding',sans-serif;"><a href="../index.html" style="color:#5B9BD5;text-decoration:none;">← 전체 글 목록 (DeonLv 아카이브)</a></nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function(){
+  /* ── lightbox ── */
+  var overlay = document.createElement('div');
+  overlay.id = 'lb-overlay';
+  overlay.style.cssText = [
+    'display:none','position:fixed','inset:0','z-index:9999',
+    'background:rgba(0,0,0,.82)','cursor:zoom-out',
+    'align-items:center','justify-content:center'
+  ].join(';');
+  var img = document.createElement('img');
+  img.id = 'lb-img';
+  img.style.cssText = [
+    'max-width:92vw','max-height:92vh','object-fit:contain',
+    'border:2px solid #fff','box-shadow:0 0 40px rgba(0,0,0,.6)',
+    'transition:transform .15s'
+  ].join(';');
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  function open(src){ img.src=src; overlay.style.display='flex'; }
+  function close(){ overlay.style.display='none'; img.src=''; }
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+
+  /* figure img 클릭 → lightbox */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.tagName==='IMG' && t.closest('figure')){ e.preventDefault(); open(t.src); }
+  });
+
+  /* figure img hover cursor */
+  var style = document.createElement('style');
+  style.textContent = 'figure img { cursor:zoom-in; transition:opacity .15s; } figure img:hover { opacity:.85; }';
+  document.head.appendChild(style);
+})();
+</script>
